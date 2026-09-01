@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   VECTOR CARDIOLOGY ACADEMY — design tokens
+   Single source of truth for colour + type. Do not hardcode hex values in
+   components — reference these tokens via Tailwind classes (bg-royal-700,
+   text-ink, font-heading, etc.) instead.
+   ========================================================================== */
+
+:root {
+  /* Royal blue — primary */
+  --color-royal-50: #eef1fb;
+  --color-royal-100: #d6ddf4;
+  --color-royal-200: #adbaea;
+  --color-royal-300: #7d92dd;
+  --color-royal-400: #4f68cd;
+  --color-royal-500: #2f47b8;
+  --color-royal-600: #22369b;
+  --color-royal-700: #1e3a8a;
+  --color-royal-800: #16276b;
+  --color-royal-900: #101c4e;
+  --color-royal-950: #0a1233;
+
+  /* Gold — accent, used sparingly */
+  --color-gold-50: #fdf7e6;
+  --color-gold-100: #faecc0;
+  --color-gold-200: #f5d980;
+  --color-gold-300: #f5c542;
+  --color-gold-400: #f5b301;
+  --color-gold-500: #d99a00;
+  --color-gold-600: #a97900;
+  --color-gold-700: #7a5700;
+
+  /* Ink + neutrals */
+  --color-ink: #0e1320;
+  --color-ink-soft: #2b3242;
+  --color-mist-50: #f8f9fb;
+  --color-mist-100: #f1f2f6;
+  --color-mist-200: #e6e8ef;
+  --color-mist-300: #d4d7e2;
+  --color-mist-500: #8b91a3;
+  --color-mist-600: #6b7280;
+  --color-mist-700: #565d72;
+
+  --background: #ffffff;
+  --foreground: var(--color-ink);
+
+  --font-heading: var(--font-fraunces), "Source Serif 4", Georgia, serif;
+  --font-body: var(--font-manrope), "Inter", -apple-system, sans-serif;
+}
+
+@theme inline {
+  --color-royal-50: var(--color-royal-50);
+  --color-royal-100: var(--color-royal-100);
+  --color-royal-200: var(--color-royal-200);
+  --color-royal-300: var(--color-royal-300);
+  --color-royal-400: var(--color-royal-400);
+  --color-royal-500: var(--color-royal-500);
+  --color-royal-600: var(--color-royal-600);
+  --color-royal-700: var(--color-royal-700);
+  --color-royal-800: var(--color-royal-800);
+  --color-royal-900: var(--color-royal-900);
+  --color-royal-950: var(--color-royal-950);
+
+  --color-gold-50: var(--color-gold-50);
+  --color-gold-100: var(--color-gold-100);
+  --color-gold-200: var(--color-gold-200);
+  --color-gold-300: var(--color-gold-300);
+  --color-gold-400: var(--color-gold-400);
+  --color-gold-500: var(--color-gold-500);
+  --color-gold-600: var(--color-gold-600);
+  --color-gold-700: var(--color-gold-700);
+
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-mist-50: var(--color-mist-50);
+  --color-mist-100: var(--color-mist-100);
+  --color-mist-200: var(--color-mist-200);
+  --color-mist-300: var(--color-mist-300);
+  --color-mist-500: var(--color-mist-500);
+  --color-mist-600: var(--color-mist-600);
+  --color-mist-700: var(--color-mist-700);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+
+  --animate-pulse-line: pulse-line 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse-line {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+* {
+  border-color: var(--color-mist-300);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+::selection {
+  background: var(--color-gold-400);
+  color: var(--color-ink);
+}
+
+/* Lenis smooth-scroll housekeeping */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Reduced motion: kill scroll-linked animation niceties globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.underline-grow {
+  position: relative;
+  text-decoration: none;
+}
+
+.underline-grow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.underline-grow:hover::after {
+  transform: scaleX(1);
+}
+
+/* Consistent, visible keyboard focus across every interactive element —
+   applied globally so no button/link/input is ever missed. Mouse/touch
+   users don't see it (the browser only matches :focus-visible for
+   keyboard/programmatic focus). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-royal-500);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
