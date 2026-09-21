@@ -78,13 +78,9 @@ replaced with the real thing.
       Manage or rotate the key at [web3forms.com](https://web3forms.com). An
       earlier mailto-based approach was replaced because it silently failed
       for visitors with no default email app configured.
-- [ ] **Web3Forms key still delivers to the OLD inbox.** `contactEmail` is
-      now `drrrpcardio@gmail.com`, but the access key in `site-data.ts`
-      (`web3formsAccessKey`) was issued for `vectorcardiologyacademy@gmail.com`,
-      and Web3Forms sends submissions to the address the key was created
-      with. Create a new key at web3forms.com using `drrrpcardio@gmail.com`,
-      replace `web3formsAccessKey`, then send a test enquiry to confirm it
-      lands in the new inbox.
+- [x] **Web3Forms key** was reissued for `drrrpcardio@gmail.com`
+      (`web3formsAccessKey` in `site-data.ts`), so enquiries now go to the
+      current inbox.
 
 ## Faculty
 

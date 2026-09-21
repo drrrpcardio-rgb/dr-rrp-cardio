@@ -39,4 +39,4 @@ export const contactEmail = "drrrpcardio@gmail.com";
  * by Web3Forms to be used client-side (it's not a secret credential), so
  * it's safe to ship in the bundle. Get/rotate it at https://web3forms.com.
  */
-export const web3formsAccessKey = "d80c625c-0f16-43b6-8168-5b1741e5c962";
+export const web3formsAccessKey = "bab3cb3a-479c-4d2b-af98-2696ea90b88e";
