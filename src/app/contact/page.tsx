@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "@/components/forms/ContactForm";
+import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Register your interest or send an enquiry to Vector Cardiology Academy.",
+  description: `Register your interest or send an enquiry to ${brand.name}.`,
 };
 
 export default function ContactPage() {

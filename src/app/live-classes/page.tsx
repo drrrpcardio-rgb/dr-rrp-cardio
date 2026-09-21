@@ -4,10 +4,11 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SessionAgenda } from "@/components/sessions/SessionAgenda";
 import { LiveClassesList } from "@/components/sessions/LiveClassesList";
 import { featuredSession, isUpcoming } from "@/lib/sessions-data";
+import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Live Classes",
-  description: "Online and offline live classes from Vector Cardiology Academy.",
+  description: `Online and offline live classes from ${brand.name}.`,
 };
 
 export default function LiveClassesPage() {

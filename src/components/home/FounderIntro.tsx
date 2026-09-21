@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
 import { ArrowRight } from "lucide-react";
-import { founder } from "@/lib/site-data";
+import { brand, founder } from "@/lib/site-data";
 
 export function FounderIntro() {
   return (
@@ -14,7 +14,7 @@ export function FounderIntro() {
             <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-mist-100 shadow-lg">
               <Image
                 src="/images/founder-portrait-1.jpg"
-                alt={`${founder.name}, ${founder.role}, Vector Cardiology Academy`}
+                alt={`${founder.name}, ${founder.role}, ${brand.name}`}
                 fill
                 sizes="(max-width: 768px) 90vw, 420px"
                 className="object-cover"
@@ -31,7 +31,7 @@ export function FounderIntro() {
             {founder.name}
           </h2>
           <p className="mt-2 text-sm font-medium text-royal-700">
-            {founder.role}, Vector Cardiology Academy
+            {founder.role}, {brand.name}
           </p>
           <p className="mt-1 text-sm text-mist-700">
             {founder.title} &middot; {founder.credentials}
@@ -44,7 +44,7 @@ export function FounderIntro() {
             {founder.name} has spent years teaching ECG, echocardiography, and cath
             lab fundamentals to doctors, postgraduates, and technologists —
             first at the bedside, then in structured classroom sessions, and
-            now through Vector Cardiology Academy. The teaching approach
+            now through {brand.name}. The teaching approach
             stays the same at every scale: break the skill into a repeatable
             system, then apply it to real cases until it becomes second
             nature.

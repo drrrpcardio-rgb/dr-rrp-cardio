@@ -22,7 +22,7 @@ export interface CourseCategory {
 export const courseCategories: CourseCategory[] = [
   {
     slug: "ecg",
-    name: "Vector ECG",
+    name: "RRP Cardio ECG",
     shortName: "ECG",
     icon: Activity,
     tagline: "Read the strip with confidence",
@@ -30,14 +30,14 @@ export const courseCategories: CourseCategory[] = [
       "A structured path from first-principles ECG interpretation to pattern recognition in real clinical cases — built for doctors, postgraduates, and nurses who read ECGs every day.",
     modules: [
       {
-        name: "Vector ECG – Level 1",
+        name: "RRP Cardio ECG – Level 1",
         description:
           "The foundation course: how the ECG is generated, a systematic reading approach, rhythm basics, and the common abnormalities every frontline clinician should recognise on sight.",
         format: "Recorded + Live",
         duration: "6 modules · ~8 hours",
       },
       {
-        name: "Vector ECG – Level 2",
+        name: "RRP Cardio ECG – Level 2",
         description:
           "Builds on Level 1 with advanced axis and hypertrophy patterns, ischaemia and infarction localisation, conduction blocks, and a structured approach to complex arrhythmias.",
         format: "Recorded + Live",
@@ -47,7 +47,7 @@ export const courseCategories: CourseCategory[] = [
   },
   {
     slug: "echo",
-    name: "Vector Echo",
+    name: "RRP Cardio Echo",
     shortName: "Echo",
     icon: Waves,
     tagline: "Build a systematic scanning eye",
@@ -55,7 +55,7 @@ export const courseCategories: CourseCategory[] = [
       "Practical transthoracic echocardiography training focused on a repeatable window-by-window protocol, chamber quantification, and recognising common structural and functional abnormalities.",
     modules: [
       {
-        name: "Vector Echo – Level 1",
+        name: "RRP Cardio Echo – Level 1",
         description:
           "Standard views and windows, basic chamber and valve assessment, ejection fraction estimation, and a checklist-driven approach to a complete study.",
         format: "Recorded + Live",
@@ -65,7 +65,7 @@ export const courseCategories: CourseCategory[] = [
   },
   {
     slug: "cath-lab",
-    name: "Vector Cath Lab",
+    name: "RRP Cardio Cath Lab",
     shortName: "Cath Lab",
     icon: GitBranch,
     tagline: "Understand the room, not just the images",
@@ -73,7 +73,7 @@ export const courseCategories: CourseCategory[] = [
       "A practical orientation to the cardiac catheterisation laboratory — workflow, equipment, sterile technique, and the fundamentals of coronary angiography for technologists and trainees.",
     modules: [
       {
-        name: "Vector Cath Lab Basics",
+        name: "RRP Cardio Cath Lab Basics",
         description:
           "Cath lab workflow and safety, C-arm and imaging fundamentals, vascular access, contrast and radiation basics, and how to read a standard angiography run.",
         format: "Recorded",
@@ -83,7 +83,7 @@ export const courseCategories: CourseCategory[] = [
   },
   {
     slug: "ivus",
-    name: "Vector IVUS",
+    name: "RRP Cardio IVUS",
     shortName: "IVUS",
     icon: Radio,
     tagline: "Intravascular imaging, made systematic",
@@ -91,7 +91,7 @@ export const courseCategories: CourseCategory[] = [
       "A focused masterclass on intravascular ultrasound for interventional cardiology trainees — image acquisition, vessel and lesion assessment, and stent optimisation.",
     modules: [
       {
-        name: "Vector IVUS Masterclass",
+        name: "RRP Cardio IVUS Masterclass",
         description:
           "IVUS fundamentals, systematic pullback interpretation, lesion severity and plaque characterisation, and using IVUS to guide and optimise stent deployment.",
         format: "Live",
@@ -101,7 +101,7 @@ export const courseCategories: CourseCategory[] = [
   },
   {
     slug: "interventional-cardiology",
-    name: "Vector Interventional Cardiology",
+    name: "RRP Cardio Interventional Cardiology",
     shortName: "Interventional",
     icon: HeartPulse,
     tagline: "From indication to procedure",
@@ -109,7 +109,7 @@ export const courseCategories: CourseCategory[] = [
       "A structured overview of interventional cardiology practice — case selection, procedural planning, device fundamentals, and the clinical reasoning behind common interventions.",
     modules: [
       {
-        name: "Vector Interventional Cardiology",
+        name: "RRP Cardio Interventional Cardiology",
         description:
           "Case-based teaching covering patient selection, procedural planning, common device and technique fundamentals, and periprocedural care.",
         format: "Recorded + Live",

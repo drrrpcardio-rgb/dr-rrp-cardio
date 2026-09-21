@@ -4,10 +4,11 @@ import { StaggerGroup, Reveal } from "@/components/ui/Reveal";
 import { VideoGridItem } from "@/components/video/VideoGridItem";
 import { Button } from "@/components/ui/Button";
 import { freeVideos, youtubeChannels } from "@/lib/video-data";
+import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Free Learning",
-  description: "Free ECG and cardiology lessons from Vector Cardiology Academy's YouTube channels.",
+  description: `Free ECG and cardiology lessons from ${brand.name}'s YouTube channels.`,
 };
 
 export default function FreeLearningPage() {
@@ -32,9 +33,9 @@ export default function FreeLearningPage() {
               These free lessons are the first step
             </p>
             <p className="max-w-lg text-sm text-mist-700">
-              Once the fundamentals click, the structured Vector courses take
-              you further — systematic frameworks, more cases, live
-              discussion, and a certificate at the end.
+              Once the fundamentals click, the structured {brand.coursePrefix}{" "}
+              courses take you further — systematic frameworks, more cases,
+              live discussion, and a certificate at the end.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button href="/courses">Explore Courses</Button>

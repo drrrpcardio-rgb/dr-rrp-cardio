@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { founder } from "@/lib/site-data";
+import { brand, founder } from "@/lib/site-data";
 
 const headline = "Learn. Understand. Apply.";
 
@@ -79,7 +79,7 @@ export function Hero() {
             variants={item}
             className="mb-5 inline-block rounded-full border border-royal-200 bg-white/70 px-4 py-1.5 text-xs font-semibold tracking-[0.16em] text-royal-700 uppercase backdrop-blur"
           >
-            Vector Cardiology Academy
+            {brand.name}
           </motion.span>
 
           <motion.h1 className="font-heading text-4xl leading-[1.08] font-semibold text-ink sm:text-6xl">

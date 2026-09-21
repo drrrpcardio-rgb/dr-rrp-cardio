@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 import { VideoEntry } from "@/lib/video-data";
+import { brand } from "@/lib/site-data";
 
 /**
  * Lite YouTube embed facade: shows the thumbnail + a play button and only
@@ -64,7 +65,7 @@ export function VideoCard({ video }: { video: VideoEntry }) {
         )}
         {video.tag === "Pre-Course Video" && (
           <p className="mt-3 text-[0.7rem] font-medium text-royal-700">
-            Part of the Vector ECG pre-course series
+            Part of the {brand.coursePrefix} ECG pre-course series
           </p>
         )}
       </div>

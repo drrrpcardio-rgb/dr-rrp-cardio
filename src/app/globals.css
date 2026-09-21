@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   VECTOR CARDIOLOGY ACADEMY — design tokens
+   DR. RRP CARDIO — design tokens
    Single source of truth for colour + type. Do not hardcode hex values in
    components — reference these tokens via Tailwind classes (bg-royal-700,
    text-ink, font-heading, etc.) instead.

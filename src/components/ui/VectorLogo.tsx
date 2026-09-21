@@ -1,18 +1,19 @@
 import { cn } from "@/lib/utils";
+import { brand } from "@/lib/site-data";
 
 interface VectorLogoProps {
   className?: string;
-  /** Show the "CARDIOLOGY ACADEMY" lockup line beneath the wordmark. */
+  /** Show the "Cardio" lockup line beneath the wordmark. */
   withLockup?: boolean;
   monochrome?: boolean;
 }
 
 /**
- * VCA wordmark: "VECTOR" set in the heading face, with a small cardiac-vector
- * motif — an ECG trace resolving into a directional arrow — sitting in for
- * the dot over nothing (there's no dot to hang it on), tucked to the right
- * of the wordmark instead. Built as inline SVG + text so it stays crisp at
- * favicon size and scales cleanly on the certificate template.
+ * Dr. RRP Cardio wordmark: "Dr. RRP" set in the heading face over a small
+ * "Cardio" lockup line, with an ECG-trace-into-arrow motif standing in for a
+ * dot — tucked to the right of the wordmark instead. Built as inline SVG +
+ * text so it stays crisp at favicon size and scales cleanly on the
+ * certificate template. Text pulls from `brand` in site-data.ts.
  */
 export function VectorLogo({
   className,
@@ -53,11 +54,11 @@ export function VectorLogo({
       </svg>
       <div className="leading-tight">
         <span className="block font-heading text-[1.05rem] font-semibold tracking-wide text-royal-800">
-          VECTOR
+          {brand.wordmarkTop}
         </span>
         {withLockup && (
           <span className="block text-[0.55rem] font-medium tracking-[0.18em] text-mist-700 uppercase">
-            Cardiology Academy
+            {brand.wordmarkBottom}
           </span>
         )}
       </div>

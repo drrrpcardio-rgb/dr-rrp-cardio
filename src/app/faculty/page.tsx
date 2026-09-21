@@ -3,11 +3,11 @@ import Image from "next/image";
 import { UserPlus } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
-import { founder } from "@/lib/site-data";
+import { brand, founder } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Faculty",
-  description: "Meet the faculty of Vector Cardiology Academy.",
+  description: `Meet the faculty of ${brand.name}.`,
 };
 
 export default function FacultyPage() {
@@ -16,7 +16,7 @@ export default function FacultyPage() {
       <PageHero
         eyebrow="Faculty"
         title="Taught by practitioners"
-        description="Vector's teaching is led by clinicians who still work the cases they teach."
+        description={`${brand.name}'s teaching is led by clinicians who still work the cases they teach.`}
       />
 
       <section className="mx-auto max-w-5xl px-5 py-20 sm:px-8">
@@ -26,7 +26,7 @@ export default function FacultyPage() {
               <div className="relative aspect-[4/5] w-full bg-mist-100">
                 <Image
                   src="/images/founder-portrait-2.jpg"
-                  alt={`${founder.name}, ${founder.role}, Vector Cardiology Academy`}
+                  alt={`${founder.name}, ${founder.role}, ${brand.name}`}
                   fill
                   priority
                   sizes="(max-width: 768px) 90vw, 460px"
@@ -40,7 +40,7 @@ export default function FacultyPage() {
                   {founder.title} &middot; {founder.credentials}
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-mist-700">
-                  {founder.name} founded Vector Cardiology Academy to teach ECG,
+                  {founder.name} founded {brand.name} to teach ECG,
                   echocardiography, and cath lab fundamentals through a
                   structured, case-based method — the same approach used at
                   the bedside, brought into the classroom.
@@ -58,7 +58,7 @@ export default function FacultyPage() {
                 More faculty joining soon
               </p>
               <p className="mt-2 max-w-xs text-sm text-mist-600">
-                As Vector grows, additional faculty across ECG, Echo, Cath
+                As {brand.name} grows, additional faculty across ECG, Echo, Cath
                 Lab, IVUS, and Interventional Cardiology will be introduced
                 here.
               </p>

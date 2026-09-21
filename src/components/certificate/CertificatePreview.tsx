@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { founder } from "@/lib/site-data";
+import { brand, founder } from "@/lib/site-data";
 
 interface CertificatePreviewProps {
   type?: "completion" | "participation";
@@ -19,9 +19,9 @@ interface CertificatePreviewProps {
 export function CertificatePreview({
   type = "completion",
   participantName = "Participant Name",
-  courseName = "Vector ECG – Level 1",
+  courseName = "RRP Cardio ECG – Level 1",
   date = "23rd August 2026",
-  certificateNumber = "VCA-ECG1-000123",
+  certificateNumber = "RRPC-ECG1-000123",
   className,
 }: CertificatePreviewProps) {
   return (
@@ -41,7 +41,7 @@ export function CertificatePreview({
 
         <div>
           <p className="font-heading text-lg font-semibold tracking-wide text-royal-800 sm:text-2xl">
-            VECTOR CARDIOLOGY ACADEMY
+            {brand.name.toUpperCase()}
           </p>
           <p className="mt-2 text-[0.6rem] font-semibold tracking-[0.25em] text-gold-700 uppercase sm:text-xs">
             Certificate of {type === "completion" ? "Completion" : "Participation"}
@@ -56,7 +56,7 @@ export function CertificatePreview({
           <p className="mt-2 text-[0.65rem] leading-relaxed text-mist-700 sm:text-sm">
             has successfully {type === "completion" ? "completed" : "participated in"}{" "}
             <span className="font-semibold text-ink-soft">{courseName}</span> conducted by
-            Vector Cardiology Academy.
+            {" "}{brand.name}.
           </p>
         </div>
 

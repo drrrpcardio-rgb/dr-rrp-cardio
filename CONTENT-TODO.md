@@ -59,26 +59,32 @@ replaced with the real thing.
 ## Certificates
 
 - [ ] `CertificatePreview` renders with placeholder participant name,
-      certificate number (`VCA-ECG1-000123`), and a fake QR-style pattern
-      (not a real QR code). Needs a real numbering scheme and, eventually,
-      an actual QR code generator if certificates go digital-verifiable.
+      certificate number (`RRPC-ECG1-000123`, prefix from `brand.certificatePrefix`
+      in `site-data.ts`), and a fake QR-style pattern (not a real QR code).
+      Needs a real numbering scheme and, eventually, an actual QR code
+      generator if certificates go digital-verifiable.
 - [ ] The `/certificates` verify form (`VerifyForm.tsx`) is UI-only — it
-      mocks a lookup client-side (anything starting with "VCA" resolves as
-      "found"). Needs a real backend/API route once certificates are
-      actually issued and tracked.
+      mocks a lookup client-side (anything starting with the certificate
+      prefix resolves as "found"). Needs a real backend/API route once
+      certificates are actually issued and tracked.
 
 ## Contact form
 
 - [x] **Delivery mechanism: Web3Forms.** `ContactForm.tsx` POSTs directly to
       the Web3Forms API on submit — no custom backend needed. Submissions are
-      emailed to `contactEmail` (`vectorcardiologyacademy@gmail.com`) for
-      real, regardless of the visitor's own device/email setup. The access
-      key lives in [`src/lib/site-data.ts`](src/lib/site-data.ts)
-      (`web3formsAccessKey`) — Web3Forms keys are designed to be public/
-      client-side, not a secret. Manage or rotate the key at
-      [web3forms.com](https://web3forms.com). An earlier mailto-based
-      approach was replaced because it silently failed for visitors with no
-      default email app configured.
+      emailed to `contactEmail` for real, regardless of the visitor's own
+      device/email setup. The access key lives in
+      [`src/lib/site-data.ts`](src/lib/site-data.ts) (`web3formsAccessKey`)
+      — Web3Forms keys are designed to be public/client-side, not a secret.
+      Manage or rotate the key at [web3forms.com](https://web3forms.com). An
+      earlier mailto-based approach was replaced because it silently failed
+      for visitors with no default email app configured.
+- [ ] **Enquiry email still carries the old brand name**
+      (`vectorcardiologyacademy@gmail.com` in `contactEmail`, `site-data.ts`)
+      — deliberately left as-is during the Dr. RRP Cardio rebrand per the
+      user's instruction ("email we will do in next step"). Decide whether
+      to keep it or switch to a new inbox, then update `contactEmail` and
+      re-verify delivery through Web3Forms.
 
 ## Faculty
 
@@ -89,11 +95,15 @@ replaced with the real thing.
 ## SEO / metadata
 
 - [ ] `metadataBase` in `src/app/layout.tsx` points at a placeholder domain
-      (`https://www.vectorcardiologyacademy.com`) — update once the real
-      domain is confirmed.
+      (`https://www.drrrpcardio.com`) — update once the real domain is
+      confirmed.
 - [ ] No `sitemap.ts` / `robots.ts` yet — add during deployment prep.
 
 ## Brand entity
 
-- [x] The site presents the brand as **Vector Cardiology Academy** only —
-      no parent-entity line anywhere (footer, certificate, or elsewhere).
+- [x] The site presents the brand as **Dr. RRP Cardio** only — no
+      parent-entity line anywhere (footer, certificate, or elsewhere).
+      Rebranded from "Vector Cardiology Academy" — every occurrence now
+      reads from `brand` in [`src/lib/site-data.ts`](src/lib/site-data.ts)
+      rather than being hardcoded, so a future rename only needs to happen
+      there (plus regenerating `public/og-image.png`).

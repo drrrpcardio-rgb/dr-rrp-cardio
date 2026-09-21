@@ -1,8 +1,22 @@
 /**
- * Single source of truth for founder identity and the official enquiry
- * email. Every component should reference these rather than hardcoding the
- * name/email, so a future correction only needs to happen here.
+ * Single source of truth for brand identity, founder identity, and the
+ * official enquiry email. Every component should reference these rather
+ * than hardcoding the name/brand/email, so a future correction only needs
+ * to happen here.
  */
+export const brand = {
+  /** Full brand name — used in titles, footer, certificate wordmark, etc. */
+  name: "Dr. RRP Cardio",
+  /** Two-line logo lockup: top line (bold) + bottom line (small, tracked). */
+  wordmarkTop: "Dr. RRP",
+  wordmarkBottom: "Cardio",
+  /** Prefix used on every course/module name, e.g. "RRP Cardio ECG – Level 1". */
+  coursePrefix: "RRP Cardio",
+  /** Prefix for generated certificate numbers, e.g. "RRPC-ECG1-000123". */
+  certificatePrefix: "RRPC",
+  tagline: "Learn. Understand. Apply.",
+};
+
 export const founder = {
   /** Always use the full name — never shorten to "Dr. Rajaram Prasad". */
   name: "Dr. A. Rajaram Prasad",

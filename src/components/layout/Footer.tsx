@@ -3,7 +3,7 @@ import { PlaySquare, Mail } from "lucide-react";
 import { VectorLogo } from "@/components/ui/VectorLogo";
 import { navLinks } from "@/lib/nav-data";
 import { youtubeChannels } from "@/lib/video-data";
-import { founder, contactEmail } from "@/lib/site-data";
+import { brand, founder, contactEmail } from "@/lib/site-data";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -80,7 +80,7 @@ export function Footer() {
         </div>
 
         <div className="mt-14 border-t border-mist-200 pt-6 text-xs text-mist-600">
-          <p>© {year} Vector Cardiology Academy. All rights reserved.</p>
+          <p>© {year} {brand.name}. All rights reserved.</p>
         </div>
       </div>
     </footer>

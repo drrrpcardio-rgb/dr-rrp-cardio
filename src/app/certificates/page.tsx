@@ -4,11 +4,12 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { CertificatePreview } from "@/components/certificate/CertificatePreview";
 import { VerifyForm } from "@/components/certificate/VerifyForm";
+import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Certificates",
   description:
-    "Certificates of completion and participation issued by Vector Cardiology Academy.",
+    `Certificates of completion and participation issued by ${brand.name}.`,
 };
 
 export default function CertificatesPage() {
@@ -17,7 +18,7 @@ export default function CertificatesPage() {
       <PageHero
         eyebrow="Certificates"
         title="Recognition that means something"
-        description="Vector issues two kinds of certificates. Knowing the difference helps you know what to expect from each."
+        description={`${brand.name} issues two kinds of certificates. Knowing the difference helps you know what to expect from each.`}
       />
 
       <section className="mx-auto max-w-5xl px-5 py-16 sm:px-8">

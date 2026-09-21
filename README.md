@@ -1,8 +1,8 @@
-# Vector Cardiology Academy — Website
+# Dr. RRP Cardio — Website
 
-Marketing + LMS-teaser site for Vector Cardiology Academy (VCA), built with
-Next.js (App Router) + TypeScript + Tailwind CSS v4, animated with Framer
-Motion and GSAP/ScrollTrigger, with Lenis for site-wide smooth scrolling.
+Marketing + LMS-teaser site for Dr. RRP Cardio, built with Next.js (App
+Router) + TypeScript + Tailwind CSS v4, animated with Framer Motion and
+GSAP/ScrollTrigger, with Lenis for site-wide smooth scrolling.
 
 ## Stack
 
@@ -40,9 +40,9 @@ src/
     sessions-data.ts     live class / workshop session data
     video-data.ts        free YouTube videos + channel links
     nav-data.ts           nav links
-    site-data.ts          founder name/credentials + official enquiry email
-                          (single source of truth — every component reads
-                          from here rather than hardcoding either)
+    site-data.ts          brand name/wordmark, course-title prefix, founder
+                          name/credentials, official enquiry email — single
+                          source of truth every component reads from
     smooth-scroll-provider.tsx   Lenis + ScrollTrigger wiring
     motion-provider.tsx  Framer Motion MotionConfig (reduced-motion handling)
     use-reduced-motion.ts
@@ -83,10 +83,17 @@ follows the same lecture → break → hands-on shape via `<SessionAgenda>`.
   — either edit the inline SVG or swap it for an `<Image>` pointing at a real
   logo file placed in `public/`. Regenerate `public/favicon.svg` and
   `public/og-image.png` from the real logo at that point.
-- **Founder identity**: name, title, and credentials live in
-  [`src/lib/site-data.ts`](src/lib/site-data.ts) — update `founder.name`,
-  `founder.title`, `founder.credentials` there and every page picks it up.
-  The official enquiry email (`contactEmail`) lives in the same file.
+- **Brand name**: the site name, logo wordmark text, course-title prefix, and
+  certificate-number prefix all live in `brand` in
+  [`src/lib/site-data.ts`](src/lib/site-data.ts) — change `brand.name`,
+  `brand.wordmarkTop`/`wordmarkBottom`, `brand.coursePrefix`, and
+  `brand.certificatePrefix` there and it propagates everywhere (nav, footer,
+  metadata, certificate template, course titles). Regenerate
+  `public/og-image.png` to match after a rename.
+- **Founder identity**: name, title, and credentials live in the same file
+  — update `founder.name`, `founder.title`, `founder.credentials` there and
+  every page picks it up. The official enquiry email (`contactEmail`) lives
+  there too.
 - **Founder photo**: `public/images/founder-portrait-1.jpg` (home) and
   `founder-portrait-2.jpg` (faculty) are real photos of Dr. A. Rajaram
   Prasad, already rotated/resized. Swap the files (same names) to update

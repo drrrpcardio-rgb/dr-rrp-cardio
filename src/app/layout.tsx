@@ -6,7 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SmoothScrollProvider } from "@/lib/smooth-scroll-provider";
 import { MotionProvider } from "@/lib/motion-provider";
 import { PageTransition } from "@/components/layout/PageTransition";
-import { founder } from "@/lib/site-data";
+import { brand, founder } from "@/lib/site-data";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -24,17 +24,17 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.vectorcardiologyacademy.com"),
+  metadataBase: new URL("https://www.drrrpcardio.com"),
   title: {
-    default: "Vector Cardiology Academy | Learn. Understand. Apply.",
-    template: "%s | Vector Cardiology Academy",
+    default: `${brand.name} | ${brand.tagline}`,
+    template: `%s | ${brand.name}`,
   },
   description: `Structured, practical cardiology education in ECG, Echo, Cath Lab, IVUS and Interventional Cardiology — founded & led by ${founder.name}.`,
   openGraph: {
-    title: "Vector Cardiology Academy",
-    description: "Learn. Understand. Apply.",
-    url: "https://www.vectorcardiologyacademy.com",
-    siteName: "Vector Cardiology Academy",
+    title: brand.name,
+    description: brand.tagline,
+    url: "https://www.drrrpcardio.com",
+    siteName: brand.name,
     images: ["/og-image.png"],
     type: "website",
   },

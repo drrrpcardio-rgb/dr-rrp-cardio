@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { navLinks } from "@/lib/nav-data";
 import { youtubeChannels } from "@/lib/video-data";
 import { cn } from "@/lib/utils";
+import { brand } from "@/lib/site-data";
 
 export function Nav() {
   const [condensed, setCondensed] = useState(false);
@@ -84,7 +85,7 @@ export function Nav() {
               href={youtubeChannels.primary.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Vector Cardiology Academy on YouTube"
+              aria-label={`${brand.name} on YouTube`}
               className="text-mist-700 transition-colors hover:text-royal-700"
             >
               <PlaySquare size={20} strokeWidth={1.75} />

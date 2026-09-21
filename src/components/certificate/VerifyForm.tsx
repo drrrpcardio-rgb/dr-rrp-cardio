@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { brand } from "@/lib/site-data";
 
 type Status = "idle" | "loading" | "found" | "not-found";
 
@@ -22,7 +23,7 @@ export function VerifyForm() {
     // Mock lookup — replace with a real API call, e.g.:
     // const res = await fetch(`/api/certificates/verify?number=${value}`);
     setTimeout(() => {
-      setStatus(value.trim().toUpperCase().startsWith("VCA") ? "found" : "not-found");
+      setStatus(value.trim().toUpperCase().startsWith(brand.certificatePrefix) ? "found" : "not-found");
     }, 900);
   }
 
@@ -30,7 +31,7 @@ export function VerifyForm() {
     <div className="rounded-2xl border border-mist-200 bg-white p-8 shadow-sm">
       <h3 className="font-heading text-lg font-semibold text-ink">Verify a certificate</h3>
       <p className="mt-1.5 text-sm text-mist-700">
-        Enter the certificate number printed on the document (e.g. VCA-ECG1-000123).
+        Enter the certificate number printed on the document (e.g. {brand.certificatePrefix}-ECG1-000123).
       </p>
 
       <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3 sm:flex-row">

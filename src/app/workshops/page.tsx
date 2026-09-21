@@ -6,10 +6,11 @@ import { SessionCard } from "@/components/sessions/SessionCard";
 import { WorkshopPlaceholderCard } from "@/components/sessions/WorkshopPlaceholderCard";
 import { Button } from "@/components/ui/Button";
 import { allSessions } from "@/lib/sessions-data";
+import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Workshops",
-  description: "Hands-on cardiology workshops from Vector Cardiology Academy.",
+  description: `Hands-on cardiology workshops from ${brand.name}.`,
 };
 
 export default function WorkshopsPage() {
