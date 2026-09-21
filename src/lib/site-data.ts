@@ -25,7 +25,7 @@ export const founder = {
   role: "Founder & Course Director",
 };
 
-export const contactEmail = "vectorcardiologyacademy@gmail.com";
+export const contactEmail = "drrrpcardio@gmail.com";
 
 /**
  * Web3Forms access key — delivers ContactForm submissions to `contactEmail`

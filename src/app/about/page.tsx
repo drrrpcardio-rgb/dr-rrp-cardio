@@ -14,33 +14,32 @@ export default function AboutPage() {
       <PageHero
         eyebrow="About Us"
         title="Why the name"
-        description="An institution built around one idea: that cardiology is learnable by anyone willing to be systematic about it."
+        description="Cardiology is learnable by anyone willing to be systematic about it. That's the idea this institution is built on."
       />
 
       <section className="mx-auto max-w-3xl px-5 py-20 sm:px-8">
         <div className="space-y-8 text-base leading-relaxed text-mist-700">
           <Reveal>
             <p>
-              {brand.name} started from a simple observation: most
-              clinicians aren&rsquo;t short on exposure to ECGs, echo
-              studies, or cath lab cases — they&rsquo;re short on a
-              repeatable system for working through them. {brand.name}{" "}
-              exists to teach that system, deliberately and in the open,
-              rather than leaving it to be picked up by osmosis over years
-              of practice.
+              Most clinicians aren&rsquo;t short on exposure &mdash; they&rsquo;ve
+              seen enough ECGs, echo studies, and cath lab cases to fill a
+              career. What they&rsquo;re short on is a repeatable system for
+              working through them. {brand.name} exists to teach that system
+              deliberately and in the open, instead of leaving it to be picked
+              up by osmosis over years of practice.
             </p>
           </Reveal>
 
           <Reveal delay={0.05}>
             <p>
-              The brand carries a name for a reason. Rather than build a
-              faceless brand and mention the founder in the fine print,{" "}
-              {brand.name} puts the person doing the teaching front and
-              centre — the credibility here is earned in clinics and cath
-              labs, not manufactured by an institution&rsquo;s marketing.
-              &ldquo;Learn. Understand. Apply.&rdquo; isn&rsquo;t a slogan we
-              picked for the sound of it; it describes the actual sequence
-              every course is built around.
+              The name itself is a decision, not a default. A faceless brand
+              name would have let us mention the founder in the fine print and
+              let the institution carry the weight. We chose the opposite
+              &mdash; putting the person doing the teaching front and center,
+              because the credibility here was earned in clinics and cath labs,
+              not manufactured by a marketing team. &ldquo;Learn. Understand.
+              Apply.&rdquo; isn&rsquo;t a slogan picked for how it sounds.
+              It&rsquo;s the actual sequence every course is built around.
             </p>
           </Reveal>
 
@@ -49,12 +48,11 @@ export default function AboutPage() {
               A practical teaching philosophy
             </h2>
             <p className="mt-4">
-              Every course, workshop, and live class follows the same shape:
-              a clear framework first, then repeated exposure to real
-              clinical cases until that framework becomes automatic. We keep
-              lectures tight and hands-on time generous, because
-              interpretation is a skill you build by doing it, not by
-              watching someone else do it.
+              Every course, workshop, and live class follows the same shape: a
+              clear framework first, then repeated exposure to real clinical
+              cases until that framework becomes automatic. Lectures stay
+              tight. Hands-on time stays generous. Interpretation is a skill
+              you build by doing it &mdash; not by watching someone else do it.
             </p>
           </Reveal>
 
@@ -63,17 +61,20 @@ export default function AboutPage() {
               The institution behind the teacher
             </h2>
             <p className="mt-4">
-              {brand.name} carries {founder.name}&rsquo;s own initials, and
-              that&rsquo;s deliberate — the credibility here comes from a
-              practising cardiologist willing to put his name behind every
-              course. But carrying a founder&rsquo;s name doesn&rsquo;t mean
-              depending on one. Courses, curricula, and quality standards are
-              built to stand on their own — designed once, taught
-              consistently, and eventually delivered by a wider faculty —
-              rather than depending entirely on any one person in the room.
+              The initials are {founder.name}&rsquo;s own, and that&rsquo;s
+              deliberate &mdash; the credibility here comes from a practising
+              cardiologist willing to put his name behind every course. But
+              carrying a founder&rsquo;s name doesn&rsquo;t mean depending on
+              one. Courses, curricula, and quality standards are designed to
+              stand on their own &mdash; built once, taught consistently, and
+              eventually delivered by a wider faculty &mdash; rather than
+              resting on any one person in the room.
+            </p>
+            <p className="mt-4">
               The goal is an academy learners can trust independent of who
-              happens to be teaching a given session, built on a foundation
-              that one experienced, practising cardiologist laid first.
+              happens to be teaching a given session &mdash; built on a
+              foundation that one experienced, practising cardiologist laid
+              first.
             </p>
           </Reveal>
         </div>

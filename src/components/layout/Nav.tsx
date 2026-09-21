@@ -47,6 +47,10 @@ export function Nav() {
     };
   }, [menuOpen]);
 
+  // Every page opens on a dark navy band, so the nav is light-on-dark until
+  // scrolled (or while the white mobile panel is open).
+  const light = !condensed && !menuOpen;
+
   return (
     <>
       <motion.header
@@ -64,7 +68,7 @@ export function Nav() {
             className="flex items-center"
           >
             <Link href="/" onClick={() => setMenuOpen(false)}>
-              <VectorLogo />
+              <VectorLogo light={light} />
             </Link>
           </motion.div>
 
@@ -73,7 +77,7 @@ export function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="underline-grow text-sm font-medium text-ink-soft hover:text-royal-700"
+                className={cn("underline-grow text-sm font-medium transition-colors", light ? "text-white/85 hover:text-white" : "text-ink-soft hover:text-royal-700")}
               >
                 {link.label}
               </Link>
@@ -86,11 +90,11 @@ export function Nav() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${brand.name} on YouTube`}
-              className="text-mist-700 transition-colors hover:text-royal-700"
+              className={cn("transition-colors", light ? "text-white/80 hover:text-white" : "text-mist-700 hover:text-royal-700")}
             >
               <PlaySquare size={20} strokeWidth={1.75} />
             </a>
-            <Button href="/contact" size="md">
+            <Button href="/contact" size="md" variant={light ? "gold" : "primary"}>
               Enquire Now
             </Button>
           </div>
@@ -100,7 +104,7 @@ export function Nav() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             onClick={() => setMenuOpen((v) => !v)}
-            className="p-2 text-ink xl:hidden"
+            className={cn("p-2 xl:hidden", light ? "text-white" : "text-ink")}
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

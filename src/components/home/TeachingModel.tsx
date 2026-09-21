@@ -27,9 +27,11 @@ const items = [
 
 export function TeachingModel() {
   return (
-    <section className="bg-mist-50 py-24">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+    <section className="relative overflow-hidden bg-royal-950 py-28 text-white">
+      <div aria-hidden="true" className="bg-grid pointer-events-none absolute inset-0 opacity-30" />
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         <SectionHeading
+          tone="dark"
           eyebrow="How you learn"
           title="A teaching model built around application"
           description="Every format feeds into the same goal: interpretation you can trust in the moment it matters."
@@ -40,19 +42,19 @@ export function TeachingModel() {
             <motion.div
               key={label}
               variants={staggerItem}
-              className="group rounded-xl border border-mist-200 bg-white p-6 text-center transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur transition-colors hover:border-gold-400/60 hover:bg-white/10"
             >
               <motion.div
                 initial={{ scale: 0.85, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-royal-50 text-royal-700 transition-transform duration-300 group-hover:scale-110"
+                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-400/15 text-gold-300 transition-transform duration-300 group-hover:scale-110"
               >
                 <Icon size={22} strokeWidth={1.75} />
               </motion.div>
-              <h3 className="mt-4 text-sm font-semibold text-ink">{label}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-mist-700">{description}</p>
+              <h3 className="mt-4 text-sm font-semibold text-white">{label}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-royal-200">{description}</p>
             </motion.div>
           ))}
         </StaggerGroup>

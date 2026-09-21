@@ -5,59 +5,59 @@ interface VectorLogoProps {
   className?: string;
   /** Show the "Cardio" lockup line beneath the wordmark. */
   withLockup?: boolean;
-  monochrome?: boolean;
+  /** Light-on-dark variant for use over navy backgrounds. */
+  light?: boolean;
 }
 
 /**
- * Dr. RRP Cardio wordmark: "Dr. RRP" set in the heading face over a small
- * "Cardio" lockup line, with an ECG-trace-into-arrow motif standing in for a
- * dot — tucked to the right of the wordmark instead. Built as inline SVG +
- * text so it stays crisp at favicon size and scales cleanly on the
- * certificate template. Text pulls from `brand` in site-data.ts.
+ * Dr. RRP Cardio logo: a royal-blue ring around a bold gold ECG beat (no
+ * filled background), beside a two-line wordmark ("Dr. RRP" over "Cardio"). Inline SVG + text so it stays crisp at any size
+ * (nav, footer, favicon — see public/favicon.svg, which mirrors the badge).
+ * Text pulls from `brand` in site-data.ts.
  */
-export function VectorLogo({
-  className,
-  withLockup = true,
-  monochrome = false,
-}: VectorLogoProps) {
-  const royal = monochrome ? "currentColor" : "var(--color-royal-700)";
-  const gold = monochrome ? "currentColor" : "var(--color-gold-400)";
-
+export function VectorLogo({ className, withLockup = true, light = false }: VectorLogoProps) {
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
+    <div className={cn("flex items-center gap-3", className)}>
       <svg
-        width="34"
-        height="34"
-        viewBox="0 0 40 40"
+        width="44"
+        height="44"
+        viewBox="0 0 44 44"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
         className="shrink-0"
       >
-        <circle cx="20" cy="20" r="19" stroke={royal} strokeWidth="1.5" />
-        <path
-          d="M6 22 L13 22 L16 14 L20 28 L23 20 L26 22 L34 22"
-          stroke={royal}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
+        <circle
+          cx="22"
+          cy="22"
+          r="20"
+          stroke={light ? "#fff" : "var(--color-royal-700)"}
+          strokeWidth="2.2"
         />
         <path
-          d="M26 22 L34 22 L30.5 18.5 M34 22 L30.5 25.5"
-          stroke={gold}
-          strokeWidth="2"
+          d="M6.5 24H14C15 21.8 17 21.8 18 24H19.5L21 27L24 9.5L27.5 34L29.5 24H31C32.5 20.4 35 20.4 36.5 24H37.5"
+          stroke="var(--color-gold-400)"
+          strokeWidth="2.6"
           strokeLinecap="round"
           strokeLinejoin="round"
-          fill="none"
         />
       </svg>
-      <div className="leading-tight">
-        <span className="block font-heading text-[1.05rem] font-semibold tracking-wide text-royal-800">
+      <div className="leading-none">
+        <span
+          className={cn(
+            "block font-heading text-[1.05rem] font-semibold tracking-wide transition-colors",
+            light ? "text-white" : "text-royal-800",
+          )}
+        >
           {brand.wordmarkTop}
         </span>
         {withLockup && (
-          <span className="block text-[0.55rem] font-medium tracking-[0.18em] text-mist-700 uppercase">
+          <span
+            className={cn(
+              "mt-0.5 block text-[0.55rem] font-semibold tracking-[0.25em] uppercase transition-colors",
+              light ? "text-gold-300" : "text-gold-700",
+            )}
+          >
             {brand.wordmarkBottom}
           </span>
         )}
