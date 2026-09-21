@@ -94,10 +94,9 @@ replaced with the real thing.
 
 ## SEO / metadata
 
-- [ ] `metadataBase` in `src/app/layout.tsx` points at a placeholder domain
-      (`https://www.drrrpcardio.com`) — update once the real domain is
-      confirmed.
-- [ ] No `sitemap.ts` / `robots.ts` yet — add during deployment prep.
+- [x] `siteUrl` in `src/lib/site-data.ts` is the real domain (`https://rrpcardio.com`);
+      `public/CNAME` matches it for GitHub Pages.
+- [x] `sitemap.ts` / `robots.ts` exist and read `siteUrl`.
 
 ## Brand entity
 

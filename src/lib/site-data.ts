@@ -29,7 +29,7 @@ export const founder = {
  * Public site URL. Placeholder until the real domain is bought/connected —
  * update it here and the metadata, sitemap and robots.txt all follow.
  */
-export const siteUrl = "https://www.drrrpcardio.com";
+export const siteUrl = "https://rrpcardio.com";
 
 export const contactEmail = "drrrpcardio@gmail.com";
 
