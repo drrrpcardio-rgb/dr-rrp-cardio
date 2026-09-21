@@ -123,7 +123,7 @@ export function Hero() {
           <div className="absolute -right-3 -bottom-3 h-full w-full rounded-3xl border-2 border-gold-400/70" />
           <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-royal-900 shadow-2xl shadow-black/40">
             <Image
-              src="/images/founder-portrait-2.jpg"
+              src="/images/founder-portrait-1.jpg"
               alt={`${founder.name}, ${founder.role}, ${brand.name}`}
               fill
               priority

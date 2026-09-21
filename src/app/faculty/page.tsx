@@ -25,7 +25,7 @@ export default function FacultyPage() {
             <div className="overflow-hidden rounded-2xl border border-mist-200 bg-white shadow-sm">
               <div className="relative aspect-[4/5] w-full bg-mist-100">
                 <Image
-                  src="/images/founder-portrait-2.jpg"
+                  src="/images/founder-portrait-1.jpg"
                   alt={`${founder.name}, ${founder.role}, ${brand.name}`}
                   fill
                   priority
