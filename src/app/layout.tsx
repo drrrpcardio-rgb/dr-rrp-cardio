@@ -6,7 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SmoothScrollProvider } from "@/lib/smooth-scroll-provider";
 import { MotionProvider } from "@/lib/motion-provider";
 import { PageTransition } from "@/components/layout/PageTransition";
-import { brand, founder } from "@/lib/site-data";
+import { brand, founder, siteUrl } from "@/lib/site-data";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -24,7 +24,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.drrrpcardio.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: `${brand.name} | ${brand.tagline}`,
     template: `%s | ${brand.name}`,
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: brand.name,
     description: brand.tagline,
-    url: "https://www.drrrpcardio.com",
+    url: siteUrl,
     siteName: brand.name,
     images: ["/og-image.png"],
     type: "website",
