@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { brand } from "@/lib/site-data";
 
-interface VectorLogoProps {
+interface LogoProps {
   className?: string;
   /** Show the "Cardio" lockup line beneath the wordmark. */
   withLockup?: boolean;
@@ -15,7 +15,7 @@ interface VectorLogoProps {
  * (nav, footer, favicon — see public/favicon.svg, which mirrors the badge).
  * Text pulls from `brand` in site-data.ts.
  */
-export function VectorLogo({ className, withLockup = true, light = false }: VectorLogoProps) {
+export function Logo({ className, withLockup = true, light = false }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
       <svg

@@ -23,7 +23,7 @@ export interface SessionData {
 }
 
 export const featuredSession: SessionData = {
-  id: "vector-ecg-level-1-aug-2026",
+  id: "rrp-cardio-ecg-level-1-aug-2026",
   courseName: "RRP Cardio ECG – Level 1",
   mode: "offline",
   title: "ECG Basics – Level 1: Lecture & Hands-on ECG Workshop",

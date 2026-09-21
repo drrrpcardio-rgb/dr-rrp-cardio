@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PlaySquare, Mail } from "lucide-react";
-import { VectorLogo } from "@/components/ui/VectorLogo";
+import { Logo } from "@/components/ui/Logo";
 import { navLinks } from "@/lib/nav-data";
 import { youtubeChannels } from "@/lib/video-data";
 import { brand, founder, contactEmail } from "@/lib/site-data";
@@ -13,7 +13,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <VectorLogo />
+            <Logo />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-mist-700">
               Structured, practical cardiology education for doctors,
               postgraduates, nurses, and cath lab &amp; echo technicians.

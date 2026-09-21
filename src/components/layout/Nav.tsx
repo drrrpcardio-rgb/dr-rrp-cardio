@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from "framer-motion";
 import { Menu, X, PlaySquare } from "lucide-react";
-import { VectorLogo } from "@/components/ui/VectorLogo";
+import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { navLinks } from "@/lib/nav-data";
 import { youtubeChannels } from "@/lib/video-data";
@@ -68,7 +68,7 @@ export function Nav() {
             className="flex items-center"
           >
             <Link href="/" onClick={() => setMenuOpen(false)}>
-              <VectorLogo light={light} />
+              <Logo light={light} />
             </Link>
           </motion.div>
 

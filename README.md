@@ -28,7 +28,7 @@ src/
   app/                 routes (App Router) — one folder per page
   components/
     layout/            Nav, Footer, PageTransition
-    ui/                Button, Reveal/StaggerGroup, SectionHeading, PageHero, VectorLogo
+    ui/                Button, Reveal/StaggerGroup, SectionHeading, PageHero, Logo
     home/               homepage sections
     courses/            course category + module cards
     sessions/           SessionCard, SessionAgenda, live-classes filter list
@@ -54,11 +54,11 @@ public/
 
 Edit [`src/lib/courses-data.ts`](src/lib/courses-data.ts). Each category has
 a `modules` array — add an entry following the existing naming convention
-(`Vector <Category> – Level N` or `Vector <Category> <Descriptor>`):
+(`RRP Cardio <Category> – Level N` or `RRP Cardio <Category> <Descriptor>`):
 
 ```ts
 {
-  name: "Vector ECG – Level 3",
+  name: "RRP Cardio ECG – Level 3",
   description: "...",
   format: "Recorded" | "Live" | "Recorded + Live",
   duration: "6 modules · ~8 hours",
@@ -79,7 +79,7 @@ follows the same lecture → break → hands-on shape via `<SessionAgenda>`.
 
 ## Swapping in real assets later
 
-- **Logo**: replace [`src/components/ui/VectorLogo.tsx`](src/components/ui/VectorLogo.tsx)
+- **Logo**: replace [`src/components/ui/Logo.tsx`](src/components/ui/Logo.tsx)
   — either edit the inline SVG or swap it for an `<Image>` pointing at a real
   logo file placed in `public/`. Regenerate `public/favicon.svg` and
   `public/og-image.png` from the real logo at that point.
@@ -94,12 +94,10 @@ follows the same lecture → break → hands-on shape via `<SessionAgenda>`.
   — update `founder.name`, `founder.title`, `founder.credentials` there and
   every page picks it up. The official enquiry email (`contactEmail`) lives
   there too.
-- **Founder photo**: `public/images/founder-portrait-1.jpg` (home) and
-  `founder-portrait-2.jpg` (faculty) are real photos of Dr. A. Rajaram
-  Prasad, already rotated/resized. Swap the files (same names) to update
-  everywhere, or point the `<Image src>` calls in `FounderIntro.tsx` /
-  `faculty/page.tsx`
-  elsewhere.
+- **Founder photo**: `public/images/founder-portrait-1.jpg` is the portrait
+  used in the hero, founder section and faculty page. Swap the file (same
+  name) to update everywhere. `founder-portrait-2.jpg` (scrub-suit photo) is
+  currently unused.
 - **Content**: see [`CONTENT-TODO.md`](CONTENT-TODO.md) for everything still
   placeholder (bio copy, curricula detail, accreditation, etc.).
 

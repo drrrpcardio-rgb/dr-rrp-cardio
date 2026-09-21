@@ -7,7 +7,7 @@ replaced with the real thing.
 
 ## Brand assets
 
-- [ ] **Logo** — `src/components/ui/VectorLogo.tsx` is a built SVG wordmark
+- [ ] **Logo** — `src/components/ui/Logo.tsx` is a built SVG wordmark
       (no real logo file exists yet). Replace with the real mark when
       available, and regenerate `public/favicon.svg` + `public/og-image.png`
       from it.
@@ -28,10 +28,9 @@ replaced with the real thing.
       [`src/lib/site-data.ts`](src/lib/site-data.ts), which every component
       reads from. Still needs the real career-detail narrative (fellowships,
       years in practice, current affiliation) once available.
-- [ ] **About page story** (`src/app/about/page.tsx`) — philosophy and
-      "Vector is the institution, [Dr. A. Rajaram Prasad] provides the
-      credibility" framing is written per the brief, but should be reviewed
-      against the real founder's voice.
+- [ ] **About page story** (`src/app/about/page.tsx`) — the "the brand
+      carries the founder's own initials" framing and the philosophy copy
+      are written, but should be reviewed against the real founder's voice.
 - [ ] **Course module descriptions** (`src/lib/courses-data.ts`) — all five
       categories have plausible, non-specific curricula copy. Needs real
       module-by-module content once curricula are finalised. Keep claims
@@ -43,7 +42,7 @@ replaced with the real thing.
 ## Live classes / workshops
 
 - [ ] Only one real session exists (`src/lib/sessions-data.ts`,
-      `featuredSession` — Vector ECG Level 1, 23 Aug 2026). Add future
+      `featuredSession` — RRP Cardio ECG Level 1, 23 Aug 2026). Add future
       sessions here as they're scheduled; the homepage carousel,
       `/live-classes`, and `/workshops` all read from this same file.
 - [ ] **Venue** — deliberately omitted site-wide (no "IMA Hall", no "partner
