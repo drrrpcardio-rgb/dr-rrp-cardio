@@ -38,8 +38,16 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
     type: "website",
   },
+  // Google's favicon crawler wants a real favicon.ico plus PNGs in multiples
+  // of 48px; the SVG is kept for modern browsers.
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
 };
 
