@@ -34,6 +34,20 @@ export const siteUrl = "https://rrpcardio.com";
 export const contactEmail = "drrrpcardio@gmail.com";
 
 /**
+ * Site-wide announcement bar (below the nav). Set `enabled: false` to turn
+ * it off without deleting the config. `id` is stored in the visitor's
+ * browser when they dismiss it — change `id` (not just the text) whenever
+ * you want a dismissed banner to reappear for returning visitors.
+ */
+export const announcement = {
+  enabled: true,
+  id: "ecg-level-2-2026",
+  text: "RRP Cardio ECG – Level 2 is upcoming — enquiries now open.",
+  href: "/courses/ecg",
+  linkLabel: "View course",
+};
+
+/**
  * Web3Forms access key — delivers ContactForm submissions to `contactEmail`
  * as real emails via https://api.web3forms.com/submit. This key is designed
  * by Web3Forms to be used client-side (it's not a secret credential), so

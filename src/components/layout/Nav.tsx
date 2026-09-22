@@ -6,17 +6,22 @@ import { usePathname } from "next/navigation";
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from "framer-motion";
 import { Menu, X, PlaySquare } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Button } from "@/components/ui/Button";
 import { navLinks } from "@/lib/nav-data";
 import { youtubeChannels } from "@/lib/video-data";
 import { cn } from "@/lib/utils";
 import { brand } from "@/lib/site-data";
+import { useAnnouncementVisible } from "@/lib/use-announcement";
 
 export function Nav() {
   const [condensed, setCondensed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { scrollY } = useScroll();
   const pathname = usePathname();
+  // Shared with <AnnouncementBar> (same hook, same dismissal state) so the
+  // mobile menu panel can clear the bar's height when it's showing.
+  const { visible: announcementVisible } = useAnnouncementVisible();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setCondensed(latest > 48);
@@ -61,6 +66,7 @@ export function Nav() {
             : "border-b border-transparent bg-white/0",
         )}
       >
+        <AnnouncementBar />
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8">
           <motion.div
             animate={{ paddingTop: condensed ? 12 : 22, paddingBottom: condensed ? 12 : 22 }}
@@ -119,7 +125,10 @@ export function Nav() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.35, ease: "easeInOut" }}
-            className="fixed inset-x-0 top-0 z-40 overflow-hidden border-b border-mist-200 bg-white pt-20 shadow-lg xl:hidden"
+            className={cn(
+              "fixed inset-x-0 top-0 z-40 overflow-hidden border-b border-mist-200 bg-white shadow-lg xl:hidden",
+              announcementVisible ? "pt-28" : "pt-20",
+            )}
           >
             <motion.nav
               initial="hidden"
