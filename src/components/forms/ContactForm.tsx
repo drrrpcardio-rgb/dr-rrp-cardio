@@ -25,7 +25,8 @@ const initialState: FormState = {
 };
 
 const interests = [
-  "ECG",
+  "ECG – Level 1",
+  "ECG – Level 2",
   "Echo",
   "Cath Lab",
   "IVUS",
