@@ -7,6 +7,13 @@ export interface CourseModule {
   description: string;
   format: CourseFormat;
   duration: string;
+  /**
+   * Whether new enrollments are currently being taken. Defaults to "open" —
+   * only set to "closed" once a module has genuinely stopped accepting
+   * enrollments. A closed module shows a "Completed" badge instead of
+   * "Enquire Now", and drops out of the contact form's course dropdown.
+   */
+  enrollmentStatus?: "open" | "closed";
 }
 
 export interface CourseCategory {
@@ -35,6 +42,7 @@ export const courseCategories: CourseCategory[] = [
           "The foundation course: how the ECG is generated, a systematic reading approach, rhythm basics, and the common abnormalities every frontline clinician should recognise on sight.",
         format: "Recorded + Live",
         duration: "6 modules · ~8 hours",
+        enrollmentStatus: "closed",
       },
       {
         name: "RRP Cardio ECG – Level 2",

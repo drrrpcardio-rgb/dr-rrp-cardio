@@ -25,7 +25,7 @@ const initialState: FormState = {
 };
 
 const interests = [
-  "ECG – Level 1",
+  // ECG – Level 1 is closed (not currently enrolling) — see courses-data.ts.
   "ECG – Level 2",
   "Echo",
   "Cath Lab",
