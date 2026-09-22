@@ -35,9 +35,15 @@ replaced with the real thing.
       categories have plausible, non-specific curricula copy. Needs real
       module-by-module content once curricula are finalised. Keep claims
       generic (no invented outcome stats or accreditation).
-- [ ] **Course format/duration** (`src/lib/courses-data.ts`) — duration and
-      module-count figures are placeholder estimates, not confirmed
-      curriculum data.
+- [x] **Course format/duration** — Echo, Cath Lab, IVUS, and Interventional
+      Cardiology have no scheduled curriculum yet, so their placeholder
+      duration/module-count figures were removed (per the site owner:
+      "we have not planned courses yet"). `format`/`duration` are now
+      optional on `CourseModule`; leaving both unset shows a "Curriculum in
+      development" note instead, while the Enquire Now button stays active
+      to keep capturing real interest. ECG (the one real, planned category)
+      is unaffected. Fill in real `format`/`duration` here once a curriculum
+      for any of these is actually finalised.
 
 ## Live classes / workshops
 

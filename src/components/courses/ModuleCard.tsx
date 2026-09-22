@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock3, Radio } from "lucide-react";
+import { CheckCircle2, Clock3, Radio, Hammer } from "lucide-react";
 import { CourseModule } from "@/lib/courses-data";
 import { Button } from "@/components/ui/Button";
 import { staggerItem } from "@/components/ui/Reveal";
 
 export function ModuleCard({ module: mod }: { module: CourseModule }) {
   const closed = mod.enrollmentStatus === "closed";
+  const curriculumPlanned = Boolean(mod.format && mod.duration);
 
   return (
     <motion.div
@@ -25,12 +26,22 @@ export function ModuleCard({ module: mod }: { module: CourseModule }) {
         <h3 className="font-heading text-xl font-semibold text-ink">{mod.name}</h3>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-mist-700">{mod.description}</p>
         <div className="mt-4 flex flex-wrap gap-4 text-xs font-medium text-mist-600">
-          <span className="inline-flex items-center gap-1.5">
-            <Radio size={14} className="text-royal-700" /> {mod.format}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Clock3 size={14} className="text-royal-700" /> {mod.duration}
-          </span>
+          {curriculumPlanned ? (
+            <>
+              <span className="inline-flex items-center gap-1.5">
+                <Radio size={14} className="text-royal-700" /> {mod.format}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock3 size={14} className="text-royal-700" /> {mod.duration}
+              </span>
+            </>
+          ) : (
+            !closed && (
+              <span className="inline-flex items-center gap-1.5">
+                <Hammer size={14} className="text-royal-700" /> Curriculum in development
+              </span>
+            )
+          )}
         </div>
       </div>
       {closed ? (

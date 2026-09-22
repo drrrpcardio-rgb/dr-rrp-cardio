@@ -5,13 +5,21 @@ export type CourseFormat = "Recorded" | "Live" | "Recorded + Live";
 export interface CourseModule {
   name: string;
   description: string;
-  format: CourseFormat;
-  duration: string;
+  /**
+   * Format and duration are only known once a curriculum is actually
+   * planned — leave both unset rather than filling in a placeholder number.
+   * ModuleCard shows a "Curriculum in development" note instead of the
+   * format/duration row when either is missing.
+   */
+  format?: CourseFormat;
+  duration?: string;
   /**
    * Whether new enrollments are currently being taken. Defaults to "open" —
    * only set to "closed" once a module has genuinely stopped accepting
    * enrollments. A closed module shows a "Completed" badge instead of
    * "Enquire Now", and drops out of the contact form's course dropdown.
+   * "open" (the default) is correct even for a module whose curriculum
+   * isn't planned yet — the enquiry button still captures real interest.
    */
   enrollmentStatus?: "open" | "closed";
 }
@@ -66,8 +74,6 @@ export const courseCategories: CourseCategory[] = [
         name: "RRP Cardio Echo – Level 1",
         description:
           "Standard views and windows, basic chamber and valve assessment, ejection fraction estimation, and a checklist-driven approach to a complete study.",
-        format: "Recorded + Live",
-        duration: "7 modules · ~9 hours",
       },
     ],
   },
@@ -84,8 +90,6 @@ export const courseCategories: CourseCategory[] = [
         name: "RRP Cardio Cath Lab Basics",
         description:
           "Cath lab workflow and safety, C-arm and imaging fundamentals, vascular access, contrast and radiation basics, and how to read a standard angiography run.",
-        format: "Recorded",
-        duration: "5 modules · ~6 hours",
       },
     ],
   },
@@ -102,8 +106,6 @@ export const courseCategories: CourseCategory[] = [
         name: "RRP Cardio IVUS Masterclass",
         description:
           "IVUS fundamentals, systematic pullback interpretation, lesion severity and plaque characterisation, and using IVUS to guide and optimise stent deployment.",
-        format: "Live",
-        duration: "4 modules · ~5 hours",
       },
     ],
   },
@@ -120,8 +122,6 @@ export const courseCategories: CourseCategory[] = [
         name: "RRP Cardio Interventional Cardiology",
         description:
           "Case-based teaching covering patient selection, procedural planning, common device and technique fundamentals, and periprocedural care.",
-        format: "Recorded + Live",
-        duration: "9 modules · ~12 hours",
       },
     ],
   },
