@@ -70,7 +70,7 @@ export const featuredSession: SessionData = {
   isoDate: "2026-10-31",
   displayDate: "October 2026 (exact date to be announced)",
   time: "Time to be announced",
-  venue: "Aasai Speciality Clinic | Heart Foundation",
+  venue: "Aasai Health Care",
   venueMapUrl:
     "https://www.google.com/maps/place/Aasai+Speciality+Clinic+%7C+Heart+Foundation/@11.6780112,78.1388493,17z/data=!3m1!4b1!4m6!3m5!1s0x3babf05b2f01bfdb:0x5b5315f29133acf0!8m2!3d11.6780112!4d78.1414242!16s%2Fg%2F11c6w0mdh0",
   audience: [

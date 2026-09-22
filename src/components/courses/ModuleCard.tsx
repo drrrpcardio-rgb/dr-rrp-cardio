@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock3, Radio, Hammer } from "lucide-react";
+import { CheckCircle2, Clock3, Radio, Hammer, CalendarDays } from "lucide-react";
+import Link from "next/link";
 import { CourseModule } from "@/lib/courses-data";
 import { Button } from "@/components/ui/Button";
 import { staggerItem } from "@/components/ui/Reveal";
@@ -43,6 +44,14 @@ export function ModuleCard({ module: mod }: { module: CourseModule }) {
             )
           )}
         </div>
+        {mod.nextLiveBatchNote && (
+          <Link
+            href="/live-classes"
+            className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-700 transition-colors hover:bg-gold-200"
+          >
+            <CalendarDays size={13} /> {mod.nextLiveBatchNote}
+          </Link>
+        )}
       </div>
       {closed ? (
         <span className="shrink-0 text-sm font-medium text-mist-600">
