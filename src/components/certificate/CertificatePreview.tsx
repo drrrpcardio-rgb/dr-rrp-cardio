@@ -27,7 +27,11 @@ export function CertificatePreview({
   return (
     <div
       className={cn(
-        "relative mx-auto aspect-[297/210] w-full max-w-3xl bg-white p-3",
+        // Fixed A4-landscape aspect ratio is only safe once there's enough
+        // width to give it real height — on narrow phones it squashes the
+        // card so short that content overflows past the border. Let height
+        // follow content below sm, then lock to the print proportions.
+        "relative mx-auto w-full max-w-3xl bg-white p-3 sm:aspect-[297/210]",
         "rounded-md border border-mist-200 shadow-xl shadow-royal-900/10",
         className,
       )}
