@@ -29,6 +29,15 @@ export const freeVideos: VideoEntry[] = [
     url: "https://youtu.be/GQ1YZjJBaD8",
     tag: "Pre-Course Video",
   },
+  {
+    id: "how-to-read-normal-ecg",
+    title: "How to Read a Normal ECG | Measurements, Intervals & Step-by-Step Interpretation",
+    description:
+      "A step-by-step method for reading a normal ECG — standard measurements, intervals, and the order to check them in — building directly on the basics from the first two videos.",
+    youtubeId: "jECBmWZ5cT4",
+    url: "https://www.youtube.com/watch?v=jECBmWZ5cT4",
+    tag: "Pre-Course Video",
+  },
 ];
 
 export const youtubeChannels = {

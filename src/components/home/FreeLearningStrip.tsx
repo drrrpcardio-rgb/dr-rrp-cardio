@@ -23,7 +23,8 @@ export function FreeLearningStrip() {
       </div>
 
       <StaggerGroup className="mt-12 grid gap-6 sm:grid-cols-2">
-        {freeVideos.map((video) => (
+        {/* Teaser strip stays a 2-up grid — the full list is on /free-learning. */}
+        {freeVideos.slice(0, 2).map((video) => (
           <motion.div key={video.id} variants={staggerItem}>
             <VideoCard video={video} />
           </motion.div>
