@@ -11,6 +11,7 @@ const tabs: { label: string; value: SessionMode | "all" }[] = [
   { label: "All", value: "all" },
   { label: "Online", value: "online" },
   { label: "Offline", value: "offline" },
+  { label: "Hybrid", value: "hybrid" },
 ];
 
 export function LiveClassesList() {

@@ -46,7 +46,18 @@ export function SessionCard({ session, className }: { session: SessionData; clas
         {session.venue && (
           <div className="flex items-center gap-2">
             <MapPin size={16} className="shrink-0 text-royal-700" />
-            {session.venue}
+            {session.venueMapUrl ? (
+              <a
+                href={session.venueMapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-dotted underline-offset-2 hover:text-royal-700"
+              >
+                {session.venue}
+              </a>
+            ) : (
+              session.venue
+            )}
           </div>
         )}
       </div>

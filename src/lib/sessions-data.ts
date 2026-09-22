@@ -4,7 +4,7 @@ export interface AgendaItem {
   description: string;
 }
 
-export type SessionMode = "online" | "offline";
+export type SessionMode = "online" | "offline" | "hybrid";
 
 export interface SessionData {
   id: string;
@@ -17,12 +17,14 @@ export interface SessionData {
   time: string;
   /** Optional — omit rather than filling with a placeholder venue. */
   venue?: string;
+  /** Optional Google Maps link for the venue. */
+  venueMapUrl?: string;
   audience: string[];
   objective: string;
   agenda: AgendaItem[];
 }
 
-export const featuredSession: SessionData = {
+const ecgLevel1Session: SessionData = {
   id: "rrp-cardio-ecg-level-1-aug-2026",
   courseName: "RRP Cardio ECG – Level 1",
   mode: "offline",
@@ -59,8 +61,37 @@ export const featuredSession: SessionData = {
   ],
 };
 
+/** Date/time/venue/agenda to be finalised — update once confirmed. */
+export const featuredSession: SessionData = {
+  id: "rrp-cardio-ecg-level-2-oct-2026",
+  courseName: "RRP Cardio ECG – Level 2",
+  mode: "hybrid",
+  title: "ECG – Level 2: Lecture & Hands-on Workshop",
+  isoDate: "2026-10-31",
+  displayDate: "October 2026 (exact date to be announced)",
+  time: "Time to be announced",
+  venue: "Aasai Speciality Clinic | Heart Foundation",
+  venueMapUrl:
+    "https://www.google.com/maps/place/Aasai+Speciality+Clinic+%7C+Heart+Foundation/@11.6780112,78.1388493,17z/data=!3m1!4b1!4m6!3m5!1s0x3babf05b2f01bfdb:0x5b5315f29133acf0!8m2!3d11.6780112!4d78.1414242!16s%2Fg%2F11c6w0mdh0",
+  audience: [
+    "MBBS Doctors",
+    "Practicing Physicians",
+    "CTVS Technologists",
+    "Nurses",
+  ],
+  objective:
+    "Building on Level 1, a deeper dive into ECG interpretation for real-world clinical practice.",
+  agenda: [
+    {
+      time: "TBA",
+      title: "Full agenda to be announced",
+      description: "",
+    },
+  ],
+};
+
 /** Every session on the site currently follows this lecture → break → hands-on template. */
-export const allSessions: SessionData[] = [featuredSession];
+export const allSessions: SessionData[] = [featuredSession, ecgLevel1Session];
 
 export function isUpcoming(session: SessionData, today: Date = new Date()) {
   return new Date(session.isoDate) >= today;

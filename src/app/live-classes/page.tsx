@@ -43,7 +43,19 @@ export default function LiveClassesPage() {
             <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-mist-700">
               <span>{featuredSession.displayDate}</span>
               <span>{featuredSession.time}</span>
-              {featuredSession.venue && <span>{featuredSession.venue}</span>}
+              {featuredSession.venue &&
+                (featuredSession.venueMapUrl ? (
+                  <a
+                    href={featuredSession.venueMapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-dotted underline-offset-2 hover:text-royal-700"
+                  >
+                    {featuredSession.venue}
+                  </a>
+                ) : (
+                  <span>{featuredSession.venue}</span>
+                ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-1.5">
               {featuredSession.audience.map((a) => (
