@@ -1,1 +1,14 @@
-if(!self.define){let e,i={};const s=(s,n)=>(s=new URL(s+".js",n).href,i[s]||new Promise(i=>{if("document"in self){const e=document.createElement("script");e.src=s,e.onload=i,document.head.appendChild(e)}else e=s,importScripts(s),i()}).then(()=>{let e=i[s];if(!e)throw new Error(`Module ${s} didn’t register its module`);return e}));self.define=(n,r)=>{const t=e||("document"in self?document.currentScript.src:"")||location.href;if(i[t])return;let o={};const c=e=>s(e,t),d={module:{uri:t},exports:o,require:c};i[t]=Promise.all(n.map(e=>d[e]||c(e))).then(e=>(r(...e),o))}}define(["./workbox-9c191d2f"],function(e){"use strict";self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"registerSW.js",revision:"432bdd4a6fbf5221ad4f9a9878b1c34c"},{url:"index.html",revision:"e6cdf44c5dfc887066e47b6e5a0357e0"},{url:"assets/index-lgKkH80H.css",revision:null},{url:"assets/index-C1FfAhzd.js",revision:null},{url:"icon.svg",revision:"4565c89f3c29457c670c0c6c6d2d1d6a"},{url:"manifest.webmanifest",revision:"15ca413308697818dc4db65bd47f8863"}],{}),e.cleanupOutdatedCaches(),e.registerRoute(new e.NavigationRoute(e.createHandlerBoundToURL("index.html")))});
+// Retired service worker. The ECG simulator used to be served from /ecg-mastery/
+// with its own PWA service worker; it now lives at /ecg-simulator/ and /ecg-mastery/
+// is a normal site page. This file replaces the old worker so visitors who installed
+// it get unregistered and their stale caches cleared.
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((k) => caches.delete(k)));
+    await self.registration.unregister();
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach((c) => c.navigate(c.url));
+  })());
+});

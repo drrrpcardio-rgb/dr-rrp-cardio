@@ -11,6 +11,7 @@ const staticRoutes = [
   "/workshops",
   "/certificates",
   "/free-learning",
+  "/ecg-mastery",
   "/contact",
 ];
 
