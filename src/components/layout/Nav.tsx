@@ -79,15 +79,18 @@ export function Nav() {
           </motion.div>
 
           <nav className="hidden items-center gap-5 xl:flex xl:gap-7">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn("underline-grow text-sm font-medium transition-colors", light ? "text-white/85 hover:text-white" : "text-ink-soft hover:text-royal-700")}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const linkClassName = cn("underline-grow text-sm font-medium transition-colors", light ? "text-white/85 hover:text-white" : "text-ink-soft hover:text-royal-700");
+              return link.external ? (
+                <a key={link.href} href={link.href} className={linkClassName}>
+                  {link.label}
+                </a>
+              ) : (
+                <Link key={link.href} href={link.href} className={linkClassName}>
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="hidden items-center gap-4 xl:flex">
@@ -147,13 +150,23 @@ export function Nav() {
                     visible: { opacity: 1, y: 0 },
                   }}
                 >
-                  <Link
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="block border-b border-mist-100 py-3.5 text-lg font-medium text-ink-soft"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.external ? (
+                    <a
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="block border-b border-mist-100 py-3.5 text-lg font-medium text-ink-soft"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="block border-b border-mist-100 py-3.5 text-lg font-medium text-ink-soft"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </motion.div>
               ))}
               <motion.div
