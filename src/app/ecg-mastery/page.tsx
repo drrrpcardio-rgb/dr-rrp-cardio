@@ -75,7 +75,7 @@ export default function EcgMasteryPage() {
         <Reveal delay={0.1}>
           <div className="mt-16 overflow-hidden rounded-2xl border border-royal-100 bg-royal-950">
             <iframe
-              src={`${SIMULATOR_URL}#machine`}
+              src={`${SIMULATOR_URL}#library`}
               title="ECG Mastery simulator"
               loading="lazy"
               className="h-[80vh] min-h-[560px] w-full"
