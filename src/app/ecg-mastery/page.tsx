@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Activity, BookOpenCheck, Gauge, Layers } from "lucide-react";
+import { Activity, Award, BookOpen, MapPin } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal, StaggerGroup } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
@@ -7,31 +7,35 @@ import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "ECG Mastery",
-  description: `ECG Mastery by ${brand.name}: an interactive 12-lead ECG simulator for learning rhythms, morphology and interpretation.`,
+  description: `ECG Mastery by ${brand.name}: an ECG library, a 12-lead ECG machine simulator, lead placement practice and a quiz.`,
 };
 
 const SIMULATOR_URL = "/ecg-simulator/";
 
-const features = [
+const sections = [
+  {
+    icon: BookOpen,
+    title: "ECG Library",
+    text: "120 topics covering rhythms, blocks, ischaemia, electrolytes and pacing, each with criteria, pitfalls and a live example.",
+    href: `${SIMULATOR_URL}#library`,
+  },
   {
     icon: Activity,
-    title: "Live 12-lead simulation",
-    text: "Rhythms, blocks, ischaemia, electrolyte and drug effects drawn from a cardiac vector model, on standard paper speed and gain.",
+    title: "ECG Machine",
+    text: "A live 12-lead simulator with 97 presets. Adjust rate, intervals, ST and pacing and watch every lead respond.",
+    href: `${SIMULATOR_URL}#machine`,
   },
   {
-    icon: Layers,
-    title: "Change one thing at a time",
-    text: "Adjust rate, PR, QRS, axis, ST shift and pacing, and watch how every lead responds.",
+    icon: MapPin,
+    title: "Lead Placement",
+    text: "Practise placing all 12 electrodes on the chest and limbs, with feedback on accuracy.",
+    href: `${SIMULATOR_URL}#placement`,
   },
   {
-    icon: BookOpenCheck,
-    title: "Reference and practice",
-    text: "A clinical library with diagnostic criteria, plus quizzes and cases to test your interpretation.",
-  },
-  {
-    icon: Gauge,
-    title: "Works on any device",
-    text: "Runs in the browser and can be installed like an app, including for offline revision.",
+    icon: Award,
+    title: "Quiz",
+    text: "115 questions on rhythm recognition, intervals, axis and infarct territories, with explanations.",
+    href: `${SIMULATOR_URL}#quiz`,
   },
 ];
 
@@ -41,10 +45,10 @@ export default function EcgMasteryPage() {
       <PageHero
         eyebrow="ECG Mastery"
         title="Learn ECGs by seeing them"
-        description="An interactive 12-lead ECG simulator and training platform for students, residents, nurses, paramedics and clinicians."
+        description="An ECG library, a live 12-lead ECG machine, lead placement practice and a quiz, in one place."
       >
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button href={SIMULATOR_URL} variant="gold" size="lg">
+          <Button href={`${SIMULATOR_URL}#machine`} variant="gold" size="lg">
             Launch Simulator
           </Button>
         </div>
@@ -52,19 +56,26 @@ export default function EcgMasteryPage() {
 
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
         <StaggerGroup className="grid gap-6 sm:grid-cols-2">
-          {features.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="rounded-2xl border border-royal-100 bg-white p-7">
+          {sections.map(({ icon: Icon, title, text, href }) => (
+            <a
+              key={title}
+              href={href}
+              className="group block rounded-2xl border border-royal-100 bg-white p-7 transition hover:border-royal-400 hover:shadow-lg"
+            >
               <Icon className="h-6 w-6 text-royal-700" aria-hidden="true" />
               <h2 className="mt-4 font-heading text-xl font-semibold text-ink">{title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-mist-700">{text}</p>
-            </div>
+              <span className="mt-4 inline-block text-sm font-medium text-royal-800 group-hover:underline">
+                Open {title} &rarr;
+              </span>
+            </a>
           ))}
         </StaggerGroup>
 
         <Reveal delay={0.1}>
           <div className="mt-16 overflow-hidden rounded-2xl border border-royal-100 bg-royal-950">
             <iframe
-              src={SIMULATOR_URL}
+              src={`${SIMULATOR_URL}#machine`}
               title="ECG Mastery simulator"
               loading="lazy"
               className="h-[80vh] min-h-[560px] w-full"
