@@ -16,7 +16,7 @@ const sections = [
   {
     icon: BookOpen,
     title: "ECG Library",
-    text: "120 topics covering rhythms, blocks, ischaemia, electrolytes and pacing, each with criteria, pitfalls and a live example.",
+    text: "111 topics covering rhythms, blocks, ischaemia, electrolytes and pacing, each with criteria, pitfalls and a live example.",
     href: `${SIMULATOR_URL}#library`,
   },
   {
@@ -34,7 +34,7 @@ const sections = [
   {
     icon: Award,
     title: "Quiz",
-    text: "115 questions on rhythm recognition, intervals, axis and infarct territories, with explanations.",
+    text: "116 questions on rhythm recognition, intervals, axis and infarct territories, with explanations.",
     href: `${SIMULATOR_URL}#quiz`,
   },
 ];
