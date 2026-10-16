@@ -7,7 +7,6 @@ import { TeachingModel } from "@/components/home/TeachingModel";
 import { UpcomingProgrammes } from "@/components/home/UpcomingProgrammes";
 import { CertificateSection } from "@/components/home/CertificateSection";
 import { FreeLearningStrip } from "@/components/home/FreeLearningStrip";
-import { SimulatorsStrip } from "@/components/home/SimulatorsStrip";
 import { FinalCTA } from "@/components/home/FinalCTA";
 
 export default function Home() {
@@ -22,7 +21,6 @@ export default function Home() {
       <UpcomingProgrammes />
       <CertificateSection />
       <FreeLearningStrip />
-      <SimulatorsStrip />
       <FinalCTA />
     </>
   );
