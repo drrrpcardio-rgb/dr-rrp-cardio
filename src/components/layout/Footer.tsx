@@ -81,7 +81,9 @@ export function Footer() {
 
         <div className="mt-14 border-t border-mist-200 pt-6 text-xs text-mist-600">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {year} {brand.name}. All rights reserved.</p>
+            <p>
+              © {year} {brand.name}. All rights reserved. Content and simulators may not be copied or redistributed without written permission.
+            </p>
             <ul className="flex gap-5">
               <li>
                 <Link href="/privacy-policy" className="underline-grow hover:text-royal-700">

@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     template: `%s | ${brand.name}`,
   },
   description: `Structured, practical cardiology education in ECG, Echo, Cath Lab, IVUS and Interventional Cardiology — founded & led by ${founder.name}.`,
+  other: { copyright: `© ${new Date().getFullYear()} ${brand.name}. All rights reserved.` },
   openGraph: {
     title: brand.name,
     description: brand.tagline,
