@@ -14,6 +14,8 @@ const staticRoutes = [
   "/ecg-mastery",
   "/cath-lab",
   "/contact",
+  "/privacy-policy",
+  "/terms",
 ];
 
 export const dynamic = "force-static";

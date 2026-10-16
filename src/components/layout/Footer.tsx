@@ -80,7 +80,21 @@ export function Footer() {
         </div>
 
         <div className="mt-14 border-t border-mist-200 pt-6 text-xs text-mist-600">
-          <p>© {year} {brand.name}. All rights reserved.</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {year} {brand.name}. All rights reserved.</p>
+            <ul className="flex gap-5">
+              <li>
+                <Link href="/privacy-policy" className="underline-grow hover:text-royal-700">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="underline-grow hover:text-royal-700">
+                  Terms &amp; Conditions
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </footer>
