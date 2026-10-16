@@ -3,6 +3,7 @@ import { Activity, Award, BookOpen, MapPin } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal, StaggerGroup } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
+import { CourseCrossLink, ToolFrame } from "@/components/ui/ToolShowcase";
 import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
@@ -54,7 +55,16 @@ export default function EcgMasteryPage() {
         </div>
       </PageHero>
 
+      <ToolFrame
+        src={`${SIMULATOR_URL}#machine`}
+        title="ECG Mastery simulator"
+        address="rrpcardio.com/ecg-simulator"
+        fullHref={SIMULATOR_URL}
+        highlights={["97 ECG presets", "111 library topics", "12-lead lead placement", "116-question quiz"]}
+      />
+
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <h2 className="mb-8 text-center font-heading text-3xl font-semibold text-ink">What&apos;s inside</h2>
         <StaggerGroup className="grid gap-6 sm:grid-cols-2">
           {sections.map(({ icon: Icon, title, text, href }) => (
             <a
@@ -72,34 +82,14 @@ export default function EcgMasteryPage() {
           ))}
         </StaggerGroup>
 
-        <Reveal delay={0.1}>
-          <div className="mt-16 overflow-hidden rounded-2xl border border-royal-100 bg-royal-950">
-            <iframe
-              src={`${SIMULATOR_URL}#library`}
-              title="ECG Mastery simulator"
-              loading="lazy"
-              className="h-[80vh] min-h-[560px] w-full"
-            />
-          </div>
-          <p className="mt-3 text-center text-xs text-mist-700">
-            Prefer more room?{" "}
-            <a className="font-medium text-royal-800 underline" href={SIMULATOR_URL}>
-              Open the simulator full screen
-            </a>
-            .
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          <div className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-royal-100 bg-royal-50 p-10 text-center">
-            <p className="font-heading text-xl font-semibold text-ink">Want structured teaching?</p>
-            <p className="max-w-lg text-sm text-mist-700">
-              The simulator pairs with the {brand.coursePrefix} ECG courses, which take you from
-              fundamentals to advanced interpretation.
-            </p>
-            <Button href="/courses/ecg">View ECG Courses</Button>
-          </div>
-        </Reveal>
+        <div className="mt-16">
+          <CourseCrossLink
+            title="Want structured teaching?"
+            text={`The simulator pairs with the ${brand.coursePrefix} ECG courses, which take you from fundamentals to advanced interpretation.`}
+            href="/courses/ecg"
+            cta="View ECG courses"
+          />
+        </div>
 
         <Reveal delay={0.2}>
           <p className="mt-10 text-center text-sm text-mist-700">

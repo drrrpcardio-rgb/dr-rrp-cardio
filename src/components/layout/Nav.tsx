@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from "framer-motion";
-import { Menu, X, PlaySquare } from "lucide-react";
+import { Menu, X, PlaySquare, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Button } from "@/components/ui/Button";
-import { navLinks } from "@/lib/nav-data";
+import { navGroups, navPlainLinks } from "@/lib/nav-data";
 import { youtubeChannels } from "@/lib/video-data";
 import { cn } from "@/lib/utils";
 import { brand } from "@/lib/site-data";
@@ -78,19 +78,54 @@ export function Nav() {
             </Link>
           </motion.div>
 
-          <nav className="hidden items-center gap-5 xl:flex xl:gap-7">
-            {navLinks.map((link) => {
-              const linkClassName = cn("underline-grow text-sm font-medium transition-colors", light ? "text-white/85 hover:text-white" : "text-ink-soft hover:text-royal-700");
-              return link.external ? (
-                <a key={link.href} href={link.href} className={linkClassName}>
-                  {link.label}
-                </a>
-              ) : (
-                <Link key={link.href} href={link.href} className={linkClassName}>
-                  {link.label}
-                </Link>
+          <nav className="hidden items-center gap-6 xl:flex xl:gap-8">
+            {navGroups.map((group) => {
+              const active = group.items.some((i) => pathname.startsWith(i.href));
+              return (
+                <div key={group.label} className="group relative">
+                  <button
+                    type="button"
+                    aria-haspopup="true"
+                    className={cn(
+                      "flex items-center gap-1 py-2 text-sm font-medium transition-colors",
+                      light ? "text-white/85 hover:text-white" : "text-ink-soft hover:text-royal-700",
+                      active && (light ? "text-white" : "text-royal-700"),
+                    )}
+                  >
+                    {group.label}
+                    <ChevronDown size={14} className="transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
+                  </button>
+                  <div className="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                    <div className="rounded-2xl border border-mist-200 bg-white p-2 shadow-xl">
+                      {group.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="block rounded-xl px-4 py-3 transition-colors hover:bg-royal-50"
+                        >
+                          <span className="block text-sm font-semibold text-ink">{item.label}</span>
+                          {item.description && (
+                            <span className="mt-0.5 block text-xs text-mist-700">{item.description}</span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               );
             })}
+            {navPlainLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "underline-grow text-sm font-medium transition-colors",
+                  light ? "text-white/85 hover:text-white" : "text-ink-soft hover:text-royal-700",
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="hidden items-center gap-4 xl:flex">
@@ -142,31 +177,42 @@ export function Nav() {
               }}
               className="flex flex-col gap-1 px-6 pb-8"
             >
-              {navLinks.map((link) => (
+              {navGroups.map((group) => (
                 <motion.div
-                  key={link.href}
+                  key={group.label}
                   variants={{
                     hidden: { opacity: 0, y: 12 },
                     visible: { opacity: 1, y: 0 },
                   }}
+                  className="border-b border-mist-100 py-3"
                 >
-                  {link.external ? (
-                    <a
-                      href={link.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="block border-b border-mist-100 py-3.5 text-lg font-medium text-ink-soft"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <Link
-                      href={link.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="block border-b border-mist-100 py-3.5 text-lg font-medium text-ink-soft"
-                    >
-                      {link.label}
-                    </Link>
-                  )}
+                  <p className="text-xs font-semibold tracking-widest text-royal-600 uppercase">{group.label}</p>
+                  <div className="mt-1 flex flex-col">
+                    {group.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="py-2 text-lg font-medium text-ink-soft"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+              {navPlainLinks.map((link) => (
+                <motion.div
+                  key={link.href}
+                  variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+                >
+                  <Link
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="block border-b border-mist-100 py-3.5 text-lg font-medium text-ink-soft"
+                  >
+                    {link.label}
+                  </Link>
                 </motion.div>
               ))}
               <motion.div

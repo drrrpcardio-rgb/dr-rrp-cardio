@@ -1,4 +1,5 @@
 import { Hero } from "@/components/home/Hero";
+import { ProductPillars } from "@/components/home/ProductPillars";
 import { VisionStrip } from "@/components/home/VisionStrip";
 import { FeaturedCourses } from "@/components/home/FeaturedCourses";
 import { FounderIntro } from "@/components/home/FounderIntro";
@@ -13,6 +14,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <ProductPillars />
       <VisionStrip />
       <FeaturedCourses />
       <FounderIntro />

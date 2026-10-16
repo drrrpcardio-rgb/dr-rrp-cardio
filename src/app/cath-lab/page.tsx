@@ -3,6 +3,7 @@ import { Activity, Boxes, ListChecks } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal, StaggerGroup } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
+import { CourseCrossLink, ToolFrame } from "@/components/ui/ToolShowcase";
 import { brand } from "@/lib/site-data";
 import { cathLabTools } from "@/lib/tools-data";
 
@@ -28,7 +29,16 @@ export default function CathLabPage() {
         </div>
       </PageHero>
 
+      <ToolFrame
+        src="/cath-sim/"
+        title="Cath Lab virtual angiography simulator"
+        address="rrpcardio.com/cath-sim"
+        fullHref="/cath-sim/"
+        highlights={["3D heart and coronary tree", "C-arm angle control", "134 devices", "29 procedures"]}
+      />
+
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <h2 className="mb-8 text-center font-heading text-3xl font-semibold text-ink">What&apos;s inside</h2>
         <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {cathLabTools.map(({ title, text, href }, i) => {
             const Icon = icons[i];
@@ -57,6 +67,15 @@ export default function CathLabPage() {
             Database Center for Life Science, licensed under CC Attribution 4.0 International.
           </p>
         </Reveal>
+
+        <div className="mt-16">
+          <CourseCrossLink
+            title="Learn the theory behind the images"
+            text="Our Cath Lab courses cover access, angiographic views, devices and procedures, with this simulator for practice."
+            href="/courses/cath-lab"
+            cta="View Cath Lab courses"
+          />
+        </div>
 
         <Reveal delay={0.15}>
           <div className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-royal-100 bg-royal-50 p-10 text-center">
