@@ -1,0 +1,497 @@
+{
+ "generated": "by tools/build-meshes.mjs",
+ "atlas": {
+  "name": "BodyParts3D",
+  "version": "4.0 (partof tree, 99% reduction OBJ)",
+  "url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/",
+  "attribution": "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International",
+  "licenceNote": "The database centre's licence page (updated 2025-02-27) states CC BY 4.0; the OBJ file headers carry the older CC BY-SA 2.1 Japan wording. See ATTRIBUTION.md."
+ },
+ "transform": {
+  "description": "p = R*(a - c); atlas (+X left, +Y posterior, +Z cranial) -> patient (+X left, +Y cranial, +Z anterior), mm",
+  "R": [
+   [
+    1,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    1
+   ],
+   [
+    0,
+    -1,
+    0
+   ]
+  ],
+  "centreAtlasMm": [
+   28.822,
+   -131.749,
+   1217.995
+  ]
+ },
+ "aortaClipAtlasZ": 1050,
+ "ribcageGridMm": 2,
+ "inputSha256": {
+  "partof_BP3D_4.0_obj_99.zip": "9fbc713fffeee924a5a657d9813d84d7eb957bded63adb854931dd5e3eb61c97",
+  "partof_parts_list_e.txt": "9224080557053e6f1322f1e13ab27f0ecde0db19bb3b505f0631afad230eeebd",
+  "partof_element_parts.txt": "3f5f6df1028eb122b30de77c711597b6bb8e5541658e5985859fd228adbf88ea",
+  "partof_inclusion_relation_list.txt": "1b40738270931e3c1d955ce34e0fce0d8d10d8c5ad543463e40b4b4c0243007c",
+  "README_e.html": "f9a90b4d945ad0fe50db45c712e931aa54e52667187b30d7085b6cc394f40107"
+ },
+ "objSha256": {
+  "FJ1931": "3d7af57f70b77dc8dbf784bcb9863743ceeec351b642f9ccf110e6a747e77899",
+  "FJ1932": "cbdbe976943f977c48b9dbdfa2efdd9eb025f935d3f921a3fb8479df2090d25d",
+  "FJ2418": "e462c4455225f7d99845af95988ca2d9885144fbb3f7567610ca5635ca3a3dbc",
+  "FJ2420": "859e44dbbc0e66eb64da60eff23afba5c4bba1a9b6aaf260d075502c0f3c4f44",
+  "FJ2422": "88654bd73fa155daf0b44fd67bccaec81c9e37c105e046076993f2684c463d95",
+  "FJ2425": "223233fef054fb67b81d27881f10a1acce47c9ade147546b6859fa90e4e37dc3",
+  "FJ2426": "a309412ea0b21043e9851a6e8d7d529db01034c379f0b846a49f2ac070c94bee",
+  "FJ2429": "83ad99e19bb6105883aa99a86a3c0089385dc5d2de96844c3e9eec6616e571e8",
+  "FJ2431": "6ab13f8acf9a3cf93830ab28538e39c423b24c07ffad6c305196671dfc419df0",
+  "FJ2432": "bdcf7f32b2a16bd8d7b2920ac0f03958174c90d31353e9b38c4462aacfc038f3",
+  "FJ2435": "410689ed978de91a6f14a3332f333b9b8db32931edb47e880cf7bc58b505d191",
+  "FJ2438": "187235f3c3612ef27abde924d01c71579c2946435e64319164f43e5ad008284d",
+  "FJ2631": "06c78376e08c2eed7416d0e2a841e47952b5d95cafa89fbcb7612c072cd65573",
+  "FJ2632": "71c8621f9ed5a9dd7814c054f9e6f2ec9a480b39141110615bc7090795040272",
+  "FJ2633": "3a38d05c39634da75a226de3a4665b02614bf38ab4ea3a39fe8ef1096c0d0296",
+  "FJ2634": "21dff12c8f9beef5d6022dda5c9d25419a72509e5a9fc2e4a33cafe771237442",
+  "FJ2635": "51114a0f6f2d95fbc18ddbce0cc19431a0b2cb55db18208029fce64f9128ec2c",
+  "FJ2636": "aa2166cc5bf12de992dd33eaee5953bc23bb739f62610bbbec345d6aea2c1ecc",
+  "FJ2637": "6c59d4cf0dbdb902fc83e5596f7a181bb66bcbeda24e10c8ce48d4661dfbe34d",
+  "FJ2638": "aa3ccf75d2a5a5fefe9665b5acafed8f1797f001a01da365bfdc709a8c84aa4b",
+  "FJ2639": "dc8bcfe30ddcaff7e1e9022bb1013bb884cd03a0fc9d9fae00a924c8d4eef955",
+  "FJ2640": "38bc0b0b2c9f8a7424098f9dbaa36ed57b07cb9a1211a86a823c779c419035b1",
+  "FJ2641": "27e5fff1fdeeff77e3c911ffe2a753279cb391b977f2de3f6ea17e21876b0dac",
+  "FJ2642": "e906224a535dbf5bfb2201cd6fc81880521aa02f5148ae1bbe67404ace96b3a6",
+  "FJ2643": "303086bfdcb88e2e9bb4cddcfaff2e9be2bf3f1db2c7943d8ccd4a7a38239fac",
+  "FJ2644": "203a8bc0e029a76f3b291729ebb4cbfd1155bb84ff5724d2eb51d5fa02d36aa9",
+  "FJ2645": "760b5d48099edb74a6b14fafe02b56ad076c4e4c27c8edb905f21929d192f8b5",
+  "FJ2646": "1e2f885bc9aafd4270895deb0000a970ca4e494e909e06a5f13b94858d0b8cc9",
+  "FJ2647": "cd55e20146fe1f08872c6733a2ed3ef5f2397235e2f7f8c77b883f64b5b67d57",
+  "FJ2648": "14c937696c6e76239474f760324389f5cc955cfe06570ec7c4f61eb4216e8894",
+  "FJ2649": "0603b5d96efc1cde531c9301a578b05c747080e9a845ca5b244b973c51b14d67",
+  "FJ2650": "ec32539fad28298dd01611d624051765eac07c989d461151996907381a1220d9",
+  "FJ2651": "2fb72c01e8e2b65a8f262e314a9b85cd1c2256defc2d00e1bd8d857013c28d54",
+  "FJ2652": "ebfa7ccd9598b689c247175e49c89ab8ea3baaef763b5554db38306a689be916",
+  "FJ2653": "fa365a612a1850f3628ef7224ce0988f1fe2d9cdb4e8c6aa4db10d2a1962a4c3",
+  "FJ2654": "2d4b35919118657f1d5b8d842d2c78021d4676f78082c71e55e7d8aba9616fa8",
+  "FJ2667": "6bb2898acda5680828658540ed9048abc51b9df9761fed5608567849fcbd6a61",
+  "FJ2668": "ecd7de3f9aa7a87a85da8abc9c023d6701040c3297fd1f6ba93d7875e871f611",
+  "FJ2670": "d23c5be67fc7e0a221e6d284772cf89bbc75b31a5bfa431210bd396be8d087b7",
+  "FJ2671": "095344f7ee5d89c8877b24c76fd57671491f34cb59e0fdf1f0738c54c239b200",
+  "FJ2672": "0adecd6703d24888e3c236c8a248393777a9b83d902ed9bfc69f258809188092",
+  "FJ2673": "b3fe7f8dd47fd7758fe4b2f8613c24c642be96d419a7699f85b44a2396a127a7",
+  "FJ2674": "605cda4cb28547b67d9569ff8576ab7dc9a945d47a9d8b4a15d9552c80daee91",
+  "FJ2675": "f0d843e88d508d4ab383c4e8131974d9fdcab3b340c87e3002fabde9cf23d3f4",
+  "FJ2676": "c588c075c7c665691e6789312dad8d86541a1d2916fb63c33d03e38266e213d7",
+  "FJ2677": "a63f5990cabf34ead2c743bda11b178cdb60a983e7d181c2b757757354f2681e",
+  "FJ2692": "560c831439ab349de9b564ca92ed175677a3d12963ccd5483314175948797347",
+  "FJ2693": "ec42da30e165d2cb4ccf189982843b88a8ba006daae95b99104a2061bf30633b",
+  "FJ2694": "2d2b675af567f743da81826537d13fe72087c98a39741f5848bb70b1676b5c75",
+  "FJ2695": "00e9b8257eed1ddb8bfb60dfe301b03c08fd8a6e4b83002dad567d8cc738ba73",
+  "FJ2696": "ec8ecd7100e6a34661db1a99861ef4f3df17c8ac87316cafac2dbf6f895efd5a",
+  "FJ2697": "e029d3b95fc5b032016ff1e0783a2c71623a55be49cdbbd4be37fcbbfed0117a",
+  "FJ2698": "2864725de555603dc502c206c9d12bef366358ee4064e8f375c1df9294b7f955",
+  "FJ2699": "b52176deba592a44bcec3e29d11a8cac00031cac0a35e215d06df515e3224fc4",
+  "FJ2700": "7c1bda6f9d3170fc5a553a5e917514bb7d108f6c3e37cbe912d6573d634fe983",
+  "FJ2714": "aa76ceec1e0b4e19b281a2da0e15328d2719eaa1d7b1a3666421bf11ab9c877a",
+  "FJ2715": "d34c2023e84119131841fe5a1e1251a7252d4900b62b2b1b61d29d3ece4cb51a",
+  "FJ2716": "ecb5e668e2cf43031263ceed40e29b6862519d8dadef6b21ef63c3398e2f81a5",
+  "FJ2717": "1dcde62744c8b83892ce1828179d736d2eafdf2fb3cbd74aa61658001dab686b",
+  "FJ2718": "07ca611daf69f5411871802dbf76e6845519b71df1ef39a772d648c7b1861414",
+  "FJ2719": "dd10bda525a6b29340babe9b70aa02f8273bedd77519fdc69398dc9f492001b7",
+  "FJ2720": "996196bea87629d81a5c2040b767026e2a0a77854500999fe9857f3f4a030f5f",
+  "FJ2721": "d42f1d3059c8a78d65b44ea7934deebd96dbc84338b30341a422a9ce1751c243",
+  "FJ2722": "f5de57227430b3622ad827348883760596469ed754c473685975be5247cc9abd",
+  "FJ2723": "a98fe0acbf5a00bd5f73dcbc47f01dfbb932ea72607fd2e74231f6cfe49619d1",
+  "FJ2737": "f350efef8902f0ca4c4ef440a650c3ec4515d6a412340beb596536f4b1b72f32",
+  "FJ3153": "d17057ed1dad252a6fa6a3e8d92bc13310cebe0b584df147af0cc4a646f98f3e",
+  "FJ3154": "55fd0b1ec25bc207c5a58cb2aa3d5f2880df6593719ec803c83ac898d3bda358",
+  "FJ3155": "7ce892808f37a9c96c74f298334be195cb50bfdbe64bcfa62072141ed38df0a2",
+  "FJ3156": "d78f0563a0c0b5be89284a6d73434998a05dc9dbddb471b49e398c9ef96f07ae",
+  "FJ3158": "57a9cd9f62fc902f2d10f32c83237bba5bee4a24ae323a2b2405d9df68fd585b",
+  "FJ3160": "f04ca280dc74fdc79afb14e5da1515a1e77762960bb38fab869be0e617348eac",
+  "FJ3163": "968ed4928160fd54c444aa8c4a2c318fa56368c55c715afcdeaa48445382d3f6",
+  "FJ3166": "cd744d75a90dc4d2b38f3b25928656ae2f9b873ea3113d01f91a102290eda5bd",
+  "FJ3169": "7eb98fe2886168196d8a7ee37d1c7a6e7decbc1c09cdf2d4295c13ed7ba3df0c",
+  "FJ3171": "7c9c326269edd09bdf02aca90333c61debe4f39c777fbef887751826a54adb9e",
+  "FJ3173": "1bcf85e649234f976236f81077019ae66971c69c0943992a7ec0072939d42245",
+  "FJ3174": "f5928470229deb2c7579804b883ffeaae611127dac1454caed3b3df93fe8dad6",
+  "FJ3175": "f1ce32fedb9f84ac37b800b2a182f6701f972fbd8cc01be7732ab3ca3864603e",
+  "FJ3178": "32a06946d8eadbe1a847a373abe7499381c0182c72b7c94e3e2a0c3ba7c867e3",
+  "FJ3225": "daa25aba7fba3ff691d61cd239f8d49debc84ff871a351051c1d57a192b91dfd",
+  "FJ3226": "4bb9d52fdb2c15cb459c2bd08fd58082cdb39d15903cde675313762ea2287fc8",
+  "FJ3227": "83e04b8b6f91e4de57e7b380a2f2c7d6f0bbf284ce76710ca89aa82fb376bd4e",
+  "FJ3228": "eb534d19462226e26b91234544f99abe118878a25c125f2a8839341e6769252b",
+  "FJ3229": "b752f038ceba8430f3872897ce69495d7dd74ed8e19c21d3f75d0bc0b156d84f",
+  "FJ3230": "8b42d241c711fe9765b1239be33fcab6b865ab4619b5d05fa98ea245b6075d5c",
+  "FJ3231": "28b852d4813703c5654d0405168e22bf0032632d47b9667b4b16e60ed89a425b",
+  "FJ3232": "6fa730aea273685148d3e9d3f52fe450acec4c13d6e3b1b6865e0e9532283abb",
+  "FJ3233": "2a0f1e32b8410b6396bea7ae342a16ae1ac1b77042e70d7e98cabeb7dcf3dfb9",
+  "FJ3234": "638a766f20b64d02095efa845b5ea316624a376acb44c7e4a6d533d4da6ef4db",
+  "FJ3235": "81a7215ef6ed923bbad6f07208bbc0ee26ddbaae3b1423f624cae465012d9144",
+  "FJ3236": "3dc292292b9f2bd5e226ac100d3a8db76cba8eb1d9d09533a6e5e871f023e2a8",
+  "FJ3239": "9ca5fdb0582ad2795c9316ab9bb2f89f952b5a8c8fcf92a37efa042fc5c7739c",
+  "FJ3242": "c83bb88d995837a455e72707e9d5ecb0035ad60d8fd2f6f28d3710b4ef4c9d8e",
+  "FJ3245": "ac65f51684b5dbcc3ea82381edae8723cbd9c7b8680bf6149a31dbf0acd26065",
+  "FJ3248": "3633cb39f1540513872b9477c829d562114dce8d19cba5c99073fe4e3abeb1be",
+  "FJ3251": "86be490af572a3d8c7f41fd1ed3f4bfac19a9966737bc1275f135f160d8298be",
+  "FJ3254": "bc9ca44f2ea1fa9800d7f0a35c4596f41df1750ba9c89910d4f64041131db2bf",
+  "FJ3255": "97e69ede580a6e81cc42bb54fb22d4752719b61c5fced8ccccfb18ce64996676",
+  "FJ3290": "b847e67db475197cc4510744fef76bafd8e75c50797ca85eb8cd56dd853d61d6",
+  "FJ3330": "0f688dd4e0d20a8328b4763c0acc7582a9beac8fe5c7ce58586db99c6e366945",
+  "FJ3331": "761d6d8713c31d4b9f795c4875da9fc750c913907386489568fdebea15af49c3",
+  "FJ3332": "ece92488a9293cde2d8a8275cee8232326b377811afba888f6147d7217e04e07",
+  "FJ3333": "616b5add6471a3fd2a7297cbebfee18a13866eb165ca0be05c5942ae16bacc10",
+  "FJ3334": "ecef0080744a8422b72b4f52229bd68945692cdef7d6fe2a57043b2155c49d17",
+  "FJ3335": "065a4969ea4210ce6d3f5838dc2da20f1153de478e02c7a86ced152eab82bf6a",
+  "FJ3336": "e9f527453bb2a48764ac7243d0b9b23e37fb2a85e92cee445972a1a770a5eaa4",
+  "FJ3337": "469513e43364a7212843011c944a9fff22b5b50496a11e739bcdafc70005d3dd",
+  "FJ3338": "69dbbcfc72d592aa862621612e7ad1151ada3fa06c5ce51e24731015561ad7ac",
+  "FJ3339": "fc442f6596ca1a7ce18fc2d65cb92dcc1de1951381ebd631223469b6e84923b1",
+  "FJ3340": "b9bc6bbb160fd579ed246c3eb145b39f82866dc2dfeebe798f0dba5a2e352597",
+  "FJ3341": "921b821e925624302d8ab138dfa80a24bf3d9150e006b7ac27a2b5f73d15ab33",
+  "FJ3342": "11d403618e4114a5edcd8f2fa4e90ef4e6427b04f4cd3962c59462694b55c443",
+  "FJ3343": "3b633ffd599c51c1f00d66442855a047b013bda569fa092ea31ece5fdc289111",
+  "FJ3344": "67f1f42fea1c289adaf4929716534bad7dfdd136ca0057f05de83d6e20c8f0a8",
+  "FJ3345": "a4d22796f4ffc6f9ad1b7d620c917be1638244864eca62aec60bd11033ed3041",
+  "FJ3346": "91aa56e034fbe6f413c0f15b76d725a1f8efd115aa2900beda6edf43a3ab0c43",
+  "FJ3347": "43a1591cf1e123ca01f64297a7ce008d679a5f5f26421cc5b69e2232da89d743",
+  "FJ3348": "7d3a969b778da18eb38b1a64d92e2b90e1730fcb0d7b2bfacd125ff4826876d0",
+  "FJ3411": "7f1bbd874b05ea618649bfd5a51ac2675523f419dd3e5f5e160d90f47bd413db",
+  "FJ3413": "f4d566821c5ee6347147631b4d1b1e5c5cb3465e05ec23fadffa161c268c7bb2",
+  "FJ3427": "5785787fdaf951e8f64c3f8d5be27cdf015bafb6adf0c70dd4b63f0b5ac2736c"
+ },
+ "outputSha256": {
+  "coronary.bin": "e72baec9a441f21d71e19b57e867a6092f1f4fb5aa97c5c98afff79204f12cd5",
+  "heart.bin": "1b275a48563c915eddf057f516f9f2a1139a2b23bf5f832a60bb5c6cb9eab027",
+  "aorta.bin": "a85ecb87266bf53cd2d51e7d5962af49ca1c33b47d4c31b5960c7644f66c35fa",
+  "ribcage.bin": "be9d59d9982b9c1d1fbff1b77ba87c80c16bcdb9b56c0577409c70ce4a2daf4b"
+ },
+ "layers": {
+  "coronary": {
+   "file": "coronary.bin",
+   "bytes": 286960,
+   "vertices": 18696,
+   "triangles": 28612,
+   "quantised": "int16 positions per group, uint16 indices",
+   "groups": [
+    {
+     "id": "LM",
+     "label": "Left main",
+     "fma": null,
+     "vertexStart": 0,
+     "vertexCount": 121,
+     "indexStart": 0,
+     "indexCount": 612
+    },
+    {
+     "id": "LAD",
+     "label": "Left anterior descending",
+     "fma": null,
+     "vertexStart": 121,
+     "vertexCount": 1550,
+     "indexStart": 612,
+     "indexCount": 9096
+    },
+    {
+     "id": "D",
+     "label": "Diagonal branches",
+     "fma": null,
+     "vertexStart": 1671,
+     "vertexCount": 2711,
+     "indexStart": 9708,
+     "indexCount": 11952
+    },
+    {
+     "id": "S",
+     "label": "LAD septal perforators",
+     "fma": null,
+     "vertexStart": 4382,
+     "vertexCount": 965,
+     "indexStart": 21660,
+     "indexCount": 3432
+    },
+    {
+     "id": "LADb",
+     "label": "Other LAD branches",
+     "fma": null,
+     "vertexStart": 5347,
+     "vertexCount": 1602,
+     "indexStart": 25092,
+     "indexCount": 7284
+    },
+    {
+     "id": "LCx",
+     "label": "Left circumflex",
+     "fma": null,
+     "vertexStart": 6949,
+     "vertexCount": 692,
+     "indexStart": 32376,
+     "indexCount": 4140
+    },
+    {
+     "id": "LCxb",
+     "label": "Circumflex branches",
+     "fma": null,
+     "vertexStart": 7641,
+     "vertexCount": 1748,
+     "indexStart": 36516,
+     "indexCount": 6888
+    },
+    {
+     "id": "RCA",
+     "label": "Right coronary artery",
+     "fma": null,
+     "vertexStart": 9389,
+     "vertexCount": 2255,
+     "indexStart": 43404,
+     "indexCount": 13506
+    },
+    {
+     "id": "AM",
+     "label": "Right marginal branches",
+     "fma": null,
+     "vertexStart": 11644,
+     "vertexCount": 1224,
+     "indexStart": 56910,
+     "indexCount": 5406
+    },
+    {
+     "id": "CB",
+     "label": "RCA conus branches",
+     "fma": null,
+     "vertexStart": 12868,
+     "vertexCount": 513,
+     "indexStart": 62316,
+     "indexCount": 2238
+    },
+    {
+     "id": "RVb",
+     "label": "Anterior ventricular branches",
+     "fma": null,
+     "vertexStart": 13381,
+     "vertexCount": 754,
+     "indexStart": 64554,
+     "indexCount": 3204
+    },
+    {
+     "id": "PDA",
+     "label": "Posterior descending artery",
+     "fma": null,
+     "vertexStart": 14135,
+     "vertexCount": 1763,
+     "indexStart": 67758,
+     "indexCount": 6984
+    },
+    {
+     "id": "PVb",
+     "label": "Posterior ventricular branches",
+     "fma": null,
+     "vertexStart": 15898,
+     "vertexCount": 2227,
+     "indexStart": 74742,
+     "indexCount": 9138
+    },
+    {
+     "id": "PS",
+     "label": "PDA septal branches",
+     "fma": null,
+     "vertexStart": 18125,
+     "vertexCount": 571,
+     "indexStart": 83880,
+     "indexCount": 1956
+    }
+   ],
+   "source": "learncoronary atlas-geometry.js"
+  },
+  "heart": {
+   "file": "heart.bin",
+   "bytes": 588664,
+   "vertices": 35224,
+   "triangles": 62770,
+   "quantised": "int16 positions per group, uint16 indices",
+   "groups": [
+    {
+     "id": "ventricles",
+     "label": "Ventricular myocardium",
+     "fma": null,
+     "vertexStart": 0,
+     "vertexCount": 21053,
+     "indexStart": 0,
+     "indexCount": 112326
+    },
+    {
+     "id": "LA",
+     "label": "Left atrial wall",
+     "fma": null,
+     "vertexStart": 21053,
+     "vertexCount": 4284,
+     "indexStart": 112326,
+     "indexCount": 22632
+    },
+    {
+     "id": "RA",
+     "label": "Right atrial wall",
+     "fma": null,
+     "vertexStart": 25337,
+     "vertexCount": 9887,
+     "indexStart": 134958,
+     "indexCount": 53352
+    }
+   ],
+   "source": "learncoronary atlas-geometry.js"
+  },
+  "aorta": {
+   "file": "aorta.bin",
+   "bytes": 19156,
+   "vertices": 1132,
+   "triangles": 1974,
+   "quantised": "int16 positions per group, uint16 indices",
+   "groups": [
+    {
+     "id": "aorta",
+     "label": "Aortic root, ascending aorta and arch",
+     "fma": null,
+     "vertexStart": 0,
+     "vertexCount": 610,
+     "indexStart": 0,
+     "indexCount": 3198
+    },
+    {
+     "id": "archBranches",
+     "label": "Brachiocephalic and left subclavian trunks",
+     "fma": null,
+     "vertexStart": 610,
+     "vertexCount": 522,
+     "indexStart": 3198,
+     "indexCount": 2724
+    }
+   ],
+   "source": "learncoronary atlas-geometry.js"
+  },
+  "ribcage": {
+   "file": "ribcage.bin",
+   "bytes": 1944416,
+   "vertices": 52913,
+   "triangles": 109070,
+   "groups": [
+    {
+     "id": "RIBS",
+     "label": "Ribs",
+     "fma": null,
+     "sourceFiles": [
+      "FJ3225",
+      "FJ3226",
+      "FJ3227",
+      "FJ3228",
+      "FJ3229",
+      "FJ3230",
+      "FJ3231",
+      "FJ3232",
+      "FJ3233",
+      "FJ3234",
+      "FJ3235",
+      "FJ3236",
+      "FJ3330",
+      "FJ3331",
+      "FJ3332",
+      "FJ3334",
+      "FJ3336",
+      "FJ3338",
+      "FJ3340",
+      "FJ3342",
+      "FJ3344",
+      "FJ3346",
+      "FJ3347",
+      "FJ3348"
+     ],
+     "vertexStart": 0,
+     "vertexCount": 37085,
+     "indexStart": 0,
+     "indexCount": 230310,
+     "partCount": 24
+    },
+    {
+     "id": "COSTAL_CARTILAGES",
+     "label": "Costal cartilages",
+     "fma": null,
+     "sourceFiles": [
+      "FJ3239",
+      "FJ3242",
+      "FJ3245",
+      "FJ3248",
+      "FJ3251",
+      "FJ3254",
+      "FJ3255",
+      "FJ3333",
+      "FJ3335",
+      "FJ3337",
+      "FJ3339",
+      "FJ3341",
+      "FJ3343",
+      "FJ3345"
+     ],
+     "vertexStart": 37085,
+     "vertexCount": 4536,
+     "indexStart": 230310,
+     "indexCount": 27744,
+     "partCount": 14
+    },
+    {
+     "id": "STERNUM",
+     "label": "Sternum",
+     "fma": null,
+     "sourceFiles": [
+      "FJ3153",
+      "FJ3178",
+      "FJ3290"
+     ],
+     "vertexStart": 41621,
+     "vertexCount": 2015,
+     "indexStart": 258054,
+     "indexCount": 12930,
+     "partCount": 1
+    },
+    {
+     "id": "THORACIC_VERTEBRAE",
+     "label": "Thoracic vertebrae",
+     "fma": null,
+     "sourceFiles": [
+      "FJ3154",
+      "FJ3155",
+      "FJ3156",
+      "FJ3158",
+      "FJ3160",
+      "FJ3163",
+      "FJ3166",
+      "FJ3169",
+      "FJ3171",
+      "FJ3173",
+      "FJ3174",
+      "FJ3175"
+     ],
+     "vertexStart": 43636,
+     "vertexCount": 9277,
+     "indexStart": 270984,
+     "indexCount": 56226,
+     "partCount": 12
+    }
+   ]
+  }
+ },
+ "learncoronaryImport": {
+  "description": "coronary, heart and aorta layers come from the maintainer's learncoronary.com atlas-geometry.js (BodyParts3D); rib cage layer from tools/build-meshes.mjs",
+  "inputSha256": "82be477206f84d7d5d1443300de609ff843787c7cfd01b0208ac6df2659f7bf9",
+  "mmPerUnit": 32,
+  "isocentreUnits": [
+   0.24443,
+   -0.84343,
+   0.2109
+  ],
+  "transform": "p_mm = (p - isocentre) * 32; both frames are +X left, +Y cranial, +Z anterior"
+ }
+}

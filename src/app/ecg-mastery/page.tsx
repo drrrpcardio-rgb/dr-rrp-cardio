@@ -100,6 +100,16 @@ export default function EcgMasteryPage() {
             <Button href="/courses/ecg">View ECG Courses</Button>
           </div>
         </Reveal>
+
+        <Reveal delay={0.2}>
+          <p className="mt-10 text-center text-sm text-mist-700">
+            Also from {brand.name}: the{" "}
+            <a className="font-medium text-royal-800 underline" href="/cath-lab">
+              Cath Lab simulator, equipment library and procedures
+            </a>
+            .
+          </p>
+        </Reveal>
       </section>
     </>
   );

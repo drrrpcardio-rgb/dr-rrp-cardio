@@ -1,0 +1,11 @@
+{
+  "name": "Virtual Coronary Angiography",
+  "short_name": "Coronary Angio",
+  "description": "Interactive teaching tool: how C-arm projection angles change normal coronary anatomy, plus the cath lab equipment in procedure order.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a1233",
+  "theme_color": "#0a1233",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

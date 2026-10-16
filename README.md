@@ -122,3 +122,9 @@ npm run lint
 - `<Reveal>` / `<StaggerGroup>` in `src/components/ui/Reveal.tsx` are the
   house scroll-reveal primitives — reach for these before writing a new
   bespoke scroll animation.
+
+## Interactive tools (prebuilt, served from /public)
+
+- `public/ecg-simulator/` is the ECG Mastery simulator (linked from `/ecg-mastery`).
+- `public/cath-sim/` is the Cath Lab app: virtual coronary angiography (Explore), the equipment library (`/cath-sim/equipment/`) and the procedures guide (`/cath-sim/procedures/`). The Next.js landing page is `/cath-lab`.
+- The Cath Lab app is built from its own project (`D:\coronary-angiography`). To refresh it, build there with `MSYS_NO_PATHCONV=1 VITE_BASE=/cath-sim/ VITE_SITE_URL=https://rrpcardio.com VITE_MAIN_SITE=https://rrpcardio.com npx vite build`, then replace `public/cath-sim/` with the `dist` folder (delete its `sitemap.xml`, `robots.txt` and `_headers`).
