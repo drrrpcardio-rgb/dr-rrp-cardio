@@ -1,4 +1,4 @@
-import{n as e,t}from"./guide-dialog-a570rHAe.js";import{i as n,r,t as i}from"./procedures-FRizJaA7.js";e(),t(!1);var a=r,o=n.items,s=`/cath-sim/`,c=e=>e.replace(/&/g,`&amp;`).replace(/</g,`&lt;`).replace(/>/g,`&gt;`).replace(/"/g,`&quot;`),l=e=>o.find(t=>t.id===e),u=e=>e.map(e=>`<li>${c(e)}</li>`).join(``),d=e=>String(e).padStart(2,`0`),f=document.getElementById(`app`);f.className=`journey procs`,f.innerHTML=`
+import{n as e,t}from"./guide-dialog-dKp6CFId.js";import{i as n,r,t as i}from"./procedures-FRizJaA7.js";e(),t(!1);var a=r,o=n.items,s=`/cath-sim/`,c=e=>e.replace(/&/g,`&amp;`).replace(/</g,`&lt;`).replace(/>/g,`&gt;`).replace(/"/g,`&quot;`),l=e=>o.find(t=>t.id===e),u=e=>e.map(e=>`<li>${c(e)}</li>`).join(``),d=e=>String(e).padStart(2,`0`),f=document.getElementById(`app`);f.className=`journey procs`,f.innerHTML=`
   <header class="eq-hero">
     <p class="kicker">Procedures</p>
     <h1>Pick a procedure, <em>see how it is done</em></h1>
