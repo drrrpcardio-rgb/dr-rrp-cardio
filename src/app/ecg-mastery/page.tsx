@@ -82,7 +82,17 @@ export default function EcgMasteryPage() {
           ))}
         </StaggerGroup>
 
-        <div className="mt-16">
+        <div className="mt-16 flex flex-col items-start gap-4 rounded-2xl border border-gold-200 bg-gold-50 p-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-heading text-xl font-semibold text-ink">Free ECG Cheat Sheet</p>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-mist-700">
+              Read any 12-lead ECG in 6 steps, then the patterns to recognise. Read it online or download the PDF.
+            </p>
+          </div>
+          <Button href="/ecg-cheat-sheet" variant="gold">Open the cheat sheet</Button>
+        </div>
+
+        <div className="mt-8">
           <CourseCrossLink
             title="Want structured teaching?"
             text={`The simulator pairs with the ${brand.coursePrefix} ECG courses, which take you from fundamentals to advanced interpretation.`}
