@@ -12,6 +12,7 @@ const staticRoutes = [
   "/certificates",
   "/free-learning",
   "/ecg-mastery",
+  "/cheat-sheets",
   "/ecg-cheat-sheet",
   "/cath-lab",
   "/cath-lab-cheat-sheet",

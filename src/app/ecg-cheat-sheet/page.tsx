@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight, Download } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
+import { CheatSheetTabs } from "@/components/ui/CheatSheetTabs";
 import { Button } from "@/components/ui/Button";
 import { Bullets, Card, Muted, Table } from "@/components/ui/CheatSheet";
 import { brand } from "@/lib/site-data";
@@ -42,6 +43,8 @@ export default function EcgCheatSheetPage() {
           </a>
         </div>
       </PageHero>
+
+      <CheatSheetTabs current="/ecg-cheat-sheet" />
 
       <section className="mx-auto max-w-6xl px-5 pt-10 sm:px-8">
         <nav aria-label="Jump to a section" className="flex flex-wrap justify-center gap-2">
