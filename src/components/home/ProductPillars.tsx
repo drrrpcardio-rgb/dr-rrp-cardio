@@ -30,7 +30,7 @@ const pillars = [
     icon: Heart,
     tag: "Free simulator",
     title: "Cath Lab",
-    text: "Virtual coronary angiography, 134 devices and 29 step-by-step procedures.",
+    text: "Virtual coronary angiography, 141 devices and 29 step-by-step procedures.",
     cta: "Open the Cath Lab",
     href: "/cath-lab",
     accent: "from-amber-500 to-orange-700",

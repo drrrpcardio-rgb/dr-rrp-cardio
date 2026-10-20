@@ -34,7 +34,7 @@ export default function CathLabPage() {
         title="Cath Lab virtual angiography simulator"
         address="rrpcardio.com/cath-sim"
         fullHref="/cath-sim/"
-        highlights={["3D heart and coronary tree", "C-arm angle control", "134 devices", "29 procedures"]}
+        highlights={["3D heart and coronary tree", "C-arm angle control", "141 devices", "29 procedures"]}
       />
 
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8">

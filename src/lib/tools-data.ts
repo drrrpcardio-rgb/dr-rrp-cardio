@@ -14,7 +14,7 @@ export const cathLabTools = [
   },
   {
     title: "Cath lab equipment",
-    text: "134 devices in procedure order, from access sheaths and wires to stents, EP catheters, valves and vessel devices, with overviews, uses and safety points.",
+    text: "141 devices in procedure order, from access sheaths and wires to stents, EP catheters, valves and vessel devices, with overviews, uses and safety points.",
     href: "/cath-sim/equipment/",
   },
   {
