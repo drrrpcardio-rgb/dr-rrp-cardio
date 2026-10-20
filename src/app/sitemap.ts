@@ -14,6 +14,7 @@ const staticRoutes = [
   "/ecg-mastery",
   "/ecg-cheat-sheet",
   "/cath-lab",
+  "/cath-lab-cheat-sheet",
   "/contact",
   "/privacy-policy",
   "/terms",

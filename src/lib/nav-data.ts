@@ -20,6 +20,7 @@ export const navGroups: NavGroup[] = [
       { label: "Workshops", href: "/workshops", description: "Hands-on practical days" },
       { label: "Free Learning", href: "/free-learning", description: "Videos on YouTube" },
       { label: "ECG Cheat Sheet", href: "/ecg-cheat-sheet", description: "Read any ECG in 6 steps, free PDF" },
+      { label: "Cath Lab Views Cheat Sheet", href: "/cath-lab-cheat-sheet", description: "Best angiography views, free PDF" },
     ],
   },
   {

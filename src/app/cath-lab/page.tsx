@@ -68,7 +68,17 @@ export default function CathLabPage() {
           </p>
         </Reveal>
 
-        <div className="mt-16">
+        <div className="mt-16 flex flex-col items-start gap-4 rounded-2xl border border-gold-200 bg-gold-50 p-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-heading text-xl font-semibold text-ink">Free Cath Lab Views Cheat Sheet</p>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-mist-700">
+              The best angiography views for each vessel, TIMI flow, dominance and pitfalls. Read it online or download the PDF.
+            </p>
+          </div>
+          <Button href="/cath-lab-cheat-sheet" variant="gold">Open the cheat sheet</Button>
+        </div>
+
+        <div className="mt-8">
           <CourseCrossLink
             title="Learn the theory behind the images"
             text="Our Cath Lab courses cover access, angiographic views, devices and procedures, with this simulator for practice."
