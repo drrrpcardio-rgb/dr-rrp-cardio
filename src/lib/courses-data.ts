@@ -24,7 +24,7 @@ export interface CourseModule {
   enrollmentStatus?: "open" | "closed";
   /**
    * Optional note pointing to the next scheduled live batch for this
-   * module (e.g. "Next live batch: October 2026 — Aasai Health Care").
+   * module (e.g. "Next live batch: December 2026 — Aasai Health Care").
    * Links through to the live classes page for full details.
    */
   nextLiveBatchNote?: string;
@@ -64,7 +64,7 @@ export const courseCategories: CourseCategory[] = [
           "Builds on Level 1 with advanced axis and hypertrophy patterns, ischaemia and infarction localisation, conduction blocks, and a structured approach to complex arrhythmias.",
         format: "Recorded + Live",
         duration: "8 modules · ~10 hours",
-        nextLiveBatchNote: "Next live batch: October 2026 — Aasai Health Care",
+        nextLiveBatchNote: "Next live batch: December 2026 — Aasai Health Care",
       },
     ],
   },

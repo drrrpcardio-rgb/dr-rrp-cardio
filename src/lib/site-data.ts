@@ -41,8 +41,8 @@ export const contactEmail = "drrrpcardio@gmail.com";
  */
 export const announcement = {
   enabled: true,
-  id: "ecg-level-2-2026",
-  text: "RRP Cardio ECG – Level 2 is coming in October — enquiries now open.",
+  id: "ecg-level-2-dec-2026",
+  text: "RRP Cardio ECG – Level 2 is coming in December — enquiries now open.",
   href: "/courses/ecg",
   linkLabel: "View course",
 };

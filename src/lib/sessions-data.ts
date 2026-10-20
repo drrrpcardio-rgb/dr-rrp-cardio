@@ -63,12 +63,12 @@ const ecgLevel1Session: SessionData = {
 
 /** Date/time/venue/agenda to be finalised — update once confirmed. */
 export const featuredSession: SessionData = {
-  id: "rrp-cardio-ecg-level-2-oct-2026",
+  id: "rrp-cardio-ecg-level-2-dec-2026",
   courseName: "RRP Cardio ECG – Level 2",
   mode: "hybrid",
   title: "ECG – Level 2: Lecture & Hands-on Workshop",
-  isoDate: "2026-10-31",
-  displayDate: "October 2026 (exact date to be announced)",
+  isoDate: "2026-12-31",
+  displayDate: "December 2026 (exact date to be announced)",
   time: "Time to be announced",
   venue: "Aasai Health Care",
   venueMapUrl:
