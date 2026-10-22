@@ -4,6 +4,11 @@ description: "Inferior STEMI with right ventricular infarction, complete heart b
 date: 2026-10-21
 tags: [Case Report, Anomalous RCA, ACAOS, Primary PCI, Guide Catheter, Complete Heart Block]
 draft: false
+cover: "/images/blog/anomalous-rca/aortic-root-schematic.svg"
+key_points:
+  - "Inferior STEMI with right ventricular infarction, complete heart block and cardiogenic shock. The culprit was a right coronary artery arising from the left sinus (ACAOS)."
+  - "The challenge: right-coronary catheters do not seat in an anterior, slit-like ostium."
+  - "What worked: a temporary pacemaker first, then an EBU 3.0 left guide, which seated coaxially and gave stable backup. The RCA reopened with TIMI III flow."
 kicker: "Case Report · Interventional Cardiology"
 author: "Dr. A. Rajaram Prasad"
 author_title: "Consultant Interventional Cardiologist · MD, DM, FSCAI"
