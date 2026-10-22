@@ -217,6 +217,6 @@ textarea:focus-visible,
 .blog-prose img, .blog-prose video { display: block; width: 100%; height: auto; margin: 2rem 0 .75rem; border-radius: .75rem; border: 1px solid var(--color-mist-200); background: #0b1020; }
 .blog-prose img[src$=".svg"] { background: #fff; }
 .blog-prose p > em:only-child { display: block; margin: -.25rem 0 1.75rem; font-size: .875rem; line-height: 1.5; font-style: normal; color: var(--color-mist-600); }
-.blog-prose p:has(> img) { margin-bottom: 0; }
+.blog-prose p:has(> img), .blog-prose p:has(> video) { margin-bottom: 0; }
 .blog-prose hr { margin: 2.5rem 0; border: 0; border-top: 1px solid var(--color-mist-200); }
 .blog-prose blockquote { margin: 1.5rem 0; padding: .25rem 0 .25rem 1.25rem; border-left: 3px solid var(--color-gold-400); color: var(--color-ink-soft); }

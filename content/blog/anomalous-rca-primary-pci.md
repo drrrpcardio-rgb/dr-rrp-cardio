@@ -35,17 +35,13 @@ A temporary pacemaker was inserted first to secure the rhythm, and the patient p
 
 The left coronary system was imaged first. The LMCA, LAD and LCx showed no flow-limiting disease, so the culprit was not in the left system.
 
-![Left coronary angiogram with no flow-limiting lesion](/images/blog/anomalous-rca/left-system.png)
+<!-- VIDEO: /images/blog/anomalous-rca/left-system.mp4 (or add YouTube ID) -->
 
 *Figure 2. Left coronary system: no flow-limiting lesion.*
 
-<!-- VIDEO: /images/blog/anomalous-rca/left-system.mp4 (or add YouTube ID) -->
-
-![Lateral aortogram to locate the RCA ostium](/images/blog/anomalous-rca/rca-origin-lateral.png)
+<!-- VIDEO: /images/blog/anomalous-rca/rca-origin-lateral.mp4 (or add YouTube ID) -->
 
 *Figure 3. Lateral aortography to locate the RCA ostium.*
-
-<!-- VIDEO: /images/blog/anomalous-rca/rca-origin-lateral.mp4 (or add YouTube ID) -->
 
 Lateral and LAO aortography separate the sinuses and show the true origin of each vessel. No separate RCA ostium was present in the right sinus. The RCA arose from the **left (opposite) sinus of Valsalva**, with an anterior, slit-like ostium. CT angiography was planned at follow-up to define the proximal course.
 
@@ -53,39 +49,31 @@ Lateral and LAO aortography separate the sinuses and show the true origin of eac
 
 *Figure 4. Schematic of the aortic root (LAO 30–35°): the RCA arises from the left sinus, and the right sinus has no RCA ostium.*
 
-![Aortogram showing the anomalous origin](/images/blog/anomalous-rca/anomalous-rca-left-sinus.png)
+<!-- VIDEO: /images/blog/anomalous-rca/anomalous-rca-left-sinus.mp4 (or add YouTube ID) -->
 
 *Figure 5. Aortogram showing the anomalous origin.*
-
-<!-- VIDEO: /images/blog/anomalous-rca/anomalous-rca-left-sinus.mp4 (or add YouTube ID) -->
 
 ## Procedure
 
 Because a right-coronary catheter does not seat in this ostium, a left guide catheter was used. An **EBU 3.0** matched the anterior ostium and seated coaxially, providing stable backup for wiring and stent delivery. The temporary pacemaker remained in place throughout.
 
-![EBU 3.0 guide engaged in the anomalous RCA ostium](/images/blog/anomalous-rca/ebu-3-engaged.png)
+<!-- VIDEO: /images/blog/anomalous-rca/ebu-3-engaged.mp4 (or add YouTube ID) -->
 
 *Figure 6. EBU 3.0 guide engaged in the anomalous RCA ostium.*
 
-<!-- VIDEO: /images/blog/anomalous-rca/ebu-3-engaged.mp4 (or add YouTube ID) -->
-
 The culprit was crossed with a wire, pre-dilated, and treated with a drug-eluting stent. Haemodynamic support continued throughout revascularisation.
 
-![Wire, pre-dilatation and stent deployment in the culprit RCA](/images/blog/anomalous-rca/stent-deployment.png)
+<!-- VIDEO: /images/blog/anomalous-rca/stent-deployment.mp4 (or add YouTube ID) -->
 
 *Figure 7. Wire, pre-dilatation and stent deployment in the culprit RCA.*
-
-<!-- VIDEO: /images/blog/anomalous-rca/stent-deployment.mp4 (or add YouTube ID) -->
 
 ## Outcome
 
 The final angiogram showed the culprit RCA reopened with TIMI III antegrade flow and a good angiographic result. The complete heart block was managed with temporary pacing. The procedure was performed in a peripheral set-up.
 
-![Final angiogram with the RCA reopened and TIMI III flow](/images/blog/anomalous-rca/final-result.png)
+<!-- VIDEO: /images/blog/anomalous-rca/final-result.mp4 (or add YouTube ID) -->
 
 *Figure 8. Final angiogram: RCA reopened with TIMI III flow.*
-
-<!-- VIDEO: /images/blog/anomalous-rca/final-result.mp4 (or add YouTube ID) -->
 
 ## Discussion
 
