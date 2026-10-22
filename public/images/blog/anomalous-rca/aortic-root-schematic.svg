@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-140 0 1180 640" width="1180" height="640" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<rect x="-140" width="1180" height="640" fill="#FFFFFF"/>
+<text x="450" y="38" text-anchor="middle" font-family="Georgia, serif" font-size="24" font-weight="bold" fill="#0A1233">Aortic root: anomalous RCA from the left sinus</text>
+<text x="450" y="62" text-anchor="middle" font-size="14" fill="#565D72">Schematic, aortogram view (LAO 30–35°)</text>
+<!-- root outline -->
+<path d="M345 100 L345 190 C265 195 160 235 168 320 C176 392 270 430 345 438 L450 452 L555 438 C630 430 724 392 732 320 C740 235 635 195 555 190 L555 100" fill="#EEF1FB" stroke="#0A1233" stroke-width="4" stroke-linejoin="round"/>
+<path d="M345 100 L345 190 M555 100 L555 190" stroke="#0A1233" stroke-width="4" fill="none"/>
+<!-- ascending aorta label region -->
+<text x="450" y="140" text-anchor="middle" font-size="15" font-weight="600" fill="#0A1233">Ascending aorta</text>
+<!-- sinotubular junction -->
+<line x1="130" y1="190" x2="770" y2="190" stroke="#8A93B8" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="775" y="195" font-size="14" fill="#565D72">Sinotubular junction</text>
+<!-- annulus -->
+<line x1="130" y1="446" x2="770" y2="446" stroke="#8A93B8" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="775" y="451" font-size="14" fill="#565D72">Aortic annulus</text>
+<!-- commissure -->
+<path d="M450 192 C446 280 452 370 450 452" stroke="#8A93B8" stroke-width="2.5" fill="none" stroke-dasharray="3 6"/>
+<!-- sinus labels -->
+<text x="330" y="395" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">Left sinus</text>
+<text x="330" y="415" text-anchor="middle" font-size="13" fill="#565D72">(LSOV)</text>
+<text x="590" y="395" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">Right sinus</text>
+<text x="590" y="415" text-anchor="middle" font-size="13" fill="#565D72">(RSOV)</text>
+<!-- LMCA -->
+<path d="M200 262 L112 232" stroke="#1B6F8A" stroke-width="16" stroke-linecap="round"/>
+<ellipse cx="205" cy="264" rx="13" ry="16" fill="#FFFFFF" stroke="#1B6F8A" stroke-width="4"/>
+<text x="100" y="212" text-anchor="end" font-size="16" font-weight="700" fill="#1B6F8A">LMCA</text>
+<text x="100" y="231" text-anchor="end" font-size="13" fill="#565D72">normal ostium</text>
+<!-- anomalous RCA -->
+<path d="M222 318 C170 335 120 360 92 405" stroke="#B3261E" stroke-width="16" stroke-linecap="round" fill="none"/>
+<ellipse cx="228" cy="316" rx="9" ry="19" fill="#FFFFFF" stroke="#B3261E" stroke-width="4" transform="rotate(25 228 316)"/>
+<text x="84" y="436" text-anchor="end" font-size="16" font-weight="700" fill="#B3261E">Anomalous RCA</text>
+<text x="84" y="455" text-anchor="end" font-size="13" fill="#565D72">anterior, slit-like ostium</text>
+<!-- right sinus: no RCA -->
+<ellipse cx="640" cy="300" rx="22" ry="26" fill="none" stroke="#8A93B8" stroke-width="3" stroke-dasharray="6 5"/>
+<text x="640" y="350" text-anchor="middle" font-size="14" font-weight="600" fill="#565D72">No RCA ostium</text>
+<text x="640" y="368" text-anchor="middle" font-size="13" fill="#565D72">in the right sinus</text>
+<!-- legend -->
+<rect x="150" y="520" width="600" height="80" rx="8" fill="#F8F9FB" stroke="#D4D7E2"/>
+<circle cx="190" cy="548" r="8" fill="#FFFFFF" stroke="#1B6F8A" stroke-width="4"/><text x="208" y="553" font-size="14" fill="#0E1320">Left main coronary artery ostium</text>
+<circle cx="190" cy="578" r="8" fill="#FFFFFF" stroke="#B3261E" stroke-width="4"/><text x="208" y="583" font-size="14" fill="#0E1320">Anomalous right coronary artery ostium</text>
+<circle cx="500" cy="548" r="8" fill="none" stroke="#8A93B8" stroke-width="3" stroke-dasharray="4 3"/><text x="518" y="553" font-size="14" fill="#0E1320">Expected RCA position (absent)</text>
+<line x1="492" y1="578" x2="508" y2="578" stroke="#8A93B8" stroke-width="2.5" stroke-dasharray="3 4"/><text x="518" y="583" font-size="14" fill="#0E1320">Commissure between sinuses</text>
+</svg>
