@@ -79,7 +79,7 @@ const WATERMARK =
 function withVideos(md: string): string {
   return md.replace(/<!--\s*VIDEO:\s*(\S+?\.mp4)[^>]*-->/g, (_all, src: string) => {
     const poster = src.replace(/\.mp4$/, ".png");
-    return `<span class="media-brand">${WATERMARK}<video controls preload="none" playsinline poster="${poster}" src="${src}"></video></span>`;
+    return `<span class="media-brand">${WATERMARK}<video controls controlsList="nodownload noremoteplayback" disablePictureInPicture preload="none" playsinline oncontextmenu="return false" poster="${poster}" src="${src}"></video></span>`;
   });
 }
 
@@ -120,7 +120,7 @@ export function getPost(slug: string): Post | null {
   // Photographs and recordings (PNG) get the watermark too; the SVG schematics are our own drawings and do not.
   const raw = (marked.parse(withVideos(body), { async: false }) as string).replace(
     /<img ([^>]*src="[^"]+\.png"[^>]*)>/g,
-    (_all, attrs: string) => `<span class="media-brand">${WATERMARK}<img ${attrs}></span>`,
+    (_all, attrs: string) => `<span class="media-brand" oncontextmenu="return false">${WATERMARK}<img draggable="false" ${attrs}></span>`,
   );
   const { html, toc } = withHeadingIds(raw);
   return { ...meta, html, toc };
