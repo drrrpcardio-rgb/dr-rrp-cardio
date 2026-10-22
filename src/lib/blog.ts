@@ -71,11 +71,15 @@ function readPost(file: string): { meta: PostMeta; body: string } {
   return { meta, body: m[2] };
 }
 
+/** Logo and name laid over the videos and the ECG, so shared screenshots and recordings carry the brand. */
+const WATERMARK =
+  '<span class="media-brand__mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" stroke="#fff" stroke-width="2.6"/><path d="M6.5 24H14C15 21.8 17 21.8 18 24H19.5L21 27L24 9.5L27.5 34L29.5 24H31C32.5 20.4 35 20.4 36.5 24H37.5" stroke="#f5b301" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Dr. RRP</b><i>Cardio</i></span>';
+
 /** Turns the `<!-- VIDEO: /path/clip.mp4 -->` placeholders into players (poster = the .png with the same name). */
 function withVideos(md: string): string {
   return md.replace(/<!--\s*VIDEO:\s*(\S+?\.mp4)[^>]*-->/g, (_all, src: string) => {
     const poster = src.replace(/\.mp4$/, ".png");
-    return `<video controls preload="none" playsinline poster="${poster}" src="${src}"></video>`;
+    return `<span class="media-brand">${WATERMARK}<video controls preload="none" playsinline poster="${poster}" src="${src}"></video></span>`;
   });
 }
 
@@ -113,7 +117,11 @@ export function getPost(slug: string): Post | null {
   const { meta, body } = readPost(file);
   if (!visible(meta)) return null;
   // The post files are written by the site owner and live in the repository, so the HTML they produce is trusted.
-  const raw = marked.parse(withVideos(body), { async: false }) as string;
+  // Photographs and recordings (PNG) get the watermark too; the SVG schematics are our own drawings and do not.
+  const raw = (marked.parse(withVideos(body), { async: false }) as string).replace(
+    /<img ([^>]*src="[^"]+\.png"[^>]*)>/g,
+    (_all, attrs: string) => `<span class="media-brand">${WATERMARK}<img ${attrs}></span>`,
+  );
   const { html, toc } = withHeadingIds(raw);
   return { ...meta, html, toc };
 }

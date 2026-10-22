@@ -220,3 +220,10 @@ textarea:focus-visible,
 .blog-prose p:has(> img), .blog-prose p:has(> video) { margin-bottom: 0; }
 .blog-prose hr { margin: 2.5rem 0; border: 0; border-top: 1px solid var(--color-mist-200); }
 .blog-prose blockquote { margin: 1.5rem 0; padding: .25rem 0 .25rem 1.25rem; border-left: 3px solid var(--color-gold-400); color: var(--color-ink-soft); }
+
+/* Logo + name laid over blog videos and the ECG. Sits top-left, clear of the frame counters in the angiograms. */
+.blog-prose .media-brand { position: relative; display: block; margin: 2rem 0 .75rem; }
+.blog-prose .media-brand img, .blog-prose .media-brand video { margin: 0; }
+.blog-prose .media-brand__mark { position: absolute; top: .6rem; left: .6rem; z-index: 2; display: inline-flex; align-items: center; gap: .4rem; padding: .25rem .6rem .25rem .35rem; border-radius: 999px; background: rgb(10 18 51 / .62); backdrop-filter: blur(3px); color: #fff; font-size: .75rem; line-height: 1; pointer-events: none; }
+.blog-prose .media-brand__mark b { font-family: var(--font-heading); font-weight: 600; letter-spacing: .01em; }
+.blog-prose .media-brand__mark i { font-style: normal; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--color-gold-300); }
