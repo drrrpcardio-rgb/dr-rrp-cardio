@@ -510,9 +510,9 @@ const CASES = [
     simulation_parameters: { HR: 72, EF: 60, LA_size_cm: 4.2, LVEDD_cm: 4.5, LVESD_cm: 2.9, IVSd_cm: 1.4, LVPWd_cm: 1.3 },
     model: { av: 'stenosis', mvEA: [0.6, 1], dtMs: 260, jets: ['as'], tdi: [0.065, 0.05, 0.08] } },
   { id: 'ar', pathology: 'Severe chronic aortic regurgitation',
-    echo_views: ['PLAX', 'PSAX AV', 'A5C', 'A3C'],
-    findings_list: ['Dilated LV with eccentric hypertrophy', 'Incomplete aortic cusp coaptation in diastole', 'Diastolic fluttering of the anterior mitral leaflet', 'Holodiastolic flow reversal in the descending aorta'],
-    color_doppler: 'Diastolic jet from the aortic valve into the LVOT; jet width / LVOT ≥ 65%, vena contracta > 0.6 cm, pressure half-time < 200 ms.',
+    echo_views: ['PLAX', 'PSAX AV', 'A5C', 'A3C', 'SSN'],
+    findings_list: ['Dilated LV with eccentric hypertrophy', 'Incomplete aortic cusp coaptation in diastole', 'Diastolic fluttering of the anterior mitral leaflet', 'Holodiastolic flow reversal in the descending aorta (SSN view)'],
+    color_doppler: 'Diastolic jet from the aortic valve into the LVOT; jet width / LVOT ≥ 65%, vena contracta > 0.6 cm, pressure half-time < 200 ms. Holodiastolic reversal in the descending aorta (end-diastolic velocity > 20 cm/s) from the suprasternal view.',
     m_mode: 'High-frequency diastolic flutter of the anterior mitral leaflet; premature mitral closure in acute AR.',
     simulation_parameters: { HR: 68, EF: 55, LA_size_cm: 4.0, LVEDD_cm: 6.8, LVESD_cm: 4.7, IVSd_cm: 1.0, LVPWd_cm: 1.0 },
     model: { av: 'regurg', flutter: true, jets: ['ar'], tdi: [0.07, 0.09, 0.06] } },
@@ -532,10 +532,10 @@ const CASES = [
     model: { mv: 'prolapse', jets: ['mr-ant'] } },
   { id: 'tamp', pathology: 'Pericardial effusion with tamponade',
     echo_views: ['PLAX', 'PSAX PM', 'A4C', 'SC4C', 'IVC'],
-    findings_list: ['Circumferential echo-free pericardial space (2 cm: large)', 'Swinging heart', 'RA collapse in late diastole / early systole', 'RV free-wall collapse in early diastole', 'Plethoric IVC (> 2.1 cm, < 50% inspiratory collapse)'],
+    findings_list: ['Circumferential echo-free pericardial space (> 2 cm in diastole: large)', 'Swinging heart', 'RA collapse in late diastole / early systole', 'RV free-wall collapse in early diastole', 'Plethoric IVC (> 2.1 cm, < 50% inspiratory collapse)'],
     color_doppler: 'Exaggerated respiratory variation: mitral E falls > 25–30% on inspiration, tricuspid inflow rises > 40–60%; hepatic vein diastolic flow reversal in expiration.',
     m_mode: 'RV free-wall diastolic collapse in PLAX; IVC M-mode with minimal respiratory collapse; electrical alternans matches the swinging heart.',
-    simulation_parameters: { HR: 118, EF: 68, LA_size_cm: 3.2, LVEDD_cm: 3.8, LVESD_cm: 2.3, IVSd_cm: 1.0, LVPWd_cm: 1.0, effusion_cm: 2.0 },
+    simulation_parameters: { HR: 118, EF: 68, LA_size_cm: 3.2, LVEDD_cm: 3.8, LVESD_cm: 2.3, IVSd_cm: 1.0, LVPWd_cm: 1.0, effusion_cm: 2.2 },
     model: { tamponade: true, swing: true, ivcR: 1.35, ivcColl: 0.08, respVar: 0.32 } },
   { id: 'asd', pathology: 'Secundum atrial septal defect',
     echo_views: ['SC4C', 'A4C', 'PSAX AV', 'RV inflow'],
@@ -556,7 +556,7 @@ const CASES = [
     findings_list: ['Akinetic, thinned (< 6 mm), bright apex and distal septum / anterior wall (LAD territory)', 'Apical aneurysm with dyskinetic bulge', 'Apical LV thrombus (echodense mass)', 'Reduced EF with compensatory basal hyperkinesis'],
     color_doppler: 'Swirling low-velocity flow at the apex; possible ischaemic MR; reduced LVOT VTI.',
     m_mode: 'Basal walls still move in PLAX, so M-mode overestimates function here; use Simpson biplane EF.',
-    simulation_parameters: { HR: 84, EF: 35, LA_size_cm: 4.2, LVEDD_cm: 5.8, LVESD_cm: 4.9, IVSd_cm: 0.9, LVPWd_cm: 0.9 },
+    simulation_parameters: { HR: 84, EF: 35, LA_size_cm: 4.2, LVEDD_cm: 5.8, LVESD_cm: 4.1, IVSd_cm: 0.9, LVPWd_cm: 0.9 },
     model: { wma: 'apex', thrombus: true, mvEA: [0.8, 0.7], dtMs: 170, jets: ['mr-mild'], swirl: true, tdi: [0.05, 0.055, 0.05] } },
   { id: 'ph', pathology: 'Pulmonary hypertension with RV pressure overload',
     echo_views: ['A4C', 'PSAX PM', 'PLAX', 'SC4C', 'IVC'],
@@ -567,7 +567,7 @@ const CASES = [
     model: { septalFlatten: 0.62, ivcR: 1.3, paR: 1.6, rvWall: 0.7, jets: ['tr'], ivcColl: 0.15, rvTdi: [0.08, 0.07, 0.09] } },
   { id: 'amyloid', pathology: 'Cardiac amyloidosis (restrictive cardiomyopathy)',
     echo_views: ['PLAX', 'PSAX PM', 'A4C', 'A2C', 'SC4C'],
-    findings_list: ['Thick LV walls (≥ 1.5 cm) with a bright, granular "sparkling" myocardium', 'Small LV cavity; EF normal or mildly reduced', 'Biatrial enlargement', 'Thickened RV free wall', 'Small pericardial effusion'],
+    findings_list: ['Thick LV walls (≥ 1.5 cm) with a bright, granular "sparkling" myocardium', 'Small LV cavity; EF normal or mildly reduced', 'Biatrial enlargement', 'Thickened RV free wall, valves and interatrial septum', 'Small pericardial effusion', 'Apical-sparing longitudinal strain ("cherry on top")'],
     color_doppler: 'Restrictive mitral inflow: E/A > 2, deceleration time < 150 ms. Very low tissue Doppler velocities (septal e′ and s′ about 4 cm/s, the "5-5-5" sign). Mild TR.',
     m_mode: 'Thick septum and posterior wall with small excursion; low-voltage ECG despite the thick walls is a clue.',
     simulation_parameters: { HR: 84, EF: 50, LA_size_cm: 4.8, LVEDD_cm: 4.0, LVESD_cm: 2.9, IVSd_cm: 1.7, LVPWd_cm: 1.6, effusion_cm: 0.4, RA_scale: 1.4 },
@@ -582,7 +582,7 @@ const CASES = [
   { id: 'pe', pathology: 'Acute pulmonary embolism with RV strain',
     echo_views: ['A4C', 'PSAX PM', 'SC4C', 'IVC', 'PLAX'],
     findings_list: ['Acutely dilated RV (RV : LV > 1 in A4C) with a thin free wall (< 5 mm)', 'Septal flattening: D-shaped LV', 'Small, underfilled LV; tachycardia', 'Plethoric IVC', 'McConnell sign (free wall hypokinetic, apex spared) is typical'],
-    color_doppler: 'TR only moderately fast (2.5–3.0 m/s): an acute RV cannot build high pressure. Short RVOT acceleration time (< 60 ms) with a normal-looking TR gradient is the "60/60" sign.',
+    color_doppler: 'TR only moderately fast (2.5–3.0 m/s): an acute RV cannot build high pressure. The "60/60" sign: RVOT acceleration time < 60 ms with a TR peak gradient < 60 mmHg.',
     m_mode: 'Low TAPSE (< 16 mm); the septum moves toward the LV.',
     simulation_parameters: { HR: 116, EF: 64, LA_size_cm: 3.0, LVEDD_cm: 3.8, LVESD_cm: 2.4, IVSd_cm: 0.9, LVPWd_cm: 0.9, RV_scale: 1.5, RA_scale: 1.35 },
     model: { septalFlatten: 0.7, ivcR: 1.3, ivcColl: 0.15, paR: 1.4, rvWall: 0.4, jets: ['tr'], jetV: { tr: 2.8 }, rvTdi: [0.07, 0.07, 0.09], mvEA: [0.7, 0.9], dtMs: 200 } },
@@ -596,7 +596,7 @@ const CASES = [
   { id: 'constrict', pathology: 'Constrictive pericarditis',
     echo_views: ['PLAX', 'A4C', 'PSAX PM', 'SC4C', 'IVC'],
     findings_list: ['Thick, bright pericardium (> 4 mm) with no effusion', 'Early-diastolic septal "bounce"', 'Respiratory septal shift toward the LV on inspiration', 'Plethoric IVC that hardly collapses', 'Normal-sized ventricles; mildly enlarged atria'],
-    color_doppler: 'Mitral E falls > 25% on inspiration (turn Respiration on). Restrictive-looking inflow (short DT) but normal or high e′ ("annulus paradoxus"), unlike restrictive cardiomyopathy. Hepatic vein expiratory diastolic reversal.',
+    color_doppler: 'Mitral E falls > 25% on inspiration (turn Respiration on). Restrictive-looking inflow (short DT) but normal or high e′ (medial e′ ≥ 8 cm/s, often above lateral e′: "annulus reversus"), unlike the low e′ of restrictive cardiomyopathy. Hepatic vein expiratory diastolic reversal.',
     m_mode: 'Septal bounce and flat posterior wall motion in mid-diastole on PLAX M-mode.',
     simulation_parameters: { HR: 92, EF: 60, LA_size_cm: 4.2, LVEDD_cm: 4.4, LVESD_cm: 2.8, IVSd_cm: 0.9, LVPWd_cm: 0.9, RA_scale: 1.2 },
     model: { pericard: 0.45, bounce: true, respVar: 0.3, ivcR: 1.35, ivcColl: 0.08, mvEA: [1, 0.45], dtMs: 140, tdi: [0.08, 0.13, 0.06] } },
@@ -701,9 +701,13 @@ const e1x = E1.x, e1y = E1.y, e1z = E1.z, e2x = E2.x, e2y = E2.y, e2z = E2.z, e3
 // The septal outer surface stays at b = 3.3 so the right heart does not need to move.
 let G = {};
 let LV = {}, LVO = {}, LVd = {}, LVOd = {}, LVOap = {};
-let RVC = [2.0, 3.6, 1.2], RVR = [4.2, 1.7, 2.5], RVOR = [4.6, 2.15, 2.95];
+// RV: a large ellipsoid centred near the septum; the LV is cut out of it, which leaves the real crescent-shaped RV
+// wrapped round the septum (about a third of the LV circumference in short axis)
+let RVC = [2.0, 3.1, 0.5], RVR = [4.2, 3.1, 3.0], RVOR = [4.6, 3.55, 3.45];
+// Tricuspid annulus centre (local b, c) and radius²: spans the RV base from the septum to the free wall
+const TVB = 4.6, TVC = 0.2, TVR2 = 2.1;
 let LAC = [-2.4, -0.2, -0.3], LAR = [1.8, 1.8, 2.0], LAOR = [2.08, 2.08, 2.28];
-let RAC = [-2.3, 4.0, -0.6], RAR = [2.0, 1.9, 2.1], RAOR = [2.28, 2.18, 2.38];
+let RAC = [-2.3, 4.4, -0.6], RAR = [2.0, 2.15, 2.1], RAOR = [2.28, 2.43, 2.38];
 let MVO = 0.5, TVO = 0.5, AVO = 0, PVO = 0, SYS = 0, TIME = 0, SWB = 0;
 
 function derive() {
@@ -715,13 +719,16 @@ function derive() {
   const s = M.RV_scale, r = M.RA_scale, laR = M.LA_size_cm / 2;
   G = { cavD, cavS, raD, raS: raD * raRatio, ivs: M.IVSd_cm, pw: M.LVPWd_cm, flat,
     lvB: 3.3 - (cavD * flat + M.IVSd_cm), apexWall: M.wma === 'apex' ? 0.45 : Math.max(0.7, M.LVPWd_cm),
-    rvR: [4.2 * (1 + (s - 1) * 0.6), 1.7 * (1 + (s - 1) * 0.35), 2.5 * (1 + (s - 1) * 0.8)], rvWall: M.rvWall,
-    raR: [2.0 * r, 1.9 * r, 2.1 * r] };
-  G.rvC = [2.0 + (G.rvR[0] - 4.2) * 0.5, 3.6 + (G.rvR[1] - 1.7) * 0.3, 1.2];
-  G.raC = [-2.3 - (G.raR[0] - 2.0) * 0.6, 4.0 + (G.raR[1] - 1.9) * 0.8, -0.6];
+    // RV_scale widens the crescent (basal diameter ~3.3 cm normal, ~4.5 cm at x1.6) and lengthens it toward the apex
+    rvR: [4.2 * (1 + (s - 1) * 0.6), 3.1 * (1 + (s - 1) * 0.5), 3.0 * (1 + (s - 1) * 0.6)], rvWall: M.rvWall,
+    raR: [2.0 * r, 2.15 * r, 2.1 * r] };
+  G.rvC = [2.0 + (G.rvR[0] - 4.2) * 0.5, 3.1 + (G.rvR[1] - 3.1) * 0.55, 0.5];
+  G.raC = [-2.3 - (G.raR[0] - 2.0) * 0.6, 4.4 + (G.raR[1] - 2.15) * 0.8, -0.6];
   // LA_size is the end-systolic AP diameter (atria are largest then; setBeat grows them 7% in systole)
   G.laR = [laR * 1.1 / 1.07, laR / 1.07, laR / 1.07]; G.laC = [-0.6 - laR, 1.6 - laR - 0.28, -0.3];
   LVd = lvShape(0); LVOd = lvOuter(LVd, 0);
+  // A small heart still lies against the chest wall (fat fills the cardiac notch), so lung must not slip in front of the apex
+  G.notch = Math.max(0, 7.9 - (LVd.a + LVd.ra)) * 1.3;
   LVOap = { a: LVd.a, b: LVd.b, ra: LVd.ra + G.apexWall, rbp: LVd.rbp + G.apexWall, rbm: LVd.rbm + G.apexWall, rc: LVd.rc + G.apexWall, rcp: LVd.rc + G.apexWall, cut: LVd.cut + G.apexWall };
   buildVessels();
 }
@@ -770,16 +777,20 @@ function setBeat(phi) {
 // ---------- Great vessels (world polylines) ----------
 // Aortic root: anterior to the LA, rightward of the mitral valve, with the RVOT in front of it (as in a real PLAX)
 const AV_LOC = [-0.6, 1.5, 1.45];
-const AVw = Lw(...AV_LOC), PVw = Lw(-0.6, 3.5, 3.9);
-// Ascending aorta runs base-ward and up in the PLAX plane; the descending aorta lies just behind the LA, left of the spine
-const AORTA = [AVw, follow(V3(-0.6, 3.07, 5.43)), follow(V3(-0.2, 3.0, 8.0), 0.6), follow(V3(0.6, 1.0, 10.0), 0.3), V3(2.0, -2.0, 10.2), V3(2.4, -3.9, 8.4), V3(1.9, -3.9, 4.0), V3(1.6, -4.1, -4.0), V3(1.5, -4.6, -12), V3(1.2, -4.4, -26)];
+// Pulmonary valve: ~3 cm from the aortic valve, anterior, to the patient's left and ~1 cm higher (RVOT crosses in front of the aorta)
+const PV_LOC = [1.0, 1.95, 3.95];
+const AVw = Lw(...AV_LOC), PVw = Lw(...PV_LOC);
+// Ascending aorta runs base-ward and up in the PLAX plane; the arch top sits ~3 cm below the suprasternal notch;
+// the descending aorta runs just behind the LA (seen in cross-section behind the LA in PLAX, PSAX AV and A4C)
+const AORTA = [AVw, follow(V3(-0.6, 3.07, 5.43)), follow(V3(-0.2, 3.0, 8.0), 0.6), V3(0.5, 2.0, 11.0), V3(1.6, -1.5, 10.6), V3(0.9, -3.6, 8.0), V3(0.3, -3.65, 0.6), V3(0.5, -4.1, -4.5), V3(1.2, -4.6, -12), V3(1.1, -4.4, -26)];
 const AORTA_R = [1.35, 1.35, 1.3, 1.25, 1.15, 1.1, 1.05, 1.0, 0.95, 0.85];
 const PA_BIF = follow(V3(2.4, 1.4, 6.8), 0.85);
 const PA = [PVw, follow(V3(2.6, 3.4, 6.2), 0.9), PA_BIF];
 const LPA = [PA_BIF, follow(V3(5.0, -0.8, 7.0), 0.6)];
 const RPA = [PA_BIF, follow(V3(0.0, 0.6, 6.9), 0.7), follow(V3(-2.8, 0.4, 6.6), 0.6)];
-const IVC = [follow(V3(-3.3, 3.2, 0.9)), follow(V3(-3.0, 1.2, -3.0), 0.6), V3(-2.2, -0.5, -7.0), V3(-1.6, -2.8, -12), V3(-1.5, -3.4, -26)];
-const HEPV = [follow(V3(-2.6, 0.4, -5.0), 0.4), V3(-7.0, 3.0, -10.0)];
+// IVC: enters the posterior-inferior RA, then runs down just in front of the spine through the liver
+const IVC = [V3(-3.5, 2.0, 1.1), V3(-4.7, 2.3, -2.2), V3(-3.4, -0.8, -7.0), V3(-2.2, -2.8, -12), V3(-1.5, -3.4, -26)];
+const HEPV = [V3(-4.05, 0.8, -4.5), V3(-7.5, 2.5, -9.0)];
 const SVC = [follow(V3(-3.4, 3.8, 3.5)), follow(V3(-3.6, 3.0, 9.5), 0.4)];
 // Arch branches: brachiocephalic (innominate), left common carotid, left subclavian
 const ARCH_BRANCHES = [[0.55, V3(-1.6, 0.6, 4.2), 0.5], [0.25, V3(0.2, -0.2, 4.2), 0.36], [0.7, V3(0.9, -0.8, 4.0), 0.4]].map(([t, d, r], i) => {
@@ -839,7 +850,7 @@ function capsule(a, b, c, P, Q, r) {
 const LVOT0 = [0.9, 0.6, 0.75], LVOT1 = AV_LOC;
 // Tricuspid annulus sits a little nearer the apex than the mitral annulus (normal apical offset ~0.7 cm)
 const TVA = 0.7;
-const RVOT0 = [1.2, 3.8, 2.0], RVOT1 = [-0.6, 3.5, 3.9];
+const RVOT0 = [1.2, 3.8, 2.0], RVOT1 = PV_LOC;
 const ASD0 = [-2.4, 0.9, -0.4], ASD1 = [-2.4, 2.9, -0.6];
 // Perimembranous VSD: just below the aortic valve, in the PLAX plane, crossing the septum into the RV
 const VSD0 = [0.85, 1.3, 0.98], VSD1 = [0.85, 2.9, 2.18], VSD_C = [0.85, 2.15, 1.61];
@@ -902,9 +913,9 @@ function valveAt(a, b, c, x, y, z) {
     if (leaflet(a, c, -0.15, -hc, Pm ? Pm[0] : null, Pm ? Pm[1] : 0, P[0], P[1], th)) return true;
   }
   // Tricuspid leaflets: septal and anterior.
-  const bp = b - 3.9, cp = c - 0.15;
-  if (a > -0.5 + TVA && a < 2.2 + TVA && bp > -1.8 && bp < 1.8 && cp > -1.34 && cp < 1.34) {
-    const hb = Math.sqrt(Math.max(0, 1.8 - cp * cp)), k = hb / 1.34;
+  const bp = b - TVB, cp = c - TVC;
+  if (a > -0.5 + TVA && a < 2.2 + TVA && bp > -1.8 && bp < 1.8 && cp > -1.45 && cp < 1.45) {
+    const hb = Math.sqrt(Math.max(0, TVR2 - cp * cp)), k = hb / 1.45;
     if (seg2(a, bp, -0.1 + TVA, -hb, lerp(0.40, 1.5, TVO) + TVA, lerp(-0.05, -1.25, TVO) * k) < 0.11) return true;
     if (seg2(a, bp, -0.1 + TVA, hb, lerp(0.45, 1.9, TVO) + TVA, lerp(0.08, 1.2, TVO) * k) < 0.11) return true;
   }
@@ -942,7 +953,7 @@ function pmAt(a, b, c) {
   return false;
 }
 const PM_ANG = [Math.PI * 0.78, Math.PI * 1.3];
-const MB0 = [4.1, 3.3, 0.05], MB1 = [4.6, 5.0, 0.1];
+const MB0 = [4.1, 3.3, 0.05], MB1 = [4.7, 5.9, 0.2];
 // Pulmonary veins entering the back of the LA
 const PV_DIRS = [[-2.7, 1.5, 0.6], [-2.4, 1.4, -0.9], [-2.5, -1.8, 0.7], [-2.2, -1.6, -0.9]];
 function pvAt(a, b, c) {
@@ -953,7 +964,7 @@ function bloodAt(a, b, c) {
   if (a > -0.2 && lvCavity(a, b, c)) return !pmAt(a, b, c);
   if (a > -1.3 && a < 0.4 && b * b + c * c < 2.1) return true;
   if (capsule(a, b, c, LVOT0, LVOT1, 1.0)) return true;
-  if (a > -1.1 && a < 0.5 + TVA && (b - 3.9) ** 2 + (c - 0.15) ** 2 < 1.69) return true;
+  if (a > -1.1 && a < 0.5 + TVA && (b - TVB) ** 2 + (c - TVC) ** 2 < TVR2) return true;
   if (a > -0.6 + TVA && inE(a, b, c, RVC, RVR) < 1 && lvOuterK(a, b, c) >= 1) return !capsule(a, b, c, MB0, MB1, 0.24);
   if (capsule(a, b, c, RVOT0, RVOT1, 1.15)) return true;
   if (inE(a, b, c, LAC, LAR) < 1) return true;
@@ -1035,7 +1046,9 @@ function tissue(x, y, z) {
   const pc = MODEL.pericard;
   if (hd >= eff && hd < eff + 0.22 + pc) { OUT.raw = pc ? 0.75 : 0.42; return; }
   // Diaphragm (right dome higher); below it the liver fills the right and central upper abdomen
-  const zd = -4.7 + 1.3 * Math.exp(-(((x + 3) / 6) ** 2));
+  // Dome-shaped: highest posteriorly and on the right, sloping down to the costal margin at the front,
+  // so it never lies between an apical probe and the heart
+  const zd = -4.7 + 1.3 * Math.exp(-(((x + 3) / 6) ** 2)) - 2.8 * sm(1.5, 8.5, y);
   if (z < zd + 0.22 && z > zd - 0.22) { OUT.raw = 0.9; return; }
   const lx = (x + 4) / 11, ly = (y - 0.5) / 8, lz = (z + 12.5) / 7.5, lq = lx * lx + ly * ly + lz * lz;
   if (lq < 1 || (z < zd && x < 4.5 && y > -5 && z > zd - 9)) { OUT.raw = lq > 0.955 && lq < 1 ? 0.8 : 0.33; return; }
@@ -1044,7 +1057,7 @@ function tissue(x, y, z) {
   const mediastinum = (z > 6 && Math.abs(x - 0.5) < 4.5 && y > -6) || vd < 0.9 || vd + hd < 3.2;
   // The lung edge does not follow the heart as it contracts, so allow for the systolic shrink (~1.2 cm)
   const hs = 1.2 * SYS;
-  if (!mediastinum && z > zd && z < 14 && s > 1.0 && hd > eff + pc + 0.55 + hs && s + hd > 4 + hs) {
+  if (!mediastinum && z > zd && z < 14 && s > 1.0 && hd > eff + pc + 0.55 + hs && s + hd > 4 + hs + G.notch) {
     OUT.raw = 0.5; OUT.kind = 4; OUT.att = 0.78; return;
   }
   if (hd < eff + pc + 0.55) { OUT.raw = 0.1; return; } // epicardial fat
@@ -1067,8 +1080,8 @@ const JET_DEFS = {
   'as': { o: [AVL[0] + AXL[0] * 0.3, AVL[1] + AXL[1] * 0.3, AVL[2] + AXL[2] * 0.3], d: AXL, L: 6.0, w0: 0.25, ha: 9, v: 4.6, when: 'sys', turb: 1, pisa: 0.25 },
   'ar': { o: [AVL[0] + AXL[0] * 0.2, AVL[1] + AXL[1] * 0.2, AVL[2] + AXL[2] * 0.2], d: [LVOT0[0] - LVOT1[0], LVOT0[1] - LVOT1[1], LVOT0[2] - LVOT1[2]], L: 5.5, w0: 0.35, ha: 13, v: 4.0, when: 'dia', turb: 0.9, pisa: 0.2 },
   'ms': { o: [0.7, 0, 0.1], d: [1, 0, 0], L: 5.0, w0: 0.35, ha: 8, v: 2.0, when: 'msd', turb: 0.75, pisa: 0.35 },
-  'tr': { o: [0.35 + TVA, 3.9, 0.15], d: [-1, 0.1, 0], L: 4.5, w0: 0.22, ha: 14, v: 3.8, when: 'sys', turb: 1, pisa: 0.25 },
-  'tr-severe': { o: [0.35 + TVA, 3.9, 0.15], d: [-1, 0.12, -0.05], L: 5.6, w0: 0.5, ha: 22, v: 2.6, when: 'sys', turb: 0.8, pisa: 0.5 },
+  'tr': { o: [0.35 + TVA, TVB, TVC], d: [-1, 0.1, 0], L: 4.5, w0: 0.22, ha: 14, v: 3.8, when: 'sys', turb: 1, pisa: 0.25 },
+  'tr-severe': { o: [0.35 + TVA, TVB, TVC], d: [-1, 0.12, -0.05], L: 5.6, w0: 0.5, ha: 22, v: 2.6, when: 'sys', turb: 0.8, pisa: 0.5 },
   'vsd': { o: [...VSD_C], d: [0, 0.8, 0.6], L: 3.2, w0: 0.32, ha: 11, v: 4.5, when: 'sys', turb: 1, pisa: 0 },
   'asd': { o: [-2.4, 1.3, -0.5], d: [0, 1, -0.05], L: 2.8, w0: 0.55, ha: 14, v: 0.9, when: 'cont', turb: 0.25, pisa: 0 },
 };
@@ -1133,7 +1146,7 @@ function flowAt() {
   const dia = PHASE >= 0.47;
   if (a > -1.3 && a < 0.4 && b * b + c * c < 2.1) { if (dia) FLOW.a = 0.8 * MVO * MVR * (1 - 0.6 * (b * b + c * c) / 2.1); return; }
   if (capsule(a, b, c, LVOT0, LVOT1, 1.0)) { const s = 1.0 * SYS; FLOW.a = LVOT_D[0] * s; FLOW.b = LVOT_D[1] * s; FLOW.c = LVOT_D[2] * s; return; }
-  if (a > -1.1 && a < 0.5 + TVA && (b - 3.9) ** 2 + (c - 0.15) ** 2 < 1.69) { if (dia) FLOW.a = 0.6 * TVO * TVR; return; }
+  if (a > -1.1 && a < 0.5 + TVA && (b - TVB) ** 2 + (c - TVC) ** 2 < TVR2) { if (dia) FLOW.a = 0.6 * TVO * TVR; return; }
   if (capsule(a, b, c, RVOT0, RVOT1, 1.15)) { const s = 0.8 * SYS; FLOW.a = RVOT_D[0] * s; FLOW.b = RVOT_D[1] * s; FLOW.c = RVOT_D[2] * s; return; }
   if (a > -0.2 && lvCavity(a, b, c)) {
     if (MODEL.swirl && a > LVd.a + 0.3 * LVd.ra) { const rb = b - LVd.b; FLOW.b = -c * 0.12; FLOW.c = rb * 0.12; FLOW.a = 0.04; return; }
@@ -1147,12 +1160,12 @@ function flowAt() {
     return;
   }
   if (a > -0.6 + TVA && inE(a, b, c, RVC, RVR) < 1) {
-    if (dia) { if ((b - 3.9) ** 2 + (c - 0.15) ** 2 < 2.2) FLOW.a = 0.45 * TVO * TVR; }
+    if (dia) { if ((b - TVB) ** 2 + (c - TVC) ** 2 < TVR2 + 0.5) FLOW.a = 0.45 * TVO * TVR; }
     else towards(a, b, c, RVOT0, 0.45 * SYS);
     return;
   }
   if (inE(a, b, c, LAC, LAR) < 1) { if (dia) { const d = Math.hypot(a + 0.2, b, c); towards(a, b, c, [-0.2, 0, 0], 0.35 * MVO * MVR * clamp(1 - d / 4, 0, 1)); } return; }
-  if (inE(a, b, c, RAC, RAR) < 1) { if (dia) towards(a, b, c, [-0.2, 3.9, 0.15], 0.3 * TVO * TVR); return; }
+  if (inE(a, b, c, RAC, RAR) < 1) { if (dia) towards(a, b, c, [-0.2, TVB, TVC], 0.3 * TVO * TVR); return; }
 }
 // Velocity component toward the probe along unit ray (dx, dy, dz), in m/s.
 function towardProbe(dx, dy, dz) {
@@ -1269,7 +1282,7 @@ function computePolar(fr, depth) {
     for (let j = 0; j < NS; j++) {
       const r = (j + 0.5) / NS * depth, px = pos.x + dx * r, py = pos.y + dy * r, pz = pos.z + dz * r;
       tissue(px, py, pz);
-      if (lineIn && OUT.kind === 1 && r >= r0 && r <= r1 && T > 0.2) {
+      if (lineIn && OUT.kind === 1 && r >= r0 && r <= r1 && T > 0.07) { // only true shadow (rib, lung) hides colour; deep flow behind thick muscle still shows
         flowAt();
         let v = towardProbe(dx, dy, dz);
         const nz = speck(px * 1.7 + TIME * 3, py * 1.7, pz * 1.7) - 0.9;
@@ -1440,7 +1453,7 @@ const dirBC = t => E2.clone().multiplyScalar(Math.cos(t)).addScaledVector(E3, Ma
 // PLAX / A3C plane: through the LV long axis, rotated toward the aortic root so it also cuts the RV, septum and LA
 const thAV = 36 * DEG, d3 = dirBC(thAV);
 const cross = (a, b) => new THREE.Vector3().crossVectors(a, b).normalize();
-const RVc = Lw(2.0, 3.6, 1.2), RAc = Lw(-2.3, 4.0, -0.6), TVw = Lw(0.3, 3.9, 0.15), APX = Lw(8.0, 0, 0);
+const RVc = Lw(2.0, 4.7, 0.5), RAc = Lw(-2.3, 4.4, -0.6), TVw = Lw(0.3, TVB, TVC), APX = Lw(8.0, 0, 0);
 function makeView(o) {
   const N = o.N.clone().normalize();
   const app = o.seed.clone().addScaledVector(N, -o.seed.dot(N)).normalize();
@@ -1451,21 +1464,38 @@ function makeView(o) {
   const pose = poseFromFrame(S, marker, beam);
   return { ...o, pose, frame: frameFromPose(pose) };
 }
-const a5Dir = AVw.clone().sub(APX).normalize();
 const IVC_T = IVC[1].clone().lerp(IVC[2], 0.15);
-const SSN_N = new THREE.Vector3().crossVectors(AORTA[3].clone().sub(AORTA[2]), AORTA[5].clone().sub(AORTA[2])).normalize();
+// Plane through the ascending aorta, the arch top and the descending aorta: the whole 'candy cane' lies in it
+const SSN_N = new THREE.Vector3().crossVectors(AORTA[3].clone().sub(AORTA[1]), AORTA[6].clone().sub(AORTA[1])).normalize();
 const SSN_T = AORTA[2].clone().add(AORTA[3]).add(AORTA[4]).add(AORTA[5]).multiplyScalar(0.25).add(V3(0, 0, -1.2));
+// LV axis ~15° off horizontal, as in a real PLAX
+const PLAX_DEF = { id: 'plax', name: 'PLAX', full: 'Parasternal long axis', group: 'Parasternal', N: cross(E1, d3), target: Lw(1.0, 0.5, 0.5), seed: d3.clone().multiplyScalar(0.85).addScaledVector(E1, 0.28), hint: E1.clone().negate(), depth: 16 };
+const A4C_DEF = { id: 'a4c', name: 'A4C', full: 'Apical four-chamber', group: 'Apical', N: E3.clone(), target: Lw(2.4, 1.6, 0), seed: E1.clone(), hint: E2.clone().negate(), depth: 18 };
+// A5C: the probe sits over the LV apex and tilts forward until the plane takes in the aortic valve,
+// so the beam runs down the LV cavity and the LVOT
+function a5Plane(S) {
+  const v = AVw.clone().sub(S);
+  return { N: cross(E2, v), target: S.clone().addScaledVector(v, 0.55), seed: v.clone().negate() };
+}
+function psaxMvPlane() {
+  // plane a = 0.95 + 0.45 (b - 0.2) + 0.15 (c - 0.1) in heart coordinates: across the mitral orifice it stays
+  // within the leaflets (fish-mouth), at the tricuspid valve it is past the leaflet tips, at the PV it is well below
+  const target = Lw(0.95, 0.2, 0.1);
+  return { N: E1.clone().addScaledVector(E2, -0.45).addScaledVector(E3, -0.15).normalize(), target, seed: V3(0.5, 10, 3.6).sub(target) };
+}
 const VIEWS = [
-  { id: 'plax', name: 'PLAX', full: 'Parasternal long axis', group: 'Parasternal', N: cross(E1, d3), target: Lw(1.0, 0.5, 0.5), seed: d3.clone().multiplyScalar(0.85).addScaledVector(E1, 0.5), hint: E1.clone().negate(), depth: 16 },
+  PLAX_DEF,
   { id: 'rvin', name: 'RV inflow', full: 'RV inflow', group: 'Parasternal', N: cross(RVc.clone().sub(RAc), V3(0.25, 1, 0.55)), target: TVw, seed: V3(0.25, 1, 0.55), hint: RAc.clone().sub(RVc), depth: 16 },
   { id: 'rvout', name: 'RV outflow', full: 'RV outflow', group: 'Parasternal', N: cross(PA[1].clone().sub(Lw(1.2, 3.8, 2.0)), ANT), target: PVw, seed: ANT, hint: PA[1].clone().sub(Lw(1.2, 3.8, 2.0)), depth: 14 },
-  { id: 'psaxav', name: 'PSAX AV', full: 'Short axis · aortic valve', group: 'Parasternal', N: AXw.clone(), target: AVw.clone().addScaledVector(AXw, 0.45), seed: ANT, hint: V3(1, 0, 0.4), depth: 14 },
-  { id: 'psaxmv', name: 'PSAX MV', full: 'Short axis · mitral valve', group: 'Parasternal', N: E1.clone(), target: Lw(0.8, 0.2, 0.1), seed: ANT, hint: V3(1, 0, 0.4), depth: 15 },
+  { id: 'psaxav', name: 'PSAX AV', full: 'Short axis · aortic valve', group: 'Parasternal', N: AXw.clone(), target: AVw.clone().addScaledVector(AXw, 0.25), seed: ANT, hint: V3(1, 0, 0.4), depth: 14 },
+  // PSAX MV: tilted a little (as a sonographer does) so the plane cuts the mitral orifice but runs apical to the
+// tricuspid leaflets on the RV side and below the pulmonary valve: RV crescent, no tricuspid ring, no PA
+  { id: 'psaxmv', name: 'PSAX MV', full: 'Short axis · mitral valve', group: 'Parasternal', ...psaxMvPlane(), hint: V3(1, 0, 0.4), depth: 15 },
   { id: 'psaxpm', name: 'PSAX PM', full: 'Short axis · papillary muscles', group: 'Parasternal', N: E1.clone(), target: Lw(3.4, 0.4, 0), seed: ANT, hint: V3(1, 0, 0.4), depth: 15 },
   { id: 'psaxap', name: 'PSAX apex', full: 'Short axis · apex', group: 'Parasternal', N: E1.clone(), target: Lw(6.0, 0.3, 0), seed: ANT, hint: V3(1, 0, 0.4), depth: 13 },
-  { id: 'a4c', name: 'A4C', full: 'Apical four-chamber', group: 'Apical', N: E3.clone(), target: Lw(2.4, 1.6, 0), seed: E1.clone(), hint: E2.clone().negate(), depth: 18 },
-  { id: 'a5c', name: 'A5C', full: 'Apical five-chamber', group: 'Apical', N: cross(E2, a5Dir), target: APX.clone().addScaledVector(a5Dir, 6.5).addScaledVector(E2, 0.9), seed: a5Dir.clone().negate(), hint: E2.clone().negate(), depth: 18 },
-  { id: 'a2c', name: 'A2C', full: 'Apical two-chamber', group: 'Apical', N: cross(E1, dirBC(thAV - 2.094)), target: Lw(2.5, 0, 0), seed: E1.clone(), hint: ANT, depth: 18 },
+  A4C_DEF,
+  { id: 'a5c', name: 'A5C', full: 'Apical five-chamber', group: 'Apical', ...a5Plane(exitPoint(APX, E1)), hint: E2.clone().negate(), depth: 18 },
+  { id: 'a2c', name: 'A2C', full: 'Apical two-chamber', group: 'Apical', N: cross(E1, dirBC(thAV - 1.78)), target: Lw(2.5, 0, 0), seed: E1.clone(), hint: E3.clone().add(ANT), depth: 18 }, // inferior wall left, anterior wall right // ~66° from A4C, as on a real scanner
   { id: 'a3c', name: 'A3C', full: 'Apical three-chamber', group: 'Apical', N: cross(E1, d3), target: Lw(2.0, 0.4, 0.8), seed: E1.clone(), hint: d3.clone(), depth: 18 },
   // Subcostal 4C: the four-chamber plane seen from below the xiphoid (liver in the near field, apex to the right)
   { id: 'sc4c', name: 'SC4C', full: 'Subcostal four-chamber', group: 'Subcostal', N: E3.clone().addScaledVector(E2, 0.25).normalize(), target: Lw(0.5, 2.2, 0), seed: V3(0.3, 9.6, -11.5).sub(Lw(0.5, 2.2, 0)), hint: E1.clone(), depth: 20 },
@@ -1475,6 +1505,8 @@ const VIEWS = [
   { id: 'ssn', name: 'SSN', full: 'Suprasternal aortic arch', group: 'Suprasternal', N: SSN_N, target: SSN_T, seed: V3(0, 6, 16).sub(SSN_T), hint: AORTA[5].clone().sub(AORTA[2]), depth: 14 },
 ].map(makeView);
 const viewIndexByName = name => VIEWS.findIndex(v => v.name === name);
+// Read-only handle for checking anatomy from the browser console
+window.__echo = { VIEWS, AORTA, IVC, PA, RPA, Lw, E1, E2, E3, O, tissue, OUT, get G() { return G; }, get LVd() { return LVd; } };
 
 // ---------- Labels ----------
 const samplePoly = (pts, from, to, step = 0.6) => { const out = []; for (let i = from; i < Math.min(to, pts.length - 1); i++) { const A = pts[i], B = pts[i + 1], n = Math.max(1, Math.ceil(A.distanceTo(B) / step)); for (let k = 0; k <= n; k++) out.push(A.clone().lerp(B, k / n)); } return out; };
@@ -1482,21 +1514,23 @@ const range = (a, b, s) => { const r = []; for (let x = a; x <= b + 1e-6; x += s
 const around = (C, R) => [Lw(...C), Lw(C[0] + R, C[1], C[2]), Lw(C[0] - R, C[1], C[2]), Lw(C[0], C[1] + R, C[2]), Lw(C[0], C[1] - R, C[2]), Lw(C[0], C[1], C[2] + R), Lw(C[0], C[1], C[2] - R)];
 let LABELS = [];
 function buildLabels() {
-  const lb = G.lvB, rvb = G.rvC[1] + 0.5;
+  const lb = G.lvB, rvb = 3.3 + (G.rvC[1] + G.rvR[1] - 3.3) * 0.5;
   LABELS = [
     { t: 'LV', tol: 1.2, pts: range(0.8, G.raD * 1.3, 0.5).flatMap(a => [Lw(a, lb, 0), Lw(a, lb - 0.8, 0), Lw(a, lb, 0.8), Lw(a, lb, -0.8)]) },
-    { t: 'RV', tol: 1.0, pts: range(0.6, 5.0, 0.5).flatMap(a => [Lw(a, rvb, 1.2), Lw(a, rvb, 2.0), Lw(a, rvb, 0.4)]) },
+    { t: 'RV', tol: 1.0, pts: range(0.6, 5.0, 0.5).flatMap(a => [Lw(a, rvb, 0.5), Lw(a, rvb, 1.4), Lw(a, rvb, -0.4), Lw(a, rvb - 0.4, 2.2)]) },
     { t: 'LA', tol: 1.2, pts: around(G.laC, 0.9) },
     { t: 'RA', tol: 1.2, pts: around([G.raC[0] - 0.1, G.raC[1] + 0.1, G.raC[2]], 0.9) },
     { t: 'Ao', tol: 0.9, pts: samplePoly(AORTA, 0, 2) },
     { t: 'Arch', tol: 0.9, pts: samplePoly(AORTA, 2, 4) },
     { t: 'Desc Ao', tol: 0.9, pts: samplePoly(AORTA, 4, 7) },
     { t: 'Abd Ao', tol: 0.9, pts: samplePoly(AORTA, 7, 9) },
-    { t: 'PA', tol: 0.9, pts: samplePoly(PA, 0, 2).concat(samplePoly(RPA, 0, 2), samplePoly(LPA, 0, 1)) },
-    { t: 'IVC', tol: 0.8, pts: samplePoly(IVC, 0, 4) },
+    { t: 'PA', tol: 0.9, pts: samplePoly(PA, 0, 2) },
+    { t: 'RPA', tol: 0.8, noApical: true, pts: samplePoly(RPA, 0, 2) },
+    { t: 'LPA', tol: 0.8, noApical: true, pts: samplePoly(LPA, 0, 1) },
+    { t: 'IVC', tol: 0.8, subOnly: true, pts: samplePoly(IVC, 0, 4) },
     { t: 'Liver', tol: 2.0, pts: [V3(-4, 2, -12), V3(-1, 4, -10), V3(-6, 1, -14), V3(-2, 3, -15), V3(1, 3, -12)] },
-    { t: 'MV', tol: 0.7, pts: [Lw(0.4, 0, 0), Lw(0.4, 0, 0.8), Lw(0.4, 0, -0.8)] },
-    { t: 'TV', tol: 0.7, pts: [Lw(0.4 + TVA, 3.9, 0.15), Lw(0.4 + TVA, 3.2, 0.15), Lw(0.4 + TVA, 4.6, 0.15)] },
+    { t: 'MV', tol: 0.7, pts: [Lw(0.4, 0, 0), Lw(0.4, 0, 0.8), Lw(0.4, 0, -0.8), Lw(1.3, 0.3, 1.0), Lw(1.3, -0.3, -0.9)] },
+    { t: 'TV', tol: 0.7, pts: [Lw(0.4 + TVA, TVB, TVC), Lw(0.4 + TVA, TVB - 0.7, TVC), Lw(0.4 + TVA, TVB + 0.7, TVC)] },
     { t: 'AV', tol: 0.7, pts: [AVw.clone().addScaledVector(AXw, 0.3)] },
   ];
   if (MODEL.effusion_cm > 0.4) LABELS.push({ t: 'PE', tol: 1.0, pts: [Lw(G.raD * 0.9, G.lvB - G.cavD - G.pw - MODEL.effusion_cm * 0.5, 0), Lw(3, G.lvB, -(G.cavD + G.pw + MODEL.effusion_cm * 0.5)), Lw(2, 3.3 + 2.3 + MODEL.effusion_cm * 0.5, 0.6)] });
@@ -1515,23 +1549,44 @@ function labelVisible(t, P, fr) {
   return T > 0.05;
 }
 let labelTick = 0;
+const SSN_LABELS = new Set(['Ao', 'Arch', 'Desc Ao', 'PA', 'RPA', 'LPA']);
 function drawLabels(ctx, fr, depth) {
   labelTick++;
   ctx.font = '500 12px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   const pxPerCm = MAXR / depth, tmp = V3(0, 0, 0), placed = [];
+  // apical views look down the LV long axis; structures cut by chance at the back of those views are not named
+  // (a subcostal probe also looks along the LV axis, but it sits near the midline, not at the lateral apex)
+  const subcostal = fr.beam.z > 0.3 && fr.pos.x < 3.5;
+  const apical = Math.abs(fr.beam.dot(E1)) > 0.75 && !subcostal;
+  // the IVC is named only where it is shown on purpose: subcostal windows and the RV inflow view
+  const rvin = VIEWS.find(v => v.id === 'rvin');
+  const ivcView = subcostal || Math.abs(fr.normal.dot(rvin.frame.normal)) > 0.95;
+  // the suprasternal window shows only the great vessels; cardiac chambers far below are not named
+  const ssn = fr.beam.z < -0.6;
   for (const L of LABELS) {
-    let best = null, bd = 1e9, bestP = null;
+    if (apical && L.noApical) continue;
+    if (ssn && !SSN_LABELS.has(L.t)) continue;
+    if (L.subOnly && !ivcView) continue;
+    const cand = [];
     for (const P of L.pts) {
       tmp.copy(P).sub(fr.pos);
-      const off = Math.abs(tmp.dot(fr.normal)); if (off > L.tol || off >= bd) continue;
+      const off = Math.abs(tmp.dot(fr.normal)); if (off > L.tol) continue;
       const lat = tmp.dot(fr.marker), dep = tmp.dot(fr.beam), r = Math.hypot(lat, dep);
       if (dep <= 0.5 || r > depth * 0.97 || Math.abs(Math.atan2(lat, dep)) > SECT * 0.92) continue;
-      bd = off; best = [US_W / 2 + lat * pxPerCm, APEX_Y + dep * pxPerCm]; bestP = P;
+      cand.push([off, P, lat, dep]);
     }
-    if (!best) continue;
-    // Visibility is a ray march, so it is refreshed every 6th frame and reused in between
-    if (labelTick % 6 === 0 || L.vis === undefined) L.vis = labelVisible(L.t, bestP, fr);
-    if (!L.vis) continue;
+    if (!cand.length) continue;
+    cand.sort((p, q) => p[0] - q[0]);
+    // Visibility is a ray march, so it is refreshed every 6th frame and reused in between;
+    // the label goes on the nearest in-plane point that is not hidden by shadow
+    // (also redone at once when the plane has moved to other points, e.g. a new view)
+    if (labelTick % 6 === 0 || L.visKey !== cand[0][1]) {
+      L.visKey = cand[0][1];
+      L.vis = cand.slice(0, 4).find(c => labelVisible(L.t, c[1], fr))?.[1] || null;
+    }
+    const hitC = L.vis && cand.find(c => c[1] === L.vis);
+    if (!hitC) continue;
+    const best = [US_W / 2 + hitC[2] * pxPerCm, APEX_Y + hitC[3] * pxPerCm];
     const w = ctx.measureText(L.t).width + 8;
     // Labels never overlap: nudge up or down, or drop the label if there is no room
     const hit = (x, y) => placed.some(q => Math.abs(q[0] - x) < (q[2] + w) / 2 + 2 && Math.abs(q[1] - y) < 17);
@@ -1600,10 +1655,32 @@ function renderUSInto(ctx, img, fr, depth, gain, labels, usePersist, mTheta = nu
 function applyModel(params, model) {
   MODEL = { ...DEFAULT_MODEL, ...params, ...model };
   derive(); buildLabels();
-  recenterPlax();
+  recenterPlax(); retargetViews(); aimJets();
 }
 // Keep the probe on the same PLAX window but tilt the plane so it still cuts through the LV centre
 // when a case moves the LV (otherwise calipers would measure an off-centre chord).
+// Follow the case's LV like a sonographer does: in a dilated or displaced heart the apex moves, so the apical
+// windows move to the new apex and the short-axis planes stay centred on the LV.
+let VIEW_BASE = null;
+function retargetViews() {
+  if (!VIEW_BASE) VIEW_BASE = VIEWS.map(v => ({ ...v, target: v.target.clone(), seed: v.seed.clone(), N: v.N.clone() }));
+  const dB = G.lvB, apexA = LVd.a + LVd.ra;
+  const put = (id, o) => { const i = VIEWS.findIndex(v => v.id === id); Object.assign(VIEWS[i], makeView({ ...VIEW_BASE[i], ...o })); };
+  const base = id => VIEW_BASE[VIEWS.findIndex(v => v.id === id)];
+  // deeper image for a longer LV or for big atria (the atria sit at the bottom of the apical views)
+  const atriaA = Math.min(-0.6 - 2.03 * G.laR[1] * 1.07, -2.3 - G.raR[0]);
+  const extra = Math.round((Math.max(0, apexA - 7.9) + Math.max(0, -4.3 - atriaA)) * 2) / 2;
+  // beam stays along the LV long axis; the window slides sideways with the LV
+  for (const id of ['a4c', 'a2c', 'a3c']) put(id, { target: base(id).target.clone().addScaledVector(E2, dB), depth: base(id).depth + extra });
+  put('a5c', { depth: base('a5c').depth + extra, ...a5Plane(exitPoint(APX.clone().addScaledVector(E2, dB), E1)) });
+  for (const id of ['psaxmv', 'psaxpm', 'psaxap']) {
+    const b = base(id), t = b.target.clone().addScaledVector(E2, dB);
+    // the apical short-axis cut sits at the same fraction of the (possibly longer) LV
+    if (id === 'psaxap') t.addScaledVector(E1, (apexA - 7.9) * 0.75);
+    if (id === 'psaxpm') t.addScaledVector(E1, (apexA - 7.9) * 0.45);
+    put(id, { target: t });
+  }
+}
 let PLAX_BASE = null;
 function recenterPlax() {
   if (!PLAX_BASE) PLAX_BASE = { ...VIEWS[0] };
@@ -1621,9 +1698,16 @@ function recenterPlax() {
   const probeL = name => toLocal(VIEWS.find(v => v.name === name).frame.pos.clone().sub(O));
   const dirTo = (o, p) => nrm([p[0] - o[0], p[1] - o[1], p[2] - o[2]]);
   const mix = (a, b, t) => nrm(a.map((x, i) => x * (1 - t) + b[i] * t));
-  const ar = JET_DEFS.ar, vs = JET_DEFS.vsd;
-  ar.d = mix(ar.d, dirTo(ar.o, probeL('A5C')), 0.8);
+  const vs = JET_DEFS.vsd;
   vs.d = mix(vs.d, dirTo(vs.o, probeL('PLAX')), 0.7);
+  JET_DEFS.ar.d0 = JET_DEFS.ar.d.slice();
+}
+// The AR jet runs down the LVOT toward this case's apex (which moves when the LV dilates),
+// so it stays in the A5C plane instead of hitting the septum
+function aimJets() {
+  const ar = JET_DEFS.ar, apexL = [8, G.lvB, 0], t = AVL.map((x, i) => x + (apexL[i] - x) * 0.6);
+  const d = nrm(t.map((x, i) => x - ar.o[i]));
+  ar.d = nrm(ar.d0.map((x, i) => x * 0.2 + d[i] * 0.8));
 }
 
 // ---------- Contact sheet (open the page with #grid, #grid:caseId or #grid:caseId:phase) ----------
@@ -2136,7 +2220,7 @@ function startApp() {
         at(r); const a = TA, b = TB, c = TC;
         if (Math.hypot(a - AVL[0], b - AVL[1], c - AVL[2]) < 1.2) return 'Aortic valve (CW)';
         if (a > -1.3 && a < 0.6 && b * b + c * c < 2.1) return 'Mitral valve (CW)';
-        if (a > -1.1 && a < 0.7 + TVA && (b - 3.9) ** 2 + (c - 0.15) ** 2 < 1.69) return 'Tricuspid valve (CW)';
+        if (a > -1.1 && a < 0.7 + TVA && (b - TVB) ** 2 + (c - TVC) ** 2 < TVR2) return 'Tricuspid valve (CW)';
       }
       return 'CW';
     }
@@ -2144,7 +2228,7 @@ function startApp() {
     if (OUT.kind === 1 && VSD < 0 && VSEGI >= 0) return ['', 'Aorta', 'Pulmonary artery', 'IVC / hepatic vein'][SEG[VSEGI].id] + ' (PW)';
     if (a > -1.3 && a < 0.6 && b * b + c * c < 2.1) return 'Mitral inflow (PW)';
     if (capsule(a, b, c, LVOT0, LVOT1, 1.0)) return 'LVOT (PW)';
-    if (a > -1.1 && a < 0.7 + TVA && (b - 3.9) ** 2 + (c - 0.15) ** 2 < 1.69) return 'Tricuspid inflow (PW)';
+    if (a > -1.1 && a < 0.7 + TVA && (b - TVB) ** 2 + (c - TVC) ** 2 < TVR2) return 'Tricuspid inflow (PW)';
     if (capsule(a, b, c, RVOT0, RVOT1, 1.15)) return 'RVOT (PW)';
     return 'PW';
   }
