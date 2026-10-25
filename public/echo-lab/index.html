@@ -895,8 +895,9 @@ function valveAt(a, b, c, x, y, z) {
       A = [lerp(0.45, 1.55, o), lerp(0.12, 0.55, o) * k]; Am = [lerp(0.15, 0.95, o), lerp(0.85, 1.25, o) * k];
       P = [lerp(0.40, 1.1, o), lerp(-0.05, -0.5, o) * k];
     } else if (M.mv === 'prolapse') {
-      th = 0.15; const pr = Math.sqrt(SYS);
-      if (o < 0.05) { P = [lerp(0.40, -0.35, pr), lerp(-0.05, -0.35, pr) * k]; Pm = [lerp(0.15, -0.8, pr), lerp(-0.8, -1.0, pr) * k]; A = [lerp(0.45, 0.25, pr), lerp(0.12, 0.1, pr) * k]; }
+      // thick myxomatous leaflets; in systole the posterior leaflet bellies ~1 cm behind the annulus into the LA
+      th = 0.18; const pr = Math.sqrt(SYS);
+      if (o < 0.05) { P = [lerp(0.40, -0.5, pr), lerp(-0.05, -0.3, pr) * k]; Pm = [lerp(0.15, -1.2, pr), lerp(-0.8, -0.95, pr) * k]; A = [lerp(0.45, 0.2, pr), lerp(0.12, 0.05, pr) * k]; }
     } else if (M.mv === 'tether') {
       const ot = o * 0.55;
       A = [lerp(0.95, 1.6, ot), lerp(0.28, 1.05, ot) * k]; P = [lerp(0.9, 1.3, ot), lerp(-0.22, -1.1, ot) * k];
@@ -1025,6 +1026,10 @@ function tissue(x, y, z) {
     // fixed to the heart so it moves with it
     const wa = a + 0.05 * fsin(2.9 * b + 2.1 * c + 0.7), wb = b + 0.07 * fsin(3.3 * a - 1.9 * c) + 0.04 * fsin(7.1 * c + 2.3 * a);
     const wc = c + 0.07 * fsin(3.7 * a + 2.5 * b) + 0.04 * fsin(6.3 * b - 3.1 * a);
+    // The aortic root wall separates the root from the RVOT and RA that press on it; only the LVOT side stays open
+    if (vd >= 0 && vd < 0.25 && SEG[VSEGI].id === 1 && !capsule(a, b, c, LVOT0, LVOT1, 1.05) && !(a > -0.2 && lvCavity(a, b, c))) {
+      OUT.raw = 0.32; OUT.heart = 1; return;
+    }
     if (vd < 0 || bloodAt(wa, wb, wc)) { OUT.raw = 0.005; OUT.kind = 1; return; }
     HDIST = 99; HDIST2 = 99;
     const m = myoAt(wa, wb, wc);
@@ -1469,6 +1474,7 @@ const IVC_T = IVC[1].clone().lerp(IVC[2], 0.15);
 const SSN_N = new THREE.Vector3().crossVectors(AORTA[3].clone().sub(AORTA[1]), AORTA[6].clone().sub(AORTA[1])).normalize();
 const SSN_T = AORTA[2].clone().add(AORTA[3]).add(AORTA[4]).add(AORTA[5]).multiplyScalar(0.25).add(V3(0, 0, -1.2));
 // LV axis ~15° off horizontal, as in a real PLAX
+const RVOT_W = Lw(1.2, 3.8, 2.0);
 const PLAX_DEF = { id: 'plax', name: 'PLAX', full: 'Parasternal long axis', group: 'Parasternal', N: cross(E1, d3), target: Lw(1.0, 0.5, 0.5), seed: d3.clone().multiplyScalar(0.85).addScaledVector(E1, 0.28), hint: E1.clone().negate(), depth: 16 };
 const A4C_DEF = { id: 'a4c', name: 'A4C', full: 'Apical four-chamber', group: 'Apical', N: E3.clone(), target: Lw(2.4, 1.6, 0), seed: E1.clone(), hint: E2.clone().negate(), depth: 18 };
 // A5C: the probe sits over the LV apex and tilts forward until the plane takes in the aortic valve,
@@ -1483,10 +1489,16 @@ function psaxMvPlane() {
   const target = Lw(0.95, 0.2, 0.1);
   return { N: E1.clone().addScaledVector(E2, -0.45).addScaledVector(E3, -0.15).normalize(), target, seed: V3(0.5, 10, 3.6).sub(target) };
 }
+function rvoutPlane() {
+  const S = makeView(PLAX_DEF).frame.pos, ax = PA_BIF.clone().sub(RVOT_W), target = PVw.clone().lerp(PA[1], 0.4);
+  return { N: cross(ax, S.clone().sub(RVOT_W)), target, seed: S.clone().sub(target) };
+}
 const VIEWS = [
   PLAX_DEF,
   { id: 'rvin', name: 'RV inflow', full: 'RV inflow', group: 'Parasternal', N: cross(RVc.clone().sub(RAc), V3(0.25, 1, 0.55)), target: TVw, seed: V3(0.25, 1, 0.55), hint: RAc.clone().sub(RVc), depth: 16 },
-  { id: 'rvout', name: 'RV outflow', full: 'RV outflow', group: 'Parasternal', N: cross(PA[1].clone().sub(Lw(1.2, 3.8, 2.0)), ANT), target: PVw, seed: ANT, hint: PA[1].clone().sub(Lw(1.2, 3.8, 2.0)), depth: 14 },
+  // RV outflow: from the PLAX window, the plane turned around the RVOT-to-PA axis, so the outflow tract, the
+  // pulmonary valve and the main PA lie along one line running away from the probe (PA to the right of the screen)
+  { id: 'rvout', name: 'RV outflow', full: 'RV outflow', group: 'Parasternal', ...rvoutPlane(), hint: PA_BIF.clone().sub(RVOT_W), depth: 14 },
   { id: 'psaxav', name: 'PSAX AV', full: 'Short axis · aortic valve', group: 'Parasternal', N: AXw.clone(), target: AVw.clone().addScaledVector(AXw, 0.25), seed: ANT, hint: V3(1, 0, 0.4), depth: 14 },
   // PSAX MV: tilted a little (as a sonographer does) so the plane cuts the mitral orifice but runs apical to the
 // tricuspid leaflets on the RV side and below the pulmonary valve: RV crescent, no tricuspid ring, no PA
@@ -1525,6 +1537,7 @@ function buildLabels() {
     { t: 'Desc Ao', tol: 0.9, pts: samplePoly(AORTA, 4, 7) },
     { t: 'Abd Ao', tol: 0.9, pts: samplePoly(AORTA, 7, 9) },
     { t: 'PA', tol: 0.9, pts: samplePoly(PA, 0, 2) },
+    { t: 'RVOT', tol: 0.9, onlyView: 'rvout', pts: samplePoly([RVOT_W, PVw], 0, 1) },
     { t: 'RPA', tol: 0.8, noApical: true, pts: samplePoly(RPA, 0, 2) },
     { t: 'LPA', tol: 0.8, noApical: true, pts: samplePoly(LPA, 0, 1) },
     { t: 'IVC', tol: 0.8, subOnly: true, pts: samplePoly(IVC, 0, 4) },
@@ -1567,6 +1580,7 @@ function drawLabels(ctx, fr, depth) {
     if (apical && L.noApical) continue;
     if (ssn && !SSN_LABELS.has(L.t)) continue;
     if (L.subOnly && !ivcView) continue;
+    if (L.onlyView && Math.abs(fr.normal.dot(VIEWS.find(v => v.id === L.onlyView).frame.normal)) < 0.95) continue;
     const cand = [];
     for (const P of L.pts) {
       tmp.copy(P).sub(fr.pos);
@@ -1710,6 +1724,19 @@ function aimJets() {
   ar.d = nrm(ar.d0.map((x, i) => x * 0.2 + d[i] * 0.8));
 }
 
+// Where the colour box goes for each view: over the valve or vessel that view is used to interrogate
+const COLOR_AIM = {
+  plax: () => Lw(-0.2, 0.2, 1.0), rvin: () => TVw, rvout: () => PVw.clone().lerp(PA[1], 0.3), psaxav: () => AVw,
+  psaxmv: () => Lw(0.9, 0, 0), psaxpm: () => Lw(3.4, 0.4, 0), psaxap: () => Lw(6.0, 0.3, 0),
+  a4c: () => Lw(0.2, 0.6, 0), a5c: () => AVw.clone().lerp(Lw(0.3, 0, 0), 0.4), a2c: () => Lw(0.2, 0, 0), a3c: () => AVw.clone().lerp(Lw(0.3, 0, 0), 0.5),
+  sc4c: () => Lw(-2.2, 1.6, -0.4), ivc: () => IVC[1], abdao: () => V3(1.4, -4.6, -14), ssn: () => AORTA[3],
+};
+function aimColorBox(v) {
+  const aim = COLOR_AIM[v.id]; if (!aim) return;
+  const d = aim().clone().sub(v.frame.pos), lat = d.dot(v.frame.marker), dep = d.dot(v.frame.beam);
+  COLOR.th = clamp(Math.atan2(lat, dep), -SECT + COLOR.hw, SECT - COLOR.hw);
+  COLOR.rc = clamp(Math.hypot(lat, dep), COLOR.hd * 0.6, v.depth - COLOR.hd * 0.6);
+}
 // ---------- Contact sheet (open the page with #grid, #grid:caseId or #grid:caseId:phase) ----------
 if (location.hash.startsWith('#grid')) {
   const [, cid, ph, col, big, only] = location.hash.slice(1).split(':');
@@ -1871,6 +1898,7 @@ function startApp() {
   const vbtns = [...presetsEl.querySelectorAll('.vbtn')];
   function goView(i) {
     const v = VIEWS[i]; if (st.frozen) setFrozen(false);
+    aimColorBox(v);
     st.tween = { from: { ...st.pose, S: st.pose.S.clone() }, to: v.pose, d0: st.depth, d1: v.depth, t0: performance.now(), dur: 750 };
   }
 
@@ -1968,7 +1996,7 @@ function startApp() {
   cwOn.addEventListener('change', () => { if (cwOn.checked) { pwOn.checked = false; tdiOn.checked = false; } setSpec(); });
   tdiOn.addEventListener('change', setSpec);
   mmOn.addEventListener('change', () => { st.mmode = mmOn.checked; mm.hidden = !st.mmode; if (st.mmode) st.clickMode = 'm'; updateHint(); });
-  colOn.addEventListener('change', () => { COLOR.on = colOn.checked; if (COLOR.on) st.clickMode = 'c'; updateHint(); });
+  colOn.addEventListener('change', () => { COLOR.on = colOn.checked; if (COLOR.on) { st.clickMode = 'c'; const v = VIEWS.find(x => x.name === st.curView); if (v) aimColorBox(v); } updateHint(); });
   clickSel.addEventListener('change', () => { st.clickMode = clickSel.value; updateHint(); });
   $('nyq').addEventListener('input', e => { COLOR.nyq = +e.target.value; $('nyqO').textContent = '±' + Math.round(COLOR.nyq * 100); });
   $('specBase').addEventListener('input', e => { spec.base = +e.target.value; clearSpec(); });
