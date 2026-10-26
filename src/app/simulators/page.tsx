@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { Activity, ArrowRight, Calculator, Check, HeartPulse, Waves, type LucideIcon } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
-import { Button } from "@/components/ui/Button";
 import { simulators } from "@/lib/tools-data";
 import { brand } from "@/lib/site-data";
 
@@ -21,6 +20,13 @@ const jsonLd = {
   itemListElement: simulators.map((s, i) => ({ "@type": "ListItem", position: i + 1, name: s.title, url: s.href })),
 };
 
+const heroIcons: Record<(typeof simulators)[number]["id"], LucideIcon> = {
+  echo: Waves,
+  ecg: Activity,
+  cath: HeartPulse,
+  calc: Calculator,
+};
+
 const steps = [
   { title: "Learn the theory", text: "Take a course or read a cheat sheet to understand what you are looking for." },
   { title: "Practise on the simulator", text: "Find the views, trace the rhythms and measure the gradients until it feels natural." },
@@ -34,28 +40,38 @@ export default function SimulatorsPage() {
       <PageHero
         eyebrow="Free simulation lab"
         title="Practise cardiology hands-on"
-        description="Echo, ECG and cath lab simulators plus echo calculators. Free, in your browser, no sign-up."
+        description="Four free tools for echo, ECG and the cath lab. Pick one and start practising in your browser, no sign-up."
       >
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button href="/echo-simulator" variant="gold" size="lg">
-            Start with echo
-          </Button>
-          <Button href="/courses" variant="gold" size="lg">
-            Browse courses
-          </Button>
+        <div className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+          {simulators.map((s) => {
+            const Icon = heroIcons[s.id];
+            return (
+              <Link
+                key={s.id}
+                href={s.href}
+                className="group flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-3 py-4 text-sm font-semibold text-white transition hover:border-gold-400 hover:bg-gold-400 hover:text-royal-950"
+              >
+                <Icon size={22} className="text-gold-400 transition-colors group-hover:text-royal-950" aria-hidden="true" />
+                {s.title}
+              </Link>
+            );
+          })}
         </div>
+        <Link href="/courses" className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-royal-100 hover:text-white">
+          Want the theory first? Browse courses <ArrowRight size={15} aria-hidden="true" />
+        </Link>
       </PageHero>
 
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:auto-rows-fr md:grid-cols-2">
           {simulators.map((s) => (
             <Link
               key={s.id}
               href={s.href}
-              className={`group flex flex-col overflow-hidden rounded-3xl ${s.id === "echo" ? "md:col-span-3 lg:grid lg:grid-cols-[1.3fr_1fr]" : ""} border border-royal-100 bg-white shadow-sm transition-shadow hover:shadow-xl`}
+              className="group flex flex-col overflow-hidden rounded-3xl border border-royal-100 bg-white shadow-sm transition-shadow hover:shadow-xl"
             >
               {s.image ? (
-                <div className={`relative aspect-[16/10] overflow-hidden bg-royal-950 ${s.id === "echo" ? "lg:aspect-auto lg:min-h-[380px]" : ""}`}>
+                <div className="relative aspect-[16/10] overflow-hidden bg-royal-950">
                   <Image src={s.image} alt={`${s.title} screenshot`} fill sizes="(max-width: 768px) 100vw, 600px" className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]" />
                 </div>
               ) : (

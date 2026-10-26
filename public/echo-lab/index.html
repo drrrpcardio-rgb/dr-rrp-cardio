@@ -55,6 +55,9 @@ header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:0}
 .tag{color:var(--muted);margin:0;font-size:13px}
 .hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pill{font-family:var(--f-mono);font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.navbtn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:inherit;text-decoration:none;white-space:nowrap;transition:border-color .15s,color .15s}
+.navbtn:hover{border-color:var(--accent);color:var(--accent)}
+.navbtn svg{width:15px;height:15px}
 .pill.on{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
 .pill.case{color:var(--accent);border-color:var(--accent-dim,#7a5700)}
 
@@ -243,7 +246,7 @@ body.gridmode #grid{display:block}
   <header>
     <a class="brand" href="/" target="_top" aria-label="Dr. RRP Cardio home"><svg viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="#fff" stroke="#1E3A8A" stroke-width="2.6"/><path d="M6.5 24H14C15 21.8 17 21.8 18 24H19.5L21 27L24 9.5L27.5 34L29.5 24H31C32.5 20.4 35 20.4 36.5 24H37.5" stroke="#F5B301" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Dr. RRP</b><small>Cardio</small></span><i></i><em>Echo <span>Lab</span></em></a>
     <p class="tag">3D transthoracic echo simulator · 16 TTE views · 2D, M-mode, color, PW / CW / TDI · 22 pathology cases</p>
-    <div class="hdr-right"><span id="casePill" class="pill case">Normal heart</span><span id="liveView" class="pill">Free scan</span></div>
+    <div class="hdr-right"><a class="navbtn" href="/" target="_top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a><a class="navbtn" href="/simulators/" target="_top">All simulators</a><script>if (window.top !== window.self) document.querySelectorAll('.navbtn').forEach((a) => (a.style.display = 'none'));</script><span id="casePill" class="pill case">Normal heart</span><span id="liveView" class="pill">Free scan</span></div>
   </header>
   <div class="main">
     <section class="stage" aria-label="3D probe stage">

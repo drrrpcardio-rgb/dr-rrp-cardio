@@ -45,25 +45,17 @@ export function BlogList({ posts }: { posts: BlogCard[] }) {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {shown.map((p, i) => (
+      <div className="grid gap-6 md:auto-rows-fr md:grid-cols-2">
+        {shown.map((p) => (
           <Link
             key={p.slug}
             href={`/blog/${p.slug}`}
-            className={cn(
-              "group flex flex-col overflow-hidden rounded-2xl border border-mist-200 bg-white shadow-sm transition hover:border-royal-300 hover:shadow-lg",
-              i === 0 && active === "All" && "md:col-span-2 md:flex-row",
-            )}
+            className="group flex flex-col overflow-hidden rounded-2xl border border-mist-200 bg-white shadow-sm transition hover:border-royal-300 hover:shadow-lg"
           >
             {p.cover && (
-              <div
-                className={cn(
-                  "flex items-center justify-center bg-mist-50",
-                  i === 0 && active === "All" ? "md:w-2/5" : "",
-                )}
-              >
+              <div className="flex aspect-[16/9] items-center justify-center bg-mist-50">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.cover} alt="" loading="lazy" className="h-48 w-full object-contain p-3 md:h-full md:max-h-72" />
+                <img src={p.cover} alt="" loading="lazy" className="h-full w-full object-contain p-3" />
               </div>
             )}
             <div className="flex flex-1 flex-col p-7">
