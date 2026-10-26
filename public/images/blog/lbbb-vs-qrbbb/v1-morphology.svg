@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460" width="1000" height="460" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>Lead V1 in normal conduction, RBBB, qRBBB and LBBB</title>
+<defs>
+  <pattern id="small" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0H0V8" fill="none" stroke="#F6D6D6" stroke-width="1"/></pattern>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="url(#small)"/><path d="M40 0H0V40" fill="none" stroke="#EDB2B2" stroke-width="1.2"/></pattern>
+</defs>
+<rect width="1000" height="460" fill="#FFFFFF"/>
+<text x="500" y="38" text-anchor="middle" font-family="Georgia, serif" font-size="24" font-weight="bold" fill="#0A1233">Lead V1: what the first deflection tells you</text>
+<text x="500" y="62" text-anchor="middle" font-size="14" fill="#565D72">Schematic QRS–T complexes. The small initial r wave is septal activation.</text>
+
+<!-- Panel 1: normal -->
+<g transform="translate(20 80)">
+  <text x="112" y="22" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">Normal</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#D4D7E2"/>
+  <path d="M15 170 Q30 160 45 170 L70 170 L77 154 L88 236 L98 170 L120 170 Q140 160 160 170 L210 170" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="77" cy="154" r="9" fill="none" stroke="#1B6F8A" stroke-width="2.5"/>
+  <text x="62" y="146" text-anchor="end" font-size="15" font-style="italic" font-weight="700" fill="#1B6F8A">r</text>
+  <text x="104" y="246" font-size="15" font-style="italic" font-weight="700" fill="#565D72">S</text>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#0E1320">rS</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">septum fires left to right:</text>
+  <text x="112" y="355" text-anchor="middle" font-size="13" fill="#565D72">small r, then deep S</text>
+</g>
+
+<!-- Panel 2: RBBB -->
+<g transform="translate(265 80)">
+  <text x="112" y="22" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">RBBB</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#D4D7E2"/>
+  <path d="M15 170 Q30 160 45 170 L68 170 L74 154 L82 190 L95 108 L106 170 L116 174 Q140 194 165 170 L210 170" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="74" cy="154" r="9" fill="none" stroke="#1B6F8A" stroke-width="2.5"/>
+  <text x="60" y="146" text-anchor="end" font-size="15" font-style="italic" font-weight="700" fill="#1B6F8A">r</text>
+  <text x="77" y="210" font-size="15" font-style="italic" font-weight="700" fill="#565D72">s</text>
+  <text x="102" y="104" font-size="15" font-style="italic" font-weight="700" fill="#565D72">R′</text>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#0E1320">rsR′</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">septal r preserved;</text>
+  <text x="112" y="355" text-anchor="middle" font-size="13" fill="#565D72">late R′ from the slow RV</text>
+</g>
+
+<!-- Panel 3: qRBBB -->
+<g transform="translate(510 80)">
+  <text x="112" y="22" text-anchor="middle" font-size="17" font-weight="700" fill="#B3261E">qRBBB + acute MI</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#B3261E" stroke-width="2"/>
+  <path d="M15 170 Q30 160 45 170 L68 170 L75 188 L89 104 L100 150" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M100 150 Q125 128 152 160 Q160 170 172 170 L210 170" fill="none" stroke="#B3261E" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="75" cy="188" r="9" fill="none" stroke="#B3261E" stroke-width="2.5"/>
+  <text x="62" y="210" text-anchor="end" font-size="15" font-style="italic" font-weight="700" fill="#B3261E">q</text>
+  <text x="96" y="100" font-size="15" font-style="italic" font-weight="700" fill="#565D72">R</text>
+  <text x="150" y="124" font-size="13" font-weight="600" fill="#B3261E">ST ↑</text>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#B3261E">qR</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">septal r lost → q wave:</text>
+  <text x="112" y="355" text-anchor="middle" font-size="13" fill="#565D72">septal infarction</text>
+</g>
+
+<!-- Panel 4: LBBB -->
+<g transform="translate(755 80)">
+  <text x="112" y="22" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">LBBB</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#D4D7E2"/>
+  <path d="M15 170 Q30 160 45 170 L65 170 L90 270 L106 152 Q130 132 156 156 Q166 170 178 170 L210 170" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="96" y="284" font-size="15" font-style="italic" font-weight="700" fill="#565D72">QS</text>
+  <text x="132" y="120" text-anchor="middle" font-size="13" font-weight="600" fill="#565D72">ST ↑ (expected)</text>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#0E1320">QS</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">septum fires right to left;</text>
+  <text x="112" y="355" text-anchor="middle" font-size="13" fill="#565D72">discordant ST ↑ is normal here</text>
+</g>
+</svg>

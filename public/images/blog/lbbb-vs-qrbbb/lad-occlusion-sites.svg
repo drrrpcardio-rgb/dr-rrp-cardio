@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" width="1000" height="730" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>Occlusion site and territory at risk in the two cases</title>
+<defs>
+  <g id="heart">
+    <path d="M230 40 C360 40 430 140 420 250 C410 340 330 420 250 455 C170 410 60 330 50 230 C40 130 110 40 230 40 Z" fill="#F8F9FB" stroke="#8A93B8" stroke-width="2.5"/>
+  </g>
+  <g id="occ">
+    <circle r="12" fill="#FFFFFF" stroke="#B3261E" stroke-width="3.5"/>
+    <path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#B3261E" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+</defs>
+<rect width="1000" height="730" fill="#FFFFFF"/>
+<text x="500" y="38" text-anchor="middle" font-family="Georgia, serif" font-size="24" font-weight="bold" fill="#0A1233">Same artery, different level, different ECG</text>
+<text x="500" y="62" text-anchor="middle" font-size="14" fill="#565D72">Schematic of the left coronary system: occlusion site and territory at risk</text>
+
+<!-- ===== Case 1: mid-to-distal LAD ===== -->
+<g transform="translate(20 90)">
+  <text x="230" y="0" text-anchor="middle" font-size="18" font-weight="700" fill="#0A1233">Case 1 · LBBB</text>
+  <text x="230" y="22" text-anchor="middle" font-size="14" fill="#565D72">Mid-to-distal LAD occlusion</text>
+  <g transform="translate(0 20)">
+    <use href="#heart"/>
+    <ellipse cx="285" cy="385" rx="72" ry="55" fill="#B3261E" fill-opacity="0.14"/>
+    <!-- LMCA + LCx -->
+    <path d="M100 70 L160 100" stroke="#1B6F8A" stroke-width="12" stroke-linecap="round"/>
+    <path d="M160 100 C130 160 100 230 95 300" stroke="#1B6F8A" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <!-- LAD patent part -->
+    <path d="M160 100 C200 150 240 220 270 290" stroke="#1B6F8A" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <!-- LAD distal (no flow) -->
+    <path d="M282 318 C300 370 300 410 270 440" stroke="#B8BDCC" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="10 7"/>
+    <!-- septals -->
+    <path d="M190 138 L232 140 M222 190 L262 196 M250 245 L285 252" stroke="#1B6F8A" stroke-width="4" stroke-linecap="round"/>
+    <!-- diagonals -->
+    <path d="M200 150 C170 200 150 240 140 280 M245 230 C220 280 200 320 190 360" stroke="#1B6F8A" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <use href="#occ" x="278" y="306"/>
+    <text x="88" y="62" text-anchor="end" font-size="14" font-weight="700" fill="#0A1233">LMCA</text>
+    <text x="80" y="320" text-anchor="middle" font-size="14" font-weight="700" fill="#0A1233">LCx</text>
+    <text x="238" y="132" font-size="13" font-weight="600" fill="#1B6F8A">S1</text>
+    <text x="128" y="296" font-size="13" font-weight="600" fill="#1B6F8A">D1</text>
+    <text x="176" y="376" font-size="13" font-weight="600" fill="#1B6F8A">D2</text>
+    <text x="296" y="302" font-size="14" font-weight="700" fill="#B3261E">100% occlusion</text>
+    <text x="285" y="392" text-anchor="middle" font-size="13" font-weight="600" fill="#B3261E">apex + distal septum</text>
+  </g>
+  <text x="230" y="520" text-anchor="middle" font-size="14" fill="#0E1320">Septal and diagonal branches upstream: still perfused</text>
+  <text x="230" y="540" text-anchor="middle" font-size="14" fill="#0E1320">Smaller territory, LBBB masks the ST changes</text>
+  <text x="230" y="560" text-anchor="middle" font-size="14" font-weight="700" fill="#0A1233">Diagnosis made by symptoms + echo</text>
+</g>
+
+<!-- ===== Case 2: proximal LAD ===== -->
+<g transform="translate(520 90)">
+  <text x="230" y="0" text-anchor="middle" font-size="18" font-weight="700" fill="#0A1233">Case 2 · qRBBB</text>
+  <text x="230" y="22" text-anchor="middle" font-size="14" fill="#565D72">Ostial / proximal LAD occlusion</text>
+  <g transform="translate(0 20)">
+    <use href="#heart"/>
+    <path d="M168 96 C260 110 335 220 335 330 C335 400 305 440 262 452 C200 420 140 345 122 280 C112 200 135 128 168 96 Z" fill="#B3261E" fill-opacity="0.14"/>
+    <!-- LMCA + LCx -->
+    <path d="M100 70 L152 96" stroke="#1B6F8A" stroke-width="12" stroke-linecap="round"/>
+    <path d="M160 100 C130 160 100 230 95 300" stroke="#1B6F8A" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <!-- entire LAD without flow -->
+    <path d="M176 120 C210 165 245 230 275 300 C300 370 300 410 270 440" stroke="#B8BDCC" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="10 7"/>
+    <path d="M190 138 L232 140 M222 190 L262 196 M250 245 L285 252" stroke="#B8BDCC" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 5"/>
+    <path d="M200 150 C170 200 150 240 140 280 M245 230 C220 280 200 320 190 360" stroke="#B8BDCC" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="8 6"/>
+    <use href="#occ" x="166" y="108"/>
+    <text x="88" y="62" text-anchor="end" font-size="14" font-weight="700" fill="#0A1233">LMCA</text>
+    <text x="80" y="320" text-anchor="middle" font-size="14" font-weight="700" fill="#0A1233">LCx</text>
+    <text x="238" y="132" font-size="13" font-weight="600" fill="#8A93B8">S1</text>
+    <text x="128" y="296" font-size="13" font-weight="600" fill="#8A93B8">D1</text>
+    <text x="176" y="376" font-size="13" font-weight="600" fill="#8A93B8">D2</text>
+    <text x="186" y="94" font-size="14" font-weight="700" fill="#B3261E">100% occlusion at the ostium</text>
+    <text x="250" y="330" text-anchor="middle" font-size="13" font-weight="600" fill="#B3261E">septum + anterior</text>
+    <text x="250" y="348" text-anchor="middle" font-size="13" font-weight="600" fill="#B3261E">+ lateral wall + apex</text>
+  </g>
+  <text x="230" y="520" text-anchor="middle" font-size="14" fill="#0E1320">Above S1 and D1: septal conduction lost → RBBB + LAFB</text>
+  <text x="230" y="540" text-anchor="middle" font-size="14" fill="#0E1320">Huge territory → ST ↑ in V2–V6, I and aVL</text>
+  <text x="230" y="560" text-anchor="middle" font-size="14" font-weight="700" fill="#0A1233">Culprit predicted from the ECG</text>
+</g>
+
+<!-- legend -->
+<rect x="130" y="666" width="740" height="46" rx="8" fill="#F8F9FB" stroke="#D4D7E2"/>
+<line x1="152" y1="689" x2="186" y2="689" stroke="#1B6F8A" stroke-width="7" stroke-linecap="round"/>
+<text x="196" y="694" font-size="14" fill="#0E1320">Perfused</text>
+<line x1="290" y1="689" x2="324" y2="689" stroke="#B8BDCC" stroke-width="7" stroke-linecap="round" stroke-dasharray="9 6"/>
+<text x="334" y="694" font-size="14" fill="#0E1320">No flow</text>
+<rect x="430" y="679" width="30" height="20" rx="4" fill="#B3261E" fill-opacity="0.14"/>
+<text x="470" y="694" font-size="14" fill="#0E1320">Myocardium at risk</text>
+<use href="#occ" x="650" y="689"/>
+<text x="672" y="694" font-size="14" fill="#0E1320">Occlusion</text>
+</svg>

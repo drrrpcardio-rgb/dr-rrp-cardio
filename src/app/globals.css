@@ -216,10 +216,24 @@ textarea:focus-visible,
 .blog-prose strong { color: var(--color-ink); font-weight: 600; }
 .blog-prose img, .blog-prose video { display: block; width: 100%; height: auto; margin: 2rem 0 .75rem; border-radius: .75rem; border: 1px solid var(--color-mist-200); background: #0b1020; }
 .blog-prose img[src$=".svg"] { background: #fff; }
+.blog-prose a.figure-zoom { display: block; cursor: zoom-in; }
+.blog-prose a.figure-zoom img { transition: border-color .15s; }
+.blog-prose a.figure-zoom:hover img { border-color: var(--color-royal-300, #9aa8e0); }
 .blog-prose p > em:only-child { display: block; margin: -.25rem 0 1.75rem; font-size: .875rem; line-height: 1.5; font-style: normal; color: var(--color-mist-600); }
-.blog-prose p:has(> img), .blog-prose p:has(> video) { margin-bottom: 0; }
+.blog-prose p:has(> img), .blog-prose p:has(> video), .blog-prose p:has(> a.figure-zoom) { margin-bottom: 0; }
 .blog-prose hr { margin: 2.5rem 0; border: 0; border-top: 1px solid var(--color-mist-200); }
 .blog-prose blockquote { margin: 1.5rem 0; padding: .25rem 0 .25rem 1.25rem; border-left: 3px solid var(--color-gold-400); color: var(--color-ink-soft); }
+.blog-prose table { display: block; width: 100%; overflow-x: auto; margin: 1.5rem 0 2rem; border-collapse: collapse; font-size: .9375rem; line-height: 1.5; }
+.blog-prose th, .blog-prose td { padding: .65rem .85rem; border-bottom: 1px solid var(--color-mist-200); text-align: left; vertical-align: top; }
+.blog-prose thead th { background: var(--color-royal-50); color: var(--color-ink); font-weight: 600; border-bottom: 2px solid var(--color-royal-100); }
+.blog-prose tbody td:first-child { font-weight: 600; color: var(--color-ink); }
+
+/* Before/after pairs: side by side from tablet width up, stacked on phones. */
+.blog-prose .media-pair { display: grid; gap: 1.25rem; margin: 2rem 0 1.75rem; }
+.blog-prose .media-pair figure { margin: 0; }
+.blog-prose .media-pair .media-brand { margin-top: 0; }
+.blog-prose .media-pair p > em:only-child { margin-bottom: 0; }
+@media (min-width: 640px) { .blog-prose .media-pair { grid-template-columns: 1fr 1fr; } }
 
 /* Logo + name laid over blog videos and the ECG. Sits top-left, clear of the frame counters in the angiograms. */
 .blog-prose .media-brand { position: relative; display: block; margin: 2rem 0 .75rem; }

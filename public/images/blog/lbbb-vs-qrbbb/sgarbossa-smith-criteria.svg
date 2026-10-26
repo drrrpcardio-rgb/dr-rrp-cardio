@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 490" width="1000" height="490" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>Sgarbossa and Smith-modified Sgarbossa criteria in LBBB</title>
+<defs>
+  <pattern id="small" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0H0V8" fill="none" stroke="#F6D6D6" stroke-width="1"/></pattern>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="url(#small)"/><path d="M40 0H0V40" fill="none" stroke="#EDB2B2" stroke-width="1.2"/></pattern>
+</defs>
+<rect width="1000" height="490" fill="#FFFFFF"/>
+<text x="500" y="38" text-anchor="middle" font-family="Georgia, serif" font-size="24" font-weight="bold" fill="#0A1233">Seeing an occlusion through LBBB</text>
+<text x="500" y="62" text-anchor="middle" font-size="14" fill="#565D72">Sgarbossa criteria with the Smith modification · 1 small square = 1 mm</text>
+
+<!-- A: expected LBBB -->
+<g transform="translate(20 80)">
+  <rect x="62" y="6" width="100" height="24" rx="12" fill="#E3F1F5"/>
+  <text x="112" y="23" text-anchor="middle" font-size="13" font-weight="700" fill="#1B6F8A">EXPECTED</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#D4D7E2"/>
+  <line x1="0" y1="150" x2="225" y2="150" stroke="#8A93B8" stroke-width="1" stroke-dasharray="4 4"/>
+  <path d="M15 150 Q30 142 45 150 L65 150 L90 262 L104 136 Q130 118 155 140 Q165 150 177 150 L210 150" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#0E1320">Discordant ST ↑ in a QS lead</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">ST 1.75 mm / S 14 mm ≈ 12%</text>
+  <text x="112" y="356" text-anchor="middle" font-size="13" fill="#565D72">proportionate: part of the block</text>
+</g>
+
+<!-- B: concordant STE -->
+<g transform="translate(265 80)">
+  <rect x="62" y="6" width="100" height="24" rx="12" fill="#F9E3E1"/>
+  <text x="112" y="23" text-anchor="middle" font-size="13" font-weight="700" fill="#B3261E">CRITERION 1</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#B3261E" stroke-width="2"/>
+  <line x1="0" y1="150" x2="225" y2="150" stroke="#8A93B8" stroke-width="1" stroke-dasharray="4 4"/>
+  <path d="M15 150 Q30 142 45 150 L62 150 L72 72 L80 82 L90 62 L102 134" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M102 134 Q128 108 152 124 Q166 150 180 150 L210 150" fill="none" stroke="#B3261E" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M112 150 L112 134 M107 150 L117 150 M107 134 L117 134" stroke="#B3261E" stroke-width="2"/>
+  <text x="120" y="164" font-size="13" font-weight="700" fill="#B3261E">2 mm</text>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#B3261E">Concordant ST ↑ ≥ 1 mm</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">ST rises in the same direction</text>
+  <text x="112" y="356" text-anchor="middle" font-size="13" fill="#565D72">as an upright QRS (any lead)</text>
+</g>
+
+<!-- C: concordant STD V1-V3 -->
+<g transform="translate(510 80)">
+  <rect x="62" y="6" width="100" height="24" rx="12" fill="#F9E3E1"/>
+  <text x="112" y="23" text-anchor="middle" font-size="13" font-weight="700" fill="#B3261E">CRITERION 2</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#B3261E" stroke-width="2"/>
+  <line x1="0" y1="150" x2="225" y2="150" stroke="#8A93B8" stroke-width="1" stroke-dasharray="4 4"/>
+  <path d="M15 150 Q30 142 45 150 L65 150 L90 262 L104 166" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M104 166 Q130 180 152 162 Q165 150 180 150 L210 150" fill="none" stroke="#B3261E" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M120 150 L120 170 M115 150 L125 150 M115 170 L125 170" stroke="#B3261E" stroke-width="2"/>
+  <text x="130" y="140" font-size="13" font-weight="700" fill="#B3261E">≥ 1 mm</text>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#B3261E">Concordant ST ↓ ≥ 1 mm</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">in V1, V2 or V3, where the</text>
+  <text x="112" y="356" text-anchor="middle" font-size="13" fill="#565D72">QRS is negative</text>
+</g>
+
+<!-- D: excessively discordant STE (Smith) -->
+<g transform="translate(755 80)">
+  <rect x="62" y="6" width="100" height="24" rx="12" fill="#F9E3E1"/>
+  <text x="112" y="23" text-anchor="middle" font-size="13" font-weight="700" fill="#B3261E">CRITERION 3</text>
+  <rect x="0" y="40" width="225" height="250" rx="6" fill="url(#grid)" stroke="#B3261E" stroke-width="2"/>
+  <line x1="0" y1="150" x2="225" y2="150" stroke="#8A93B8" stroke-width="1" stroke-dasharray="4 4"/>
+  <path d="M15 150 Q30 142 45 150 L65 150 L90 262 L104 110" fill="none" stroke="#0A1233" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M104 110 Q130 90 155 125 Q168 150 180 150 L210 150" fill="none" stroke="#B3261E" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M60 150 L60 262 M55 150 L65 150 M55 262 L65 262" stroke="#565D72" stroke-width="2"/>
+  <text x="52" y="212" text-anchor="end" font-size="13" font-weight="700" fill="#565D72">S</text>
+  <text x="52" y="228" text-anchor="end" font-size="12" fill="#565D72">14</text>
+  <path d="M118 150 L118 110 M113 150 L123 150 M113 110 L123 110" stroke="#B3261E" stroke-width="2"/>
+  <text x="128" y="170" font-size="13" font-weight="700" fill="#B3261E">ST 5 mm</text>
+  <text x="112" y="318" text-anchor="middle" font-size="14" font-weight="700" fill="#B3261E">Excessive discordant ST ↑</text>
+  <text x="112" y="338" text-anchor="middle" font-size="13" fill="#565D72">ST ≥ 1 mm and ≥ 25% of S:</text>
+  <text x="112" y="356" text-anchor="middle" font-size="13" fill="#565D72">5 / 14 ≈ 36% (Smith rule)</text>
+</g>
+
+<rect x="140" y="452" width="720" height="30" rx="8" fill="#F8F9FB" stroke="#D4D7E2"/>
+<text x="500" y="472" text-anchor="middle" font-size="14" fill="#0E1320"><tspan font-weight="700" fill="#B3261E">Any one criterion</tspan> = activate the cath lab. A negative result does <tspan font-weight="700">not</tspan> exclude MI.</text>
+</svg>

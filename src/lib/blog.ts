@@ -26,6 +26,8 @@ export interface PostMeta {
   author?: string;
   authorTitle?: string;
   cta: PostCta[];
+  /** Heading of the call-to-action box at the end of the post. */
+  ctaTitle?: string;
   draft: boolean;
   /** Cover image shown on the blog cards. */
   cover?: string;
@@ -63,6 +65,7 @@ function readPost(file: string): { meta: PostMeta; body: string } {
     author: fm.author ? String(fm.author) : undefined,
     authorTitle: fm.author_title ? String(fm.author_title) : undefined,
     cta: Array.isArray(fm.cta) ? (fm.cta as PostCta[]) : [],
+    ctaTitle: fm.cta_title ? String(fm.cta_title) : undefined,
     draft: fm.draft === true,
     cover: fm.cover ? String(fm.cover) : undefined,
     keyPoints: Array.isArray(fm.key_points) ? fm.key_points.map(String) : [],
@@ -75,11 +78,15 @@ function readPost(file: string): { meta: PostMeta; body: string } {
 const WATERMARK =
   '<span class="media-brand__mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" stroke="#fff" stroke-width="2.6"/><path d="M6.5 24H14C15 21.8 17 21.8 18 24H19.5L21 27L24 9.5L27.5 34L29.5 24H31C32.5 20.4 35 20.4 36.5 24H37.5" stroke="#f5b301" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Dr. RRP</b><i>Cardio</i></span>';
 
-/** Turns the `<!-- VIDEO: /path/clip.mp4 -->` placeholders into players (poster = the .png with the same name). */
+/**
+ * Turns the `<!-- VIDEO: /path/clip.mp4 -->` placeholders into players (poster = the .png with the same name).
+ * Add the word `loop` (`<!-- VIDEO: /path/clip.mp4 loop -->`) for short angiogram runs that should play silently on repeat.
+ */
 function withVideos(md: string): string {
-  return md.replace(/<!--\s*VIDEO:\s*(\S+?\.mp4)[^>]*-->/g, (_all, src: string) => {
+  return md.replace(/<!--\s*VIDEO:\s*(\S+?\.mp4)([^>]*)-->/g, (_all, src: string, opts: string) => {
     const poster = src.replace(/\.mp4$/, ".png");
-    return `<span class="media-brand">${WATERMARK}<video controls controlsList="nodownload noremoteplayback" disablePictureInPicture preload="none" playsinline oncontextmenu="return false" poster="${poster}" src="${src}"></video></span>`;
+    const playback = /\bloop\b/.test(opts) ? 'autoplay muted loop preload="metadata"' : 'preload="none"';
+    return `<span class="media-brand">${WATERMARK}<video controls controlsList="nodownload noremoteplayback" disablePictureInPicture ${playback} playsinline oncontextmenu="return false" poster="${poster}" src="${src}"></video></span>`;
   });
 }
 
@@ -117,11 +124,18 @@ export function getPost(slug: string): Post | null {
   const { meta, body } = readPost(file);
   if (!visible(meta)) return null;
   // The post files are written by the site owner and live in the repository, so the HTML they produce is trusted.
-  // Photographs and recordings (PNG) get the watermark too; the SVG schematics are our own drawings and do not.
-  const raw = (marked.parse(withVideos(body), { async: false }) as string).replace(
-    /<img ([^>]*src="[^"]+\.png"[^>]*)>/g,
-    (_all, attrs: string) => `<span class="media-brand" oncontextmenu="return false">${WATERMARK}<img draggable="false" ${attrs}></span>`,
-  );
+  // Photographs and recordings (PNG/JPG) get the watermark too; the SVG schematics are our own drawings and do not.
+  // Diagrams (SVG) open full size in a new tab when tapped, so their labels stay readable on a phone.
+  const raw = (marked.parse(withVideos(body), { async: false }) as string)
+    .replace(
+      /<img ([^>]*src="[^"]+\.(?:png|jpe?g)"[^>]*)>/g,
+      (_all, attrs: string) => `<span class="media-brand" oncontextmenu="return false">${WATERMARK}<img draggable="false" ${attrs}></span>`,
+    )
+    .replace(
+      /<img ([^>]*src="([^"]+\.svg)"[^>]*)>/g,
+      (_all, attrs: string, src: string) =>
+        `<a class="figure-zoom" href="${src}" target="_blank" rel="noopener" title="Open the diagram full size"><img ${attrs}></a>`,
+    );
   const { html, toc } = withHeadingIds(raw);
   return { ...meta, html, toc };
 }

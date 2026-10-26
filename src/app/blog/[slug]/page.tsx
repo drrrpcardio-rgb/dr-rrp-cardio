@@ -95,7 +95,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {post.cta.length > 0 && (
               <div className="mt-10 rounded-2xl border border-royal-100 bg-royal-50 p-8 text-center">
-                <p className="font-heading text-xl font-semibold text-ink">Learn the cath lab the structured way</p>
+                <p className="font-heading text-xl font-semibold text-ink">{post.ctaTitle ?? "Learn the cath lab the structured way"}</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-3">
                   {post.cta.map((c, i) => (
                     <Button key={c.url} href={c.url.replace(siteUrl, "") || "/"} variant={i === 0 ? "primary" : "secondary"}>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" width="1000" height="720" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>Conduction system and its blood supply from the LAD</title>
+<rect width="1000" height="720" fill="#FFFFFF"/>
+<text x="500" y="38" text-anchor="middle" font-family="Georgia, serif" font-size="24" font-weight="bold" fill="#0A1233">Why a proximal LAD occlusion causes RBBB + LAFB</text>
+<text x="500" y="62" text-anchor="middle" font-size="14" fill="#565D72">Schematic of the ventricular conduction system (frontal view) and its blood supply</text>
+
+<!-- heart outline -->
+<path d="M330 140 L670 140 C790 150 820 260 790 360 C760 450 620 540 500 600 C380 540 240 450 210 360 C180 260 210 150 330 140 Z" fill="#F8F9FB" stroke="#0A1233" stroke-width="3" stroke-linejoin="round"/>
+<text x="320" y="330" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">Right</text>
+<text x="320" y="350" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">ventricle</text>
+<text x="690" y="330" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">Left</text>
+<text x="690" y="350" text-anchor="middle" font-size="17" font-weight="700" fill="#0A1233">ventricle</text>
+
+<!-- septum -->
+<path d="M458 140 L542 140 L528 540 Q500 575 472 540 Z" fill="#EEF1FB" stroke="#8A93B8" stroke-width="2"/>
+<text x="500" y="420" text-anchor="middle" font-size="12" font-weight="600" fill="#565D72" transform="rotate(-90 500 420)">Interventricular septum</text>
+
+<!-- supply zones -->
+<ellipse cx="505" cy="215" rx="110" ry="62" fill="#B3261E" fill-opacity="0.10" stroke="#B3261E" stroke-width="2" stroke-dasharray="7 5"/>
+<ellipse cx="610" cy="400" rx="85" ry="70" fill="#1B6F8A" fill-opacity="0.08" stroke="#1B6F8A" stroke-width="2" stroke-dasharray="7 5"/>
+
+<!-- AV node and His bundle -->
+<line x1="500" y1="122" x2="500" y2="178" stroke="#0A1233" stroke-width="7" stroke-linecap="round"/>
+<circle cx="500" cy="110" r="13" fill="#F5B301" stroke="#0A1233" stroke-width="3"/>
+<text x="478" y="106" text-anchor="end" font-size="15" font-weight="600" fill="#0A1233">AV node</text>
+<text x="552" y="152" font-size="14" font-weight="600" fill="#0A1233">His bundle</text>
+
+<!-- right bundle branch -->
+<path d="M500 178 C478 230 468 330 470 450 C468 480 450 500 420 505" stroke="#B3261E" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M470 450 C460 470 440 475 410 470 M470 470 C475 500 480 520 490 535" stroke="#B3261E" stroke-width="3" fill="none" stroke-linecap="round"/>
+<line x1="462" y1="360" x2="395" y2="400" stroke="#565D72" stroke-width="1.5"/>
+<text x="390" y="405" text-anchor="end" font-size="15" font-weight="700" fill="#B3261E">Right bundle branch</text>
+<text x="390" y="423" text-anchor="end" font-size="13" fill="#565D72">thin, single strand</text>
+
+<!-- left bundle: anterior and posterior fascicles -->
+<path d="M500 178 C515 186 530 192 545 196" stroke="#0A1233" stroke-width="7" fill="none" stroke-linecap="round"/>
+<path d="M545 196 C600 188 660 178 725 200" stroke="#B3261E" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M725 200 C740 205 752 215 760 228 M725 200 C742 196 756 196 770 200" stroke="#B3261E" stroke-width="3" fill="none" stroke-linecap="round"/>
+<text x="730" y="178" font-size="15" font-weight="700" fill="#B3261E">Left anterior fascicle</text>
+<path d="M545 196 C580 260 610 360 640 450" stroke="#1B6F8A" stroke-width="7" fill="none" stroke-linecap="round"/>
+<path d="M640 450 C650 470 665 478 685 478 M640 450 C640 475 630 495 612 505" stroke="#1B6F8A" stroke-width="3" fill="none" stroke-linecap="round"/>
+<text x="700" y="470" font-size="15" font-weight="700" fill="#1B6F8A">Left posterior fascicle</text>
+<text x="700" y="488" font-size="13" fill="#565D72">broad, dual blood supply</text>
+
+<!-- supply labels -->
+<line x1="398" y1="190" x2="196" y2="190" stroke="#B3261E" stroke-width="1.5"/>
+<text x="190" y="180" text-anchor="end" font-size="14" font-weight="700" fill="#B3261E">Upper septum</text>
+<text x="190" y="198" text-anchor="end" font-size="13" fill="#0E1320">first septal perforators</text>
+<text x="190" y="215" text-anchor="end" font-size="13" fill="#0E1320">of the proximal LAD</text>
+<line x1="690" y1="380" x2="830" y2="330" stroke="#1B6F8A" stroke-width="1.5"/>
+<text x="835" y="320" font-size="14" font-weight="700" fill="#1B6F8A">Posterior septum</text>
+<text x="835" y="338" font-size="13" fill="#0E1320">LAD + posterior</text>
+<text x="835" y="355" font-size="13" fill="#0E1320">descending artery</text>
+
+<!-- legend / take-home -->
+<rect x="100" y="620" width="800" height="76" rx="8" fill="#F8F9FB" stroke="#D4D7E2"/>
+<line x1="125" y1="645" x2="160" y2="645" stroke="#B3261E" stroke-width="6" stroke-linecap="round"/>
+<text x="172" y="650" font-size="14" fill="#0E1320">Fed by the first septal branches: lost when the LAD is occluded <tspan font-weight="700">above</tspan> them</text>
+<line x1="125" y1="673" x2="160" y2="673" stroke="#1B6F8A" stroke-width="6" stroke-linecap="round"/>
+<text x="172" y="678" font-size="14" fill="#0E1320">Dual supply: usually spared. Result: <tspan font-weight="700" fill="#B3261E">RBBB + LAFB (bifascicular block) = proximal LAD</tspan></text>
+</svg>
