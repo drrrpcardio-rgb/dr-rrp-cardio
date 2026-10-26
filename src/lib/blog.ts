@@ -15,6 +15,12 @@ export interface PostCta {
   url: string;
 }
 
+export interface PostAuthor {
+  name: string;
+  title?: string;
+  bio?: string;
+}
+
 export interface PostMeta {
   slug: string;
   title: string;
@@ -25,6 +31,10 @@ export interface PostMeta {
   kicker?: string;
   author?: string;
   authorTitle?: string;
+  /** One line about the main author, shown on the author card at the end of the post. */
+  authorBio?: string;
+  /** Co-authors credited alongside the main author. */
+  coauthors: PostAuthor[];
   cta: PostCta[];
   /** Heading of the call-to-action box at the end of the post. */
   ctaTitle?: string;
@@ -64,6 +74,16 @@ function readPost(file: string): { meta: PostMeta; body: string } {
     kicker: fm.kicker ? String(fm.kicker) : undefined,
     author: fm.author ? String(fm.author) : undefined,
     authorTitle: fm.author_title ? String(fm.author_title) : undefined,
+    authorBio: fm.author_bio ? String(fm.author_bio) : undefined,
+    coauthors: Array.isArray(fm.coauthors)
+      ? (fm.coauthors as { name?: unknown; title?: unknown; bio?: unknown }[])
+          .filter((c) => c && c.name)
+          .map((c) => ({
+            name: String(c.name),
+            title: c.title ? String(c.title) : undefined,
+            bio: c.bio ? String(c.bio) : undefined,
+          }))
+      : [],
     cta: Array.isArray(fm.cta) ? (fm.cta as PostCta[]) : [],
     ctaTitle: fm.cta_title ? String(fm.cta_title) : undefined,
     draft: fm.draft === true,
@@ -138,8 +158,23 @@ export function getPost(slug: string): Post | null {
       (_all, attrs: string, src: string) =>
         `<a class="figure-zoom" href="${src}" target="_blank" rel="noopener" title="Open the diagram full size"><img ${attrs}></a>`,
     );
-  const { html, toc } = withHeadingIds(raw);
-  return { ...meta, html, toc };
+  const withIds = withHeadingIds(raw);
+  // Number the reference list (ref-1, ref-2, ...) so <sup><a href="#ref-2">2</a></sup> in the text can jump to it.
+  const html = withIds.html.replace(/(<h2 id="references">[\s\S]*?<\/h2>\s*<ol>)([\s\S]*?)(<\/ol>)/, (_all, open: string, items: string, close: string) => {
+    let n = 0;
+    return open + items.replace(/<li>/g, () => `<li id="ref-${++n}">`) + close;
+  });
+  return { ...meta, html, toc: withIds.toc };
+}
+
+/** "October 2026": the issue a post belongs to. */
+export function issueLabel(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+}
+
+/** All authors of a post in credit order. */
+export function postAuthors(post: PostMeta): PostAuthor[] {
+  return [...(post.author ? [{ name: post.author, title: post.authorTitle, bio: post.authorBio }] : []), ...post.coauthors];
 }
 
 export function formatDate(iso: string): string {

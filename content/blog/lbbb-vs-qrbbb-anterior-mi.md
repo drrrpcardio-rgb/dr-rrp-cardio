@@ -12,7 +12,12 @@ key_points:
   - "With ongoing ischaemic symptoms, treat LBBB or RBBB as a STEMI equivalent, whether the block is old or new."
 kicker: "Case Report · ECG & Interventional Cardiology"
 author: "Dr. A. Rajaram Prasad"
-author_title: "Consultant Interventional Cardiologist · MD, DM, FSCAI"
+author_title: "MD, DM, FSCAI · Consultant Interventional Cardiologist"
+author_bio: "Founder & Course Director, Dr. RRP Cardio."
+coauthors:
+  - name: "Kalaiyarasan G"
+    title: "Cardiovascular Technologist"
+    bio: "Co-author of this case report."
 tagline: "Learn. Understand. Apply."
 cta_title: "Read ECGs with confidence"
 cta:
@@ -51,6 +56,10 @@ The ECG showed LBBB with left axis deviation. There were deep QS complexes in V1
 ![12-lead ECG of case 1 showing left bundle branch block with left axis deviation](/images/blog/lbbb-vs-qrbbb/case1-lbbb-ecg.jpg)
 
 *Figure 2. Case 1: LBBB with left axis deviation (QRS 134 ms). The ST changes in V1–V3 are discordant, as expected for the block.*
+
+> In LBBB, the ECG can stay silent over a completely occluded artery. Listen to the patient.
+>
+> — Case 1 lesson
 
 What raised suspicion was the patient, not the paper. In an elderly diabetic woman, persistent unexplained back and axillary pain is an acute coronary syndrome until proven otherwise. A bedside echo settled it: the distal septum and apex were severely hypokinetic, LVEF was 30%, and there was an LV thrombus.
 
@@ -118,6 +127,10 @@ The ECG was unambiguous: RBBB with a **qR in V1**, marked left axis deviation (l
 *Figure 6. Case 2: complete RBBB (QRS 129 ms) with a qR in V1, left anterior fascicular block and extensive anterolateral ST elevation (V2–V6, I, aVL).*
 
 The QRS width differed between the two tracings: 92 ms on one, 129 ms on the other. Conduction in the septum was unstable, which is itself a warning sign in a proximal LAD occlusion.
+
+> The ECG said proximal LAD before the angiogram did.
+>
+> — Case 2 lesson
 
 Every feature pointed to the same place:
 
@@ -199,7 +212,7 @@ When LBBB clouds the picture, look for ST changes that break the block's own rul
 
 1. **Concordant ST elevation ≥ 1 mm** in any lead with a positive QRS.
 2. **Concordant ST depression ≥ 1 mm in V1–V3.**
-3. **Excessively discordant ST elevation:** ST elevation ≥ 1 mm that is at least 25% of the depth of the preceding S wave. This is the Smith modification, which replaced Sgarbossa's original fixed cut-off of ≥ 5 mm. In the derivation study it was about 91% sensitive and 90% specific for an acutely occluded artery.
+3. **Excessively discordant ST elevation:** ST elevation ≥ 1 mm that is at least 25% of the depth of the preceding S wave. This is the Smith modification, which replaced Sgarbossa's original fixed cut-off of ≥ 5 mm.<sup><a href="#ref-3">3</a></sup> In the derivation study it was about 91% sensitive and 90% specific for an acutely occluded artery.<sup><a href="#ref-4">4</a></sup>
 
 ![Schematic of the Sgarbossa and Smith criteria: expected proportionate discordant ST elevation in LBBB, concordant ST elevation, concordant ST depression in V1 to V3, and excessively discordant ST elevation with an ST/S ratio of at least 25%](/images/blog/lbbb-vs-qrbbb/sgarbossa-smith-criteria.svg)
 
@@ -207,7 +220,7 @@ When LBBB clouds the picture, look for ST changes that break the block's own rul
 
 Any one of these warrants activation of the cath lab. A negative result does not exclude MI in LBBB, as our first patient showed. Try them on her ECG in Figure 2: check each lead for concordance, then compare the ST elevation in V1–V3 with the depth of the S wave before it.
 
-The 2023 ESC guidelines are clear: in a patient with suspected ongoing ischaemia, LBBB or RBBB should prompt a primary PCI strategy, as for STEMI, **whether or not the block was known to be old**.
+The 2023 ESC guidelines are clear: in a patient with suspected ongoing ischaemia, LBBB or RBBB should prompt a primary PCI strategy, as for STEMI, **whether or not the block was known to be old**.<sup><a href="#ref-1">1</a>,<a href="#ref-2">2</a></sup>
 
 ## Six take-home points
 
@@ -260,11 +273,5 @@ Bundle branch blocks, fascicular blocks and STEMI equivalents are all in the [EC
 4. Smith SW, et al. Diagnosis of ST-elevation myocardial infarction in the presence of left bundle branch block with the ST-elevation to S-wave ratio in a modified Sgarbossa rule. *Ann Emerg Med.* 2012;60:766–776.
 
 ---
-
-**Dr. A. Rajaram Prasad**
-Founder & Course Director, Dr. RRP Cardio
-Consultant Interventional Cardiologist · MD, DM, FSCAI
-
-*Learn. Understand. Apply.*
 
 *For education only; not a substitute for medical advice. Both cases are shared with all patient identifiers removed.*

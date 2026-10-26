@@ -35,7 +35,7 @@ export function ReadingProgress() {
 }
 
 /** "In this post": sticky on large screens with the current section highlighted, a collapsible list on phones. */
-export function TableOfContents({ items, variant }: { items: TocItem[]; variant: "mobile" | "sidebar" }) {
+export function TableOfContents({ items, variant }: { items: TocItem[]; variant: "mobile" | "sidebar" | "panel" }) {
   const [active, setActive] = useState(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -74,6 +74,14 @@ export function TableOfContents({ items, variant }: { items: TocItem[]; variant:
     </ol>
   );
 
+  if (variant === "panel") {
+    return (
+      <div>
+        <p className="mb-3 text-xs font-semibold tracking-widest text-mist-600 uppercase">On this page</p>
+        {list}
+      </div>
+    );
+  }
   if (variant === "mobile") {
     return (
       <details className="mb-8 rounded-xl border border-mist-200 bg-mist-50 px-4 py-3 lg:hidden">

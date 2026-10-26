@@ -201,9 +201,22 @@ textarea:focus-visible,
 }
 
 /* Blog article typography. The post HTML comes from Markdown, so it is styled by element here. */
-.blog-prose { color: var(--color-ink-soft); font-size: 1.0625rem; line-height: 1.75; }
+.blog-prose { color: var(--color-ink-soft); font-size: 1.0625rem; line-height: 1.75; counter-reset: section; }
+.blog-prose[data-size="sm"] { font-size: .975rem; }
+.blog-prose[data-size="lg"] { font-size: 1.1875rem; }
 .blog-prose > :first-child { margin-top: 0; }
-.blog-prose h2 { margin: 2.75rem 0 1rem; font-family: var(--font-heading); font-size: 1.75rem; line-height: 1.25; font-weight: 600; color: var(--color-ink); }
+/* Section headings in the magazine style: a small gold section number above a royal serif heading. */
+.blog-prose h2 { clear: both; margin: 3.25rem 0 1rem; font-family: var(--font-heading); font-size: 1.85rem; line-height: 1.2; font-weight: 600; color: var(--color-royal-800); }
+.blog-prose h2::before { counter-increment: section; content: counter(section, decimal-leading-zero); display: block; margin-bottom: .55rem; padding-top: 1.1rem; border-top: 2px solid var(--color-royal-100); font-family: var(--font-body); font-size: .75rem; font-weight: 700; letter-spacing: .22em; color: var(--color-gold-500); }
+.blog-prose > h2:first-child { margin-top: 0; }
+.blog-prose h2#references::before, .blog-prose h2#test-yourself::before { content: none; }
+.blog-prose h2#references, .blog-prose h2#test-yourself { padding-top: 1.1rem; border-top: 2px solid var(--color-royal-100); }
+/* Drop cap on the opening paragraph. */
+.blog-prose > h2:first-child + p::first-letter { float: left; margin: .06em .14em 0 0; font-family: var(--font-heading); font-size: 3.7em; line-height: .82; font-weight: 600; color: var(--color-royal-700); }
+/* Numbered reference links in the text. */
+.blog-prose sup { font-size: .7em; line-height: 0; }
+.blog-prose sup a { margin-left: .1em; padding: 0 .2em; border-radius: .25rem; background: var(--color-royal-50); font-weight: 700; text-decoration: none; }
+.blog-prose ol li[id^="ref-"]:target { background: var(--color-gold-50, #fff8e1); border-radius: .25rem; }
 .blog-prose h3 { margin: 2rem 0 .75rem; font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600; color: var(--color-ink); }
 .blog-prose p { margin: 0 0 1.25rem; }
 .blog-prose a { color: var(--color-royal-700); text-decoration: underline; text-underline-offset: 3px; }
@@ -222,7 +235,17 @@ textarea:focus-visible,
 .blog-prose p > em:only-child { display: block; margin: -.25rem 0 1.75rem; font-size: .875rem; line-height: 1.5; font-style: normal; color: var(--color-mist-600); }
 .blog-prose p:has(> img), .blog-prose p:has(> video), .blog-prose p:has(> a.figure-zoom) { margin-bottom: 0; }
 .blog-prose hr { margin: 2.5rem 0; border: 0; border-top: 1px solid var(--color-mist-200); }
-.blog-prose blockquote { margin: 1.5rem 0; padding: .25rem 0 .25rem 1.25rem; border-left: 3px solid var(--color-gold-400); color: var(--color-ink-soft); }
+/* Pull quotes as speech bubbles, floated into the text on wider screens. End with a "— Source" line for the attribution. */
+.blog-prose blockquote { position: relative; margin: 1.75rem 0 2.75rem; padding: 1.6rem 1.6rem 1.4rem; border-radius: 1.25rem; background: var(--color-royal-800); color: #fff; }
+.blog-prose blockquote::after { content: ""; position: absolute; left: 2.25rem; bottom: -1.1rem; border-width: 1.15rem 1.15rem 0 0; border-style: solid; border-color: var(--color-royal-800) transparent transparent transparent; }
+.blog-prose blockquote p { margin: 0; font-family: var(--font-heading); font-size: 1.22em; line-height: 1.4; font-weight: 500; color: #fff; }
+.blog-prose blockquote p strong { color: var(--color-gold-300); }
+.blog-prose blockquote p:last-child:not(:first-child) { margin-top: .9rem; font-family: inherit; font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--color-gold-300); }
+.blog-prose blockquote p:last-child:not(:first-child)::after { content: "”"; float: right; margin-top: -.6rem; font-family: var(--font-heading); font-size: 3.2rem; line-height: 1; color: var(--color-gold-400); }
+@media (min-width: 768px) {
+  .blog-prose blockquote { float: right; width: 44%; margin: .4rem 0 2.25rem 1.75rem; }
+}
+.blog-prose .media-pair, .blog-prose .media-trio, .blog-prose table, .blog-prose details, .blog-prose hr { clear: both; }
 .blog-prose table { display: block; width: 100%; overflow-x: auto; margin: 1.5rem 0 2rem; border-collapse: collapse; font-size: .9375rem; line-height: 1.5; }
 .blog-prose th, .blog-prose td { padding: .65rem .85rem; border-bottom: 1px solid var(--color-mist-200); text-align: left; vertical-align: top; }
 .blog-prose thead th { background: var(--color-royal-50); color: var(--color-ink); font-weight: 600; border-bottom: 2px solid var(--color-royal-100); }
@@ -258,3 +281,15 @@ textarea:focus-visible,
    screenshots or someone using the browser's developer tools; the logo overlay is what travels with a copy. */
 .blog-prose .media-brand img { pointer-events: none; -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; }
 .blog-prose .media-brand video { -webkit-touch-callout: none; user-select: none; }
+
+/* Printing a blog post: just the article, no site chrome, sharing tools or videos. */
+@media print {
+  header:not(.post-masthead), footer, .no-print { display: none !important; }
+  .post-masthead { padding: 0 0 1.5rem !important; background: #fff !important; color: #000 !important; }
+  .post-masthead * { color: #000 !important; }
+  .post-masthead figure, .post-masthead [aria-hidden="true"] { display: none !important; }
+  .blog-prose video, .blog-prose .media-brand__mark { display: none !important; }
+  .blog-prose blockquote { float: none; width: auto; background: #fff; border: 2px solid #1e3a8a; }
+  .blog-prose blockquote p { color: #000; }
+  .blog-prose details > p { display: block; }
+}
