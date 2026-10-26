@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
 import { Button } from "@/components/ui/Button";
+import { EchoLabFrame } from "@/components/ui/EchoLabFrame";
 import { brand } from "@/lib/site-data";
+
+const description = `Scan a 3D heart with a virtual probe and see a realistic transthoracic echo image: 15 views, colour, PW, CW and tissue Doppler, M-mode, measurements and 22 pathology cases. Free from ${brand.name}.`;
 
 export const metadata: Metadata = {
   title: "Echo Simulator",
-  description: `Scan a 3D heart with a virtual probe and see a realistic transthoracic echo image: 15 views, colour, PW, CW and tissue Doppler, M-mode, measurements and 22 pathology cases. Free from ${brand.name}.`,
+  description,
 };
 
 const features = [
@@ -15,9 +19,23 @@ const features = [
   { title: "22 pathology cases", text: "AS, MS, HOCM, tamponade, DCM, amyloid, PE and more, with a quiz and an echo report." },
 ];
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Dr. RRP Cardio Echo Simulator",
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Any (web browser)",
+  isAccessibleForFree: true,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+  description,
+  provider: { "@type": "Organization", name: brand.name },
+  educationalUse: "Echocardiography training",
+};
+
 export default function EchoSimulatorPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageHero
         eyebrow="Echo"
         title="Echo simulator"
@@ -33,19 +51,11 @@ export default function EchoSimulatorPage() {
         </div>
       </PageHero>
 
-      <section id="lab" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-10 sm:px-8 sm:py-14">
-        <div className="h-[88vh] min-h-[640px] w-full overflow-hidden rounded-3xl border border-royal-200 bg-royal-950 shadow-2xl lg:h-[900px]">
-          <iframe
-            src="/echo-lab/index.html"
-            title="Dr. RRP Cardio Echo Lab"
-            allow="fullscreen; clipboard-write"
-            allowFullScreen
-            className="size-full border-0"
-          />
-        </div>
+      <section id="lab" className="mx-auto max-w-7xl scroll-mt-24 px-3 py-8 sm:px-8 sm:py-14">
+        <EchoLabFrame />
         <p className="mt-4 text-center text-sm text-royal-700">
           Drag the probe on the chest, or pick a view under the 3D model. Click inside the simulator to use the keyboard: arrows slide, Q/E
-          rotate, W/S fan, Space freezes. On a phone, use <a href="/echo-lab/index.html" className="font-semibold underline">full screen</a>.
+          rotate, W/S fan, Space freezes. Use the button in the corner for full screen.
         </p>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -55,6 +65,23 @@ export default function EchoSimulatorPage() {
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">{f.text}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mx-auto mt-12 max-w-3xl space-y-3 text-sm leading-relaxed text-ink-soft">
+          <h2 className="font-heading text-xl font-semibold text-royal-950">Learn transthoracic echo before you touch a patient</h2>
+          <p>
+            The simulator builds each image from a 3D heart, so moving the probe changes the cut just as it would on a real scanner. Practise
+            finding the parasternal long and short axis, apical four, five and two chamber, subcostal and suprasternal views, then switch on
+            colour or spectral Doppler to measure gradients and valve areas.
+          </p>
+          <p>
+            Practice mode scores how close your view is to the target, and the case quiz asks you to name the diagnosis from the images. Your
+            progress is kept in this browser. When you have a measurement, grade it with the{" "}
+            <Link href="/echo-calculators" className="font-semibold text-royal-700 underline-offset-2 hover:underline">
+              echo calculators
+            </Link>
+            .
+          </p>
         </div>
 
         <p className="mt-10 text-center text-xs text-royal-700">

@@ -289,7 +289,8 @@ body.gridmode #grid{display:block}
             <label class="chip" title="Continuous-wave Doppler: all velocities along the line"><input type="checkbox" id="cwOn"> CW</label>
             <label class="chip" title="Tissue Doppler: PW on the myocardium (e′, s′, a′)"><input type="checkbox" id="tdiOn"> TDI</label>
           </span>
-          <label class="mini">Click sets <select id="clickMode"><option value="m">M-mode line</option><option value="c">Color box</option><option value="d">Doppler cursor</option></select></label>
+          <button class="chip" id="savePng" type="button" title="Download the current image (and any M-mode or Doppler strip) as a PNG">Save PNG</button>
+          <label class="mini">Click sets <select id="clickMode" aria-label="What a click on the image sets"><option value="m">M-mode line</option><option value="c">Color box</option><option value="d">Doppler cursor</option></select></label>
           <span id="mmHint" style="flex-basis:100%">Turn on a mode, then click the image to place its cursor.</span>
         </div>
         <div class="console" id="console">
@@ -330,6 +331,7 @@ body.gridmode #grid{display:block}
         <p class="note" id="quizIntro">Name the pathology: a random case loads with its name hidden; scan it and pick the diagnosis. Measure it: freeze the image, draw a caliper, and check it against the model. Doppler gradient: line up CW Doppler with a jet (AS, TR, MS, AR or VSD) and measure its peak velocity and gradient.</p>
         <div id="quizBody" hidden>
           <div class="prac-line"><b id="quizQ">Which pathology is this?</b><span id="quizScore">0 / 0</span></div>
+          <p class="note" id="quizAll" style="margin-top:2px"></p>
           <p class="note" id="quizTask" style="margin-top:6px"></p>
           <div class="qopts" id="quizOpts" style="margin-top:8px"></div>
           <div class="row" id="quizMeasRow" style="margin-top:8px" hidden><button class="btn primary" id="quizSubmit" type="button">Submit last caliper</button></div>
@@ -389,6 +391,7 @@ body.gridmode #grid{display:block}
           <h2>Practice</h2>
           <div class="row">
             <label class="chip"><input type="checkbox" id="ghost" checked> Target ghost</label>
+            <button class="btn" id="lessonToggle" type="button" title="Step through the standard views in order, with tips">Guided lesson</button>
             <button class="btn primary" id="pracToggle" type="button">Start practice</button>
           </div>
         </div>
@@ -400,7 +403,8 @@ body.gridmode #grid{display:block}
             <button class="btn" id="pracNext" type="button">Next view →</button>
           </div>
         </div>
-        <p class="note" id="pracIntro">Pick a random target view and steer the probe until the match reaches 85%.</p>
+        <p class="note" id="pracIntro">Pick a random target view and steer the probe until the match reaches 85%, or take the guided lesson through every view.</p>
+        <p class="note" id="pracDone" style="margin-top:6px"></p>
       </div>
 
       <div class="panel">
@@ -2807,13 +2811,62 @@ function startApp() {
 
   // Practice
   const pr = { body: $('pracBody'), intro: $('pracIntro'), name: $('pracName'), score: $('pracScore'), meter: $('pracMeter'), hint: $('pracHint') };
-  const pickTarget = () => { let n; do { n = Math.floor(Math.random() * VIEWS.length); } while (n === st.target && VIEWS.length > 1); st.target = n; pr.name.textContent = VIEWS[n].full; };
-  $('pracToggle').onclick = e => {
-    st.practice = !st.practice; pr.body.hidden = !st.practice; pr.intro.hidden = st.practice;
-    e.target.textContent = st.practice ? 'Stop practice' : 'Start practice'; if (st.practice) pickTarget();
+  // Progress (views found, quiz totals) is saved in this browser only
+  const PROG_KEY = 'rrp-echo-lab-progress';
+  const prog = (() => { try { const o = JSON.parse(localStorage.getItem(PROG_KEY) || '{}'); return { views: Array.isArray(o.views) ? o.views : [], quiz: o.quiz && typeof o.quiz === 'object' ? o.quiz : {} }; } catch { return { views: [], quiz: {} }; } })();
+  const saveProg = () => { try { localStorage.setItem(PROG_KEY, JSON.stringify(prog)); } catch { } };
+  const pracDone = $('pracDone'), quizAll = $('quizAll');
+  const showProg = () => {
+    const n = VIEWS.filter(v => prog.views.includes(v.id)).length;
+    pracDone.textContent = n ? `Views found so far: ${n} / ${VIEWS.length}` : '';
+    const parts = Object.entries({ dx: 'Pathology', meas: 'Measure', dop: 'Doppler' }).filter(([k]) => prog.quiz[k] && prog.quiz[k].n).map(([k, l]) => `${l} ${prog.quiz[k].right}/${prog.quiz[k].n}`);
+    quizAll.textContent = parts.length ? `All-time: ${parts.join(' · ')}` : '';
   };
+  const markView = i => { const id = VIEWS[i].id; if (!prog.views.includes(id)) { prog.views.push(id); saveProg(); showProg(); } };
+  const logQuiz = (mode, ok) => { const q = prog.quiz[mode] || (prog.quiz[mode] = { n: 0, right: 0 }); q.n++; if (ok) q.right++; saveProg(); showProg(); };
+
+  // Guided lesson: every view in order, moving on once the match holds at 85% or more
+  const TIPS = {
+    Parasternal: 'Probe left of the sternum, 3rd–4th intercostal space. Rotate and tilt until the target cut appears.',
+    Apical: 'Probe at the apex beat, beam aimed at the right shoulder. Rotate to bring in the chambers you need.',
+    Subcostal: 'Probe flat under the xiphoid, beam aimed up towards the left shoulder.',
+    Suprasternal: 'Probe in the suprasternal notch, beam aimed down along the aortic arch.',
+  };
+  const lesson = { on: false, i: 0, holdSince: 0 };
+  const setTarget = n => { st.target = n; pr.name.textContent = lesson.on ? `Lesson ${n + 1} / ${VIEWS.length} · ${VIEWS[n].full}` : VIEWS[n].full; lesson.holdSince = 0; };
+  const pickTarget = () => {
+    if (lesson.on) { if (lesson.i < VIEWS.length - 1) setTarget(++lesson.i); else stopPractice('Lesson complete: you have found every standard view.'); return; }
+    let n; do { n = Math.floor(Math.random() * VIEWS.length); } while (n === st.target && VIEWS.length > 1); setTarget(n);
+  };
+  const pracBtn = $('pracToggle'), lessonBtn = $('lessonToggle');
+  const startPractice = asLesson => {
+    lesson.on = asLesson; lesson.i = 0; st.practice = true; pr.body.hidden = false; pr.intro.hidden = true;
+    pracBtn.textContent = 'Stop practice'; lessonBtn.hidden = true;
+    if (asLesson) setTarget(0); else pickTarget();
+  };
+  function stopPractice(msg) {
+    st.practice = false; lesson.on = false; pr.body.hidden = true; pr.intro.hidden = false;
+    pracBtn.textContent = 'Start practice'; lessonBtn.hidden = false;
+    if (msg) pracDone.textContent = msg; else showProg();
+  }
+  pracBtn.onclick = () => (st.practice ? stopPractice() : startPractice(false));
+  lessonBtn.onclick = () => startPractice(true);
   $('pracNext').onclick = pickTarget;
+  showProg();
   const ghostToggle = $('ghost');
+
+  // Save the current image (and visible M-mode / Doppler strips) as a PNG
+  $('savePng').onclick = () => {
+    const parts = [usCanvas, mm, spc].filter(c => !c.hidden && c.width);
+    const W = Math.max(...parts.map(c => c.width)), H = parts.reduce((h, c) => h + c.height, 0) + 22;
+    const out = document.createElement('canvas'); out.width = W; out.height = H;
+    const o = out.getContext('2d'); o.fillStyle = '#000'; o.fillRect(0, 0, W, H);
+    let y = 0; for (const c of parts) { o.drawImage(c, 0, y); y += c.height; }
+    o.fillStyle = '#8fa3d8'; o.font = '12px system-ui, sans-serif';
+    o.fillText(`Dr. RRP Cardio echo simulator · ${st.curView || 'Free scan'} · ${CASES[st.caseIdx] && !casePanel.classList.contains('quizhide') ? CASES[st.caseIdx].pathology : 'simulated'} · for teaching only`, 8, H - 7);
+    const a = document.createElement('a'); a.download = `echo-${(st.curView || 'scan').replace(/\W+/g, '-').toLowerCase()}-${Date.now()}.png`;
+    a.href = out.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove();
+  };
 
   // Quiz
   const qz = { on: false, mode: 'dx', n: 0, right: 0, idx: -1, task: null, answered: false, hints: 0 };
@@ -2892,7 +2945,7 @@ function startApp() {
   }
   function answerDx(i) {
     if (qz.answered) return; qz.answered = true; qz.n++;
-    const ok = i === qz.idx; if (ok) qz.right++;
+    const ok = i === qz.idx; if (ok) qz.right++; logQuiz('dx', ok);
     for (const b of Q.opts.children) { b.disabled = true; const k = +b.dataset.i; if (k === qz.idx) b.classList.add('right'); else if (k === i) b.classList.add('wrong'); }
     Q.fb.className = 'qfb ' + (ok ? 'good' : 'bad');
     Q.fb.textContent = ok ? `Correct: ${CASES[qz.idx].pathology}. The key findings are in the Pathology panel below.` : `Not quite. This is ${CASES[qz.idx].pathology}. Compare its key findings below.`;
@@ -2905,7 +2958,7 @@ function startApp() {
       const got = spec.result && spec.result.data.vmax ? spec.result.data.vmax : lastD ? Math.max(Math.abs(spVal(lastD).v1), Math.abs(spVal(lastD).v2)) : null;
       if (!got) { Q.fb.className = 'qfb bad'; Q.fb.textContent = 'Press “Measure last beat” under the Doppler strip (or place a Doppler caliper on the peak) first.'; return; }
       const truth = jetPeak(qz.task.jet), ok = got >= truth * 0.85 && got <= truth * 1.1;
-      qz.answered = true; qz.n++; if (ok) qz.right++;
+      qz.answered = true; qz.n++; if (ok) qz.right++; logQuiz(qz.mode, ok);
       const ang = got < truth ? Math.acos(clamp(got / truth, 0, 1)) / DEG : 0;
       Q.fb.className = 'qfb ' + (ok ? 'good' : 'bad');
       Q.fb.textContent = `${ok ? 'Well aligned.' : 'Off target.'} You measured ${got.toFixed(2)} m/s (peak gradient ${(4 * got * got).toFixed(0)} mmHg). The jet's true peak is ${truth.toFixed(2)} m/s (${(4 * truth * truth).toFixed(0)} mmHg). ` +
@@ -2916,7 +2969,7 @@ function startApp() {
     if (!m) { Q.fb.className = 'qfb bad'; Q.fb.textContent = 'Draw a caliper on the 2D image first: press CALIPER (or MEASURE), then click edge to edge.'; return; }
     const t = qz.task, got = usCm(m), truth = t.truth(), err = got - truth, tol = Math.max(0.3, truth * 0.12);
     const phaseOk = st.frozen && (t.freeze === 'ED' ? Math.abs(cd(st.phase, 0)) < 0.06 : Math.abs(st.phase - 0.26) < 0.08);
-    qz.answered = true; qz.n++; const ok = Math.abs(err) <= tol; if (ok) qz.right++;
+    qz.answered = true; qz.n++; const ok = Math.abs(err) <= tol; if (ok) qz.right++; logQuiz(qz.mode, ok);
     const abn = truth < t.normal[0] ? 'below normal' : truth > t.normal[1] ? 'above normal' : 'normal';
     Q.fb.className = 'qfb ' + (ok ? 'good' : 'bad');
     Q.fb.textContent = `${ok ? 'Within tolerance.' : 'Outside tolerance.'} You measured ${got.toFixed(2)} cm; the model value is ${truth.toFixed(2)} cm (${abn}; normal ${t.normal[0]}–${t.normal[1]} cm). ` +
@@ -3072,7 +3125,11 @@ function startApp() {
       if (st.practice) {
         const s = match(fr, VIEWS[st.target].frame), good = s >= 85;
         pr.score.textContent = `Match ${Math.round(s)}%`; pr.meter.firstChild.style.width = s.toFixed(0) + '%'; pr.meter.classList.toggle('good', good);
-        pr.hint.textContent = good ? 'On target. Try the next view.' : 'Find the view. The green ghost shows where the probe should sit.';
+        if (good) markView(st.target);
+        if (lesson.on) {
+          pr.hint.textContent = good ? 'On target. Hold it there…' : TIPS[VIEWS[st.target].group] || 'Find the view. The green ghost shows where the probe should sit.';
+          if (good) { const now = performance.now(); if (!lesson.holdSince) lesson.holdSince = now; else if (now - lesson.holdSince > 1200) pickTarget(); } else lesson.holdSince = 0;
+        } else pr.hint.textContent = good ? 'On target. Try the next view.' : 'Find the view. The green ghost shows where the probe should sit.';
       }
     }
 
