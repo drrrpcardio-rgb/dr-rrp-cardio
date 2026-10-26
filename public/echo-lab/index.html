@@ -381,10 +381,7 @@ body.gridmode #grid{display:block}
         </div>
         <div class="row" style="justify-content:space-between">
           <button class="btn" id="caseReset" type="button">Reset values</button>
-          <span class="row">
-            <button class="btn" id="caseCopy" type="button">Copy case JSON</button>
-            <button class="btn primary" id="caseLoad" type="button">Load your case</button>
-          </span>
+          <button class="btn primary" id="caseLoad" type="button">Load your case</button>
         </div>
       </div>
 
@@ -2844,13 +2841,6 @@ function startApp() {
   };
   caseSel.addEventListener('change', () => loadCase(+caseSel.value));
   $('caseReset').onclick = () => loadCase(st.caseIdx, false);
-  $('caseCopy').onclick = async e => {
-    const c = CASES[st.caseIdx], sp = {};
-    for (const d of PARAM_DEFS) if (d.k in c.simulation_parameters || MODEL[d.k] !== DEFAULT_MODEL[d.k]) sp[d.k] = MODEL[d.k];
-    const json = JSON.stringify({ pathology: c.pathology, echo_views: c.echo_views, findings_list: c.findings_list, color_doppler: c.color_doppler, m_mode: c.m_mode, simulation_parameters: sp }, null, 2);
-    try { await navigator.clipboard.writeText(json); e.target.textContent = 'Copied'; } catch { e.target.textContent = 'Copy blocked by browser'; }
-    setTimeout(() => { e.target.textContent = 'Copy case JSON'; }, 1800);
-  };
 
   // Practice
   const pr = { body: $('pracBody'), intro: $('pracIntro'), name: $('pracName'), score: $('pracScore'), meter: $('pracMeter'), hint: $('pracHint') };
