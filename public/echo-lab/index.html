@@ -381,7 +381,6 @@ body.gridmode #grid{display:block}
         </div>
         <div class="row" style="justify-content:space-between">
           <button class="btn" id="caseReset" type="button">Reset values</button>
-          <button class="btn primary" id="caseLoad" type="button">Load your case</button>
         </div>
       </div>
 
@@ -437,18 +436,6 @@ body.gridmode #grid{display:block}
     <div class="row"><button class="btn" id="repCopy" type="button">Copy text</button><button class="btn" id="repDl" type="button">Download .txt</button><button class="btn" id="repPrint" type="button">Print</button><button class="btn primary" id="repClose" type="button">Close</button></div>
   </div>
   <div class="dlg-body report" id="reportBody"></div>
-</dialog>
-<dialog id="loadDlg" aria-labelledby="loadTitle">
-  <div class="dlg-head">
-    <h2 id="loadTitle">Load your case</h2>
-    <div class="row"><button class="btn" id="loadExample" type="button">Insert example</button><button class="btn" id="loadCancel" type="button">Cancel</button><button class="btn primary" id="loadGo" type="button">Load case</button></div>
-  </div>
-  <div class="dlg-body">
-    <p class="note" style="margin-bottom:8px">Paste one case, or an array of cases, with the fields pathology, echo_views, findings_list, color_doppler, m_mode and simulation_parameters. You can also choose a .json file. An optional "model" object sets valve behaviour, jets and shunts; without it they are guessed from the pathology and findings text. Loaded cases are kept in this browser.</p>
-    <input type="file" id="loadFile" accept=".json,application/json" style="margin-bottom:8px;max-width:100%">
-    <textarea id="loadText" spellcheck="false" aria-label="Case JSON"></textarea>
-    <p class="qfb bad" id="loadErr" style="margin-top:8px"></p>
-  </div>
 </dialog>
 <div id="grid"></div>
 
@@ -2737,7 +2724,7 @@ function startApp() {
     return p.length ? p.join(' · ') : 'no valve or flow lesion';
   };
 
-  // ---- Load your own case (JSON) ----
+  // ---- Custom cases (JSON): cases saved in this browser earlier still load into the case list ----
   const MODEL_KEYS = { mv: ['normal', 'tether', 'ms', 'prolapse'], av: ['normal', 'stenosis', 'regurg', 'bicuspid'], wma: [null, 'apex', 'balloon'] };
   const BOOL_KEYS = ['sam', 'flutter', 'asd', 'vsd', 'thrombus', 'tamponade', 'swing', 'af', 'swirl', 'myxoma', 'veg', 'sparkle', 'bounce', 'hvRev', 'hvExp', 'paNotch'];
   const NUM_KEYS = { septalFlatten: [0.4, 1], ivcR: [0.6, 2], paR: [0.8, 2.2], rvWall: [0.3, 1.2], ivcColl: [0, 1], respVar: [0, 0.5], RA_scale: [0.7, 2], dtMs: [80, 350], pericard: [0, 1], paAT: [0, 180], latE: [0.5, 1.6] };
@@ -2815,30 +2802,6 @@ function startApp() {
     return i;
   }
   try { const raw = localStorage.getItem(CUSTOM_KEY); if (raw) for (const o of JSON.parse(raw)) { try { addCase(validateCase(o)); } catch { } } } catch { }
-  const loadDlg = $('loadDlg'), loadText = $('loadText'), loadErr = $('loadErr');
-  const EXAMPLE = {
-    pathology: 'Severe aortic stenosis with LV dysfunction', echo_views: ['PLAX', 'PSAX AV', 'A5C', 'A4C'],
-    findings_list: ['Heavily calcified aortic valve with restricted opening', 'Reduced LV systolic function', 'Low-flow aortic stenosis'],
-    color_doppler: 'Turbulent mosaic jet in the ascending aorta in systole', m_mode: 'Reduced aortic cusp separation',
-    simulation_parameters: { HR: 84, EF: 35, LA_size_cm: 4.6, LVEDD_cm: 6.0, LVESD_cm: 5.0, IVSd_cm: 1.3, LVPWd_cm: 1.2 },
-    model: { av: 'stenosis', jets: ['as', 'mr-central'], mvEA: [1, 0.4] }
-  };
-  $('caseLoad').onclick = () => { loadErr.textContent = ''; if (!loadText.value.trim()) loadText.value = ''; loadDlg.showModal(); loadText.focus(); };
-  $('loadCancel').onclick = () => loadDlg.close();
-  $('loadExample').onclick = () => { loadText.value = JSON.stringify(EXAMPLE, null, 2); loadErr.textContent = ''; };
-  $('loadFile').addEventListener('change', async e => { const f = e.target.files[0]; if (!f) return; if (f.size > 500000) { loadErr.textContent = 'That file is too large (limit 500 KB).'; return; } loadText.value = await f.text(); loadErr.textContent = ''; });
-  $('loadGo').onclick = () => {
-    loadErr.textContent = '';
-    let data; try { data = JSON.parse(loadText.value); } catch (err) { loadErr.textContent = 'Not valid JSON: ' + err.message; return; }
-    const list = Array.isArray(data) ? data : [data];
-    if (!list.length || list.length > 50) { loadErr.textContent = 'Give one case, or a list of up to 50 cases.'; return; }
-    let cases; try { cases = list.map((o, n) => validateCase(o, list.length > 1 ? n : null)); } catch (err) { loadErr.textContent = err.message; return; }
-    let i = 0; for (const c of cases) i = addCase(c);
-    saveCustom(); loadDlg.close();
-    if (qz.on) Q.toggle.click();
-    loadCase(i);
-    const w = cases.flatMap(c => c.warn); if (w.length) mmHint.textContent = `Loaded. Ignored unknown fields: ${[...new Set(w)].join(', ')}.`;
-  };
   caseSel.addEventListener('change', () => loadCase(+caseSel.value));
   $('caseReset').onclick = () => loadCase(st.caseIdx, false);
 
