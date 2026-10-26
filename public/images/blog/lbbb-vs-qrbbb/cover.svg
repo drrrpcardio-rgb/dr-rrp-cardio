@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>LBBB vs qRBBB in anterior MI</title>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#101C4E"/><stop offset="1" stop-color="#0A1233"/></linearGradient>
+  <pattern id="small" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" stroke="#F6D6D6" stroke-width="1"/></pattern>
+  <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse"><rect width="80" height="80" fill="#FFFDFC"/><rect width="80" height="80" fill="url(#small)"/><path d="M80 0H0V80" fill="none" stroke="#EDB2B2" stroke-width="1.6"/></pattern>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/>
+
+<!-- heading -->
+<text x="800" y="112" text-anchor="middle" font-size="30" font-weight="700" letter-spacing="6" fill="#F5B301">CASE REPORT · ANTERIOR MI</text>
+<text x="800" y="200" text-anchor="middle" font-family="Georgia, serif" font-size="76" font-weight="bold" fill="#FFFFFF">One Artery, Two Disguises</text>
+
+<!-- LBBB panel -->
+<g transform="translate(120 270)">
+  <rect width="620" height="430" rx="28" fill="url(#grid)" stroke="#2F47B8" stroke-width="4"/>
+  <text x="310" y="68" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="bold" fill="#0A1233">LBBB</text>
+  <line x1="30" y1="220" x2="590" y2="220" stroke="#8A93B8" stroke-width="2" stroke-dasharray="8 8"/>
+  <path d="M40 220 Q75 200 110 220 L170 220 L230 380 L268 196 Q320 160 372 206 Q392 220 420 220 L580 220" fill="none" stroke="#0A1233" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="310" y="412" text-anchor="middle" font-size="34" font-weight="700" fill="#565D72">hides the infarct</text>
+</g>
+
+<!-- vs -->
+<circle cx="800" cy="485" r="52" fill="#F5B301"/>
+<text x="800" y="500" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="bold" fill="#0A1233">vs</text>
+
+<!-- qRBBB panel -->
+<g transform="translate(860 270)">
+  <rect width="620" height="430" rx="28" fill="url(#grid)" stroke="#B3261E" stroke-width="4"/>
+  <text x="310" y="68" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="bold" fill="#B3261E">qRBBB</text>
+  <line x1="30" y1="220" x2="590" y2="220" stroke="#8A93B8" stroke-width="2" stroke-dasharray="8 8"/>
+  <path d="M40 220 Q75 200 110 220 L170 220 L186 262 L222 104 L248 186" fill="none" stroke="#0A1233" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M248 186 Q310 140 376 208 Q394 220 420 220 L580 220" fill="none" stroke="#B3261E" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="186" cy="262" r="20" fill="none" stroke="#B3261E" stroke-width="5"/>
+  <text x="310" y="412" text-anchor="middle" font-size="34" font-weight="700" fill="#B3261E">announces it</text>
+</g>
+
+<!-- footer -->
+<text x="800" y="790" text-anchor="middle" font-size="34" fill="#D6DDF4">Two LAD occlusions · What lead V1 tells you</text>
+<g transform="translate(800 846)">
+  <g transform="translate(-118 -22)">
+    <circle cx="22" cy="22" r="20" fill="none" stroke="#FFFFFF" stroke-width="2.6"/>
+    <path d="M6.5 24H14C15 21.8 17 21.8 18 24H19.5L21 27L24 9.5L27.5 34L29.5 24H31C32.5 20.4 35 20.4 36.5 24H37.5" stroke="#F5B301" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="-62" y="10" font-family="Georgia, serif" font-size="30" font-weight="bold" fill="#FFFFFF">Dr. RRP</text>
+  <text x="66" y="10" font-size="20" font-weight="700" letter-spacing="5" fill="#F5C542">CARDIO</text>
+</g>
+</svg>

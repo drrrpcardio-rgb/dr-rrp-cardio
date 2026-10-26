@@ -4,7 +4,7 @@ description: "Two LAD occlusions in one week, both with bundle branch block. One
 date: 2026-10-26
 tags: [Case Report, ECG, LBBB, RBBB, Anterior STEMI, Sgarbossa, Primary PCI]
 draft: false
-cover: "/images/blog/lbbb-vs-qrbbb/case2-qrbbb-ecg-b.jpg"
+cover: "/images/blog/lbbb-vs-qrbbb/cover.svg"
 key_points:
   - "Two patients with a total LAD occlusion in the same week, both with a bundle branch block on the ECG."
   - "LBBB hid the infarct. The diagnosis came from the symptoms and a bedside echo, and the culprit was a mid-to-distal LAD occlusion."
