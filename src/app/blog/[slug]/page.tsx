@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, MessageCircle } from "lucide-react";
+import { ArrowLeft, Clock } from "lucide-react";
 import { ReadingProgress, TableOfContents } from "@/components/blog/PostSidebar";
 import { PageHero } from "@/components/ui/PageHero";
 import { Button } from "@/components/ui/Button";
@@ -65,14 +65,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <span className="inline-flex items-center gap-1.5">
                 <Clock size={14} aria-hidden="true" /> {post.readingMinutes} min read
               </span>
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(`${post.title} ${siteUrl}/blog/${post.slug}/`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 font-medium text-royal-700 hover:underline"
-              >
-                <MessageCircle size={14} aria-hidden="true" /> Share on WhatsApp
-              </a>
             </div>
 
             <TableOfContents items={post.toc} variant="mobile" />

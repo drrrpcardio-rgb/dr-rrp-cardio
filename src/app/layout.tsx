@@ -6,7 +6,8 @@ import { Footer } from "@/components/layout/Footer";
 import { SmoothScrollProvider } from "@/lib/smooth-scroll-provider";
 import { MotionProvider } from "@/lib/motion-provider";
 import { PageTransition } from "@/components/layout/PageTransition";
-import { brand, founder, siteUrl } from "@/lib/site-data";
+import { brand, contactEmail, founder, siteUrl } from "@/lib/site-data";
+import { courseCategories } from "@/lib/courses-data";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -52,12 +53,42 @@ export const metadata: Metadata = {
   },
 };
 
+// Site-wide structured data: the academy, its founder and its courses
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "@id": `${siteUrl}/#org`,
+  name: brand.name,
+  url: siteUrl,
+  logo: `${siteUrl}/icon-512.png`,
+  email: contactEmail,
+  slogan: brand.tagline,
+  founder: {
+    "@type": "Person",
+    name: founder.name,
+    jobTitle: founder.title,
+    honorificSuffix: founder.credentials,
+  },
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Cardiology courses",
+    itemListElement: courseCategories.map((c) => ({
+      "@type": "Course",
+      name: c.name,
+      description: c.tagline,
+      url: `${siteUrl}/courses/${c.slug}/`,
+      provider: { "@id": `${siteUrl}/#org` },
+    })),
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${fraunces.variable} ${manrope.variable}`}>
       <body className="bg-background text-foreground antialiased">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <MotionProvider>
           <SmoothScrollProvider>
             <Nav />
