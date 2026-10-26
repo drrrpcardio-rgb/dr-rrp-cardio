@@ -17,7 +17,7 @@ author_bio: "Founder & Course Director, Dr. RRP Cardio."
 coauthors:
   - name: "Kalaiyarasan G"
     title: "Cardiovascular Technologist"
-    bio: "Co-author of this article."
+    bio: "Cath Lab Team, Dr. A. Rajaram Prasad"
 tagline: "Learn. Understand. Apply."
 cta_title: "Read ECGs with confidence"
 cta:
