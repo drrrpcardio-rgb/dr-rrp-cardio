@@ -889,12 +889,18 @@ function leaflet(a, c, ha, hc, ma, mc, ta, tc, th) {
   if (ma === null) return seg2(a, c, ha, hc, ta, tc) < th;
   return seg2(a, c, ha, hc, ma, mc) < th || seg2(a, c, ma, mc, ta, tc) < th;
 }
-function valveAt(a, b, c, x, y, z) {
+// Mitral frame turned 36° in the b-c plane (the PLAX direction): the anterior leaflet faces the aortic root and
+// the commissures run medial-lateral, so PSAX shows a side-to-side fish-mouth and PLAX cuts both leaflets.
+const MV_CU = Math.cos(36 * Math.PI / 180), MV_SU = Math.sin(36 * Math.PI / 180);
+function valveAt(a, b0, c0, x, y, z) {
   const M = MODEL;
-  // Mitral leaflets: anterior (toward the aortic root, +c) and posterior.
+  // Mitral leaflets: anterior (toward the aortic root, +c) and posterior; b runs between the commissures.
+  const c = b0 * MV_CU + c0 * MV_SU, b = -b0 * MV_SU + c0 * MV_CU;
   if (a > -1.3 && a < 2.4 && b > -1.45 && b < 1.45 && c > -2.2 && c < 2.4) {
     const hc = Math.sqrt(Math.max(0, 2.1 - b * b)), k = hc / 1.45, o = MVO;
-    let th = 0.11, A = [lerp(0.45, 2.0, o), lerp(0.12, 1.25, o) * k], Am = null, P = [lerp(0.40, 1.3, o), lerp(-0.05, -1.35, o) * k], Pm = null;
+    // Open tips stay inside the annulus: anterior leaflet swings further than the shorter posterior one, so in
+    // short axis the orifice is an oval, wide between the commissures and narrower front to back (fish-mouth)
+    let th = 0.11, A = [lerp(0.45, 2.0, o), lerp(0.12, 0.78, o) * k], Am = null, P = [lerp(0.40, 1.3, o), lerp(-0.05, -0.62, o) * k], Pm = null;
     if (M.mv === 'ms') {
       th = 0.2;
       A = [lerp(0.45, 1.55, o), lerp(0.12, 0.55, o) * k]; Am = [lerp(0.15, 0.95, o), lerp(0.85, 1.25, o) * k];
@@ -919,11 +925,11 @@ function valveAt(a, b, c, x, y, z) {
     if (leaflet(a, c, -0.15, -hc, Pm ? Pm[0] : null, Pm ? Pm[1] : 0, P[0], P[1], th)) return true;
   }
   // Tricuspid leaflets: septal and anterior.
-  const bp = b - TVB, cp = c - TVC;
+  const bp = b0 - TVB, cp = c0 - TVC;
   if (a > -0.5 + TVA && a < 2.2 + TVA && bp > -1.8 && bp < 1.8 && cp > -1.45 && cp < 1.45) {
     const hb = Math.sqrt(Math.max(0, TVR2 - cp * cp)), k = hb / 1.45;
-    if (seg2(a, bp, -0.1 + TVA, -hb, lerp(0.40, 1.5, TVO) + TVA, lerp(-0.05, -1.25, TVO) * k) < 0.11) return true;
-    if (seg2(a, bp, -0.1 + TVA, hb, lerp(0.45, 1.9, TVO) + TVA, lerp(0.08, 1.2, TVO) * k) < 0.11) return true;
+    if (seg2(a, bp, -0.1 + TVA, -hb, lerp(0.40, 1.5, TVO) + TVA, lerp(-0.05, -0.8, TVO) * k) < 0.11) return true;
+    if (seg2(a, bp, -0.1 + TVA, hb, lerp(0.45, 1.9, TVO) + TVA, lerp(0.08, 0.85, TVO) * k) < 0.11) return true;
   }
   if (semilunar(x, y, z, AVw, AXw, AVU, AVV, 1.3, AVO, M.av)) return true;
   // Pulmonary cusps drawn a little thicker: the RV outflow view cuts them obliquely, and thin ones vanish in speckle
