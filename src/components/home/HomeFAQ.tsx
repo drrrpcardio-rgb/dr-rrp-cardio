@@ -24,6 +24,10 @@ export const homeFaqs = [
     a: "Yes. They work on phones and tablets; for the echo simulator, use full screen for the most room. A laptop gives the best experience for long practice sessions.",
   },
   {
+    q: "Where can I see real cases?",
+    a: "The Case Files on our blog walk through real, anonymised cases from the cath lab: the ECG, the echo and the angiogram, with the lessons and a short self-test.",
+  },
+  {
     q: "How do I enrol?",
     a: "Send an enquiry through the contact page with the course you are interested in. The team replies by email with dates, fees and next steps.",
   },
@@ -40,7 +44,8 @@ export function HomeFAQ() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <div>
-          <SectionHeading eyebrow="Questions" title="Frequently asked" description="Quick answers about the courses, simulators and certificates." />
+          <SectionHeading eyebrow="Questions" title="Frequently asked"
+          accent="asked" description="Quick answers about the courses, simulators and certificates." />
           <p className="mt-6 text-sm text-mist-700">
             Something else?{" "}
             <Link href="/contact" className="font-semibold text-royal-700 underline-offset-2 hover:underline">

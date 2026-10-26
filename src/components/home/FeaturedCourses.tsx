@@ -5,10 +5,12 @@ import { courseCategories } from "@/lib/courses-data";
 
 export function FeaturedCourses() {
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24">
+    <section className="section-tint overflow-hidden">
+      <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
       <SectionHeading
         eyebrow="Curriculum"
         title="Featured courses"
+          accent="courses"
         description="Five focused tracks, each built around structured interpretation and real clinical cases."
       />
       <StaggerGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
@@ -17,6 +19,7 @@ export function FeaturedCourses() {
           <CourseCard key={course.slug} slug={course.slug} className={i < 3 ? "lg:col-span-2" : "lg:col-span-3"} />
         ))}
       </StaggerGroup>
+      </div>
     </section>
   );
 }

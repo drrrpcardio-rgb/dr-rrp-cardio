@@ -15,6 +15,7 @@ export function FreeLearningStrip() {
         <SectionHeading
           eyebrow="Free Learning"
           title="Start on YouTube, go deeper in the academy"
+          accent="academy"
           description="Free lessons that build real understanding — and lead naturally into the structured courses."
         />
         <Button href="/free-learning" variant="secondary" icon={<ArrowRight size={16} />}>

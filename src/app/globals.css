@@ -293,3 +293,63 @@ textarea:focus-visible,
   .blog-prose blockquote p { color: #000; }
   .blog-prose details > p { display: block; }
 }
+
+/* ==========================================================================
+   Site-wide motion kit (2026 redesign). Everything here is CSS-only and is
+   switched off by the prefers-reduced-motion block above.
+   ========================================================================== */
+
+/* Slow drifting colour glows behind the dark bands (see <Aurora>). */
+.aurora { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.aurora span { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; will-change: transform; }
+.aurora span:nth-child(1) { width: 42rem; height: 42rem; top: -18rem; right: -10rem; background: var(--color-royal-600); animation: aurora-a 22s ease-in-out infinite alternate; }
+.aurora span:nth-child(2) { width: 30rem; height: 30rem; bottom: -14rem; left: -8rem; background: var(--color-royal-700); animation: aurora-b 26s ease-in-out infinite alternate; }
+.aurora span:nth-child(3) { width: 18rem; height: 18rem; top: 30%; left: 45%; background: var(--color-gold-500); opacity: .14; animation: aurora-c 30s ease-in-out infinite alternate; }
+@keyframes aurora-a { to { transform: translate(-8rem, 6rem) scale(1.12); } }
+@keyframes aurora-b { to { transform: translate(10rem, -5rem) scale(1.18); } }
+@keyframes aurora-c { to { transform: translate(-14rem, 4rem) scale(.85); } }
+
+/* Gentle float for decorative chips. */
+@keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.float-slow { animation: float-y 6s ease-in-out infinite; }
+.float-slower { animation: float-y 8s ease-in-out infinite; animation-delay: -3s; }
+
+/* Light sweep across buttons on hover. */
+.btn-shine { position: relative; overflow: hidden; isolation: isolate; }
+.btn-shine::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / .45) 50%, transparent 70%); transform: translateX(-120%); transition: transform .7s cubic-bezier(.22, 1, .36, 1); }
+.btn-shine:hover::after { transform: translateX(120%); }
+
+/* Cursor spotlight on cards: <SpotlightTracker> sets --spot-x/--spot-y on the hovered .spotlight element. */
+.spotlight { position: relative; isolation: isolate; }
+.spotlight::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; opacity: 0; transition: opacity .3s; background: radial-gradient(420px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgb(245 179 1 / .12), transparent 45%); pointer-events: none; }
+.spotlight:hover::before { opacity: 1; }
+.spotlight-dark::before { background: radial-gradient(420px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgb(245 179 1 / .18), transparent 45%); }
+
+/* Endless horizontal ticker (see <Marquee>). The track holds the items twice. */
+.marquee { overflow: hidden; mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent); }
+.marquee__track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
+.marquee:hover .marquee__track { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* Gold shimmer text. */
+.text-shimmer { background: linear-gradient(100deg, var(--color-gold-400) 20%, #fff3c4 40%, var(--color-gold-400) 60%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer 5s ease-in-out infinite; }
+@keyframes shimmer { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+
+/* Self-drawing ECG trace (see <HeartbeatLine>). */
+.heartbeat path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: heartbeat-draw 4.5s cubic-bezier(.45, 0, .2, 1) .3s forwards; }
+.heartbeat path + path { stroke-dasharray: .06 .94; stroke-dashoffset: 1.06; animation: heartbeat-pulse 3.6s linear 2s infinite; }
+@keyframes heartbeat-draw { to { stroke-dashoffset: 0; } }
+@keyframes heartbeat-pulse { to { stroke-dashoffset: 0; } }
+
+/* Route-change progress bar. */
+@keyframes route-progress { from { transform: scaleX(0); } to { transform: scaleX(.85); } }
+
+/* Accordions (<details>) open and close smoothly where the browser supports animating to "auto". */
+:root { interpolate-size: allow-keywords; }
+details::details-content { block-size: 0; overflow: hidden; transition: block-size .35s cubic-bezier(.22, 1, .36, 1), content-visibility .35s allow-discrete; }
+details[open]::details-content { block-size: auto; }
+
+/* Soft tinted section background: faint dot grid and two blurred colour pools. */
+.section-tint { position: relative; isolation: isolate; background: linear-gradient(180deg, var(--color-mist-50), #fff 70%); }
+.section-tint::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: radial-gradient(rgb(30 58 138 / .09) 1px, transparent 1.2px); background-size: 22px 22px; mask-image: linear-gradient(180deg, black, transparent 85%); pointer-events: none; }
+.section-tint::after { content: ""; position: absolute; z-index: -1; top: -6rem; right: -8rem; width: 32rem; height: 32rem; border-radius: 9999px; background: radial-gradient(circle, rgb(245 179 1 / .14), transparent 65%); pointer-events: none; }

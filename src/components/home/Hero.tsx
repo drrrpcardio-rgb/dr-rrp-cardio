@@ -5,8 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import { Activity, ArrowRight, PlayCircle, Waves } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Aurora } from "@/components/ui/Motion";
+import { RotatingWord } from "@/components/ui/RotatingWord";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { brand, founder } from "@/lib/site-data";
 
@@ -73,10 +75,7 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-royal-950 text-white">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,var(--color-royal-700)_0%,transparent_55%),radial-gradient(ellipse_at_10%_90%,var(--color-royal-800)_0%,transparent_50%)] opacity-80"
-      />
+      <Aurora />
       <div aria-hidden="true" className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pt-36 pb-28 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:pt-44 lg:pb-36">
@@ -102,8 +101,11 @@ export function Hero() {
           </motion.h1>
 
           <motion.p variants={item} className="mt-7 max-w-xl text-lg leading-relaxed text-royal-100">
-            Structured, practical cardiology education for doctors, postgraduates, nurses, and
-            cath lab &amp; echo technicians.
+            ECG, echo and the cath lab, taught one case at a time. Structured, practical cardiology education for{" "}
+            <RotatingWord
+              words={["doctors", "postgraduates", "nurses", "cath lab technicians", "echo technicians"]}
+              className="font-semibold text-gold-300"
+            />
           </motion.p>
 
           <motion.div variants={item} className="mt-9 flex flex-col gap-4 sm:flex-row">
@@ -163,6 +165,32 @@ export function Hero() {
               </p>
             </div>
           </div>
+
+          {/* Floating highlights */}
+          <Link
+            href="/echo-simulator"
+            className="float-slow absolute top-10 -left-4 hidden items-center gap-3 rounded-2xl border border-white/15 bg-royal-900/70 px-4 py-3 shadow-xl backdrop-blur-md transition-colors hover:border-gold-400/60 sm:flex lg:-left-12"
+          >
+            <span className="flex size-9 items-center justify-center rounded-xl bg-gold-400 text-royal-950">
+              <Waves size={18} aria-hidden="true" />
+            </span>
+            <span className="text-left leading-tight">
+              <span className="block text-sm font-semibold text-white">3D echo simulator</span>
+              <span className="block text-xs text-royal-200">16 views · 22 cases · free</span>
+            </span>
+          </Link>
+          <Link
+            href="/courses/ecg"
+            className="float-slower absolute right-3 bottom-36 hidden items-center gap-3 rounded-2xl border border-white/15 bg-white/95 px-4 py-3 text-ink shadow-xl backdrop-blur-md transition-transform hover:scale-[1.03] sm:flex lg:-right-4"
+          >
+            <span className="flex size-9 items-center justify-center rounded-xl bg-royal-800 text-gold-300">
+              <Activity size={18} aria-hidden="true" />
+            </span>
+            <span className="text-left leading-tight">
+              <span className="block text-sm font-semibold">ECG Level 2</span>
+              <span className="block text-xs text-mist-700">Live batch · December 2026</span>
+            </span>
+          </Link>
         </motion.div>
       </div>
 

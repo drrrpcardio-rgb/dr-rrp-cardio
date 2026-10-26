@@ -10,11 +10,13 @@ import { Button } from "@/components/ui/Button";
 
 export function UpcomingProgrammes() {
   return (
-    <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
+    <section className="section-tint overflow-hidden">
+      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <SectionHeading
           eyebrow="Live &amp; In-Person"
           title="Upcoming programmes"
+          accent="programmes"
           description="Live classes and hands-on workshops, listed as they're scheduled."
         />
         <Button href="/live-classes" variant="secondary">
@@ -40,6 +42,7 @@ export function UpcomingProgrammes() {
           <p className="mt-1 text-xs text-mist-600">Check back soon, or register your interest.</p>
         </motion.div>
       </StaggerGroup>
+      </div>
     </section>
   );
 }

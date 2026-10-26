@@ -14,6 +14,7 @@ export function CertificateSection() {
           <SectionHeading
             eyebrow="Recognition"
             title="A certificate that reflects real learning"
+          accent="real learning"
             description="Issued for genuine completion, not just attendance."
           />
           <ul className="mt-8 space-y-4 text-sm text-ink-soft">

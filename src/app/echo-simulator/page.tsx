@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const features = [
   { title: "Realistic 2D image", text: "Beam model with speckle, harmonics, attenuation, dropout and lung shadowing, like a real scanner." },
-  { title: "15 standard views", text: "Parasternal, apical, subcostal and suprasternal windows. Drag the probe or jump to a view." },
+  { title: "16 echo views", text: "Parasternal, apical, subcostal and suprasternal windows. Drag the probe or jump to a view." },
   { title: "Full Doppler", text: "Colour flow with aliasing, PW, CW and tissue Doppler, with auto trace and gradients." },
   { title: "22 pathology cases", text: "AS, MS, HOCM, tamponade, DCM, amyloid, PE and more, with a quiz and an echo report." },
 ];

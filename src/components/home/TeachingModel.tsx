@@ -20,7 +20,7 @@ const items = [
   { icon: Users, label: "Offline Classes", description: "In-person, classroom-style teaching sessions." },
   { icon: Wrench, label: "Hands-on Workshops", description: "Practical, case-driven skill building." },
   { icon: MessageSquare, label: "Case Discussions", description: "Real cases, discussed systematically." },
-  { icon: PlaySquare, label: "YouTube Content", description: "Free lessons that lead into full courses." },
+  { icon: PlaySquare, label: "Free YouTube Lessons", description: "Short lessons that lead into full courses." },
   { icon: ClipboardCheck, label: "Assessments", description: "Check understanding, not just attendance." },
   { icon: Award, label: "Certificates", description: "Completion and participation certificates." },
 ];
@@ -34,6 +34,7 @@ export function TeachingModel() {
           tone="dark"
           eyebrow="How you learn"
           title="A teaching model built around application"
+          accent="application"
           description="Every format feeds into the same goal: interpretation you can trust in the moment it matters."
         />
 
@@ -42,7 +43,7 @@ export function TeachingModel() {
             <motion.div
               key={label}
               variants={staggerItem}
-              className="group rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur transition-colors hover:border-gold-400/60 hover:bg-white/10"
+              className="spotlight spotlight-dark group rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur transition-colors hover:border-gold-400/60 hover:bg-white/10"
             >
               <motion.div
                 initial={{ scale: 0.85, opacity: 0 }}

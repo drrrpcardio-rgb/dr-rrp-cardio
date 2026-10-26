@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SmoothScrollProvider } from "@/lib/smooth-scroll-provider";
 import { MotionProvider } from "@/lib/motion-provider";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { SiteEffects } from "@/components/layout/SiteEffects";
 import { brand, contactEmail, founder, siteUrl } from "@/lib/site-data";
 import { courseCategories } from "@/lib/courses-data";
 
@@ -96,6 +97,7 @@ export default function RootLayout({
               <PageTransition>{children}</PageTransition>
             </main>
             <Footer />
+            <SiteEffects />
           </SmoothScrollProvider>
         </MotionProvider>
       </body>

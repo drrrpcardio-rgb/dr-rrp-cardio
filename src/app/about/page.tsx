@@ -22,8 +22,8 @@ export default function AboutPage() {
     <>
       <PageHero
         eyebrow="About Us"
-        title="Why the name"
-        description="Cardiology is learnable by anyone willing to be systematic about it. That's the idea this institution is built on."
+        title="Cardiology, made systematic"
+        description="Cardiology is learnable by anyone willing to be systematic about it. That is the idea this academy is built on."
       />
 
       <section className="mx-auto max-w-3xl px-5 pt-20 pb-12 sm:px-8">
@@ -69,7 +69,7 @@ export default function AboutPage() {
             </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="text-xs font-semibold tracking-[0.2em] text-gold-300 uppercase">The institution behind the teacher</p>
+            <p className="text-xs font-semibold tracking-[0.2em] text-gold-300 uppercase">Why the name</p>
             <h2 className="mt-3 font-heading text-3xl font-semibold sm:text-4xl">{founder.name}</h2>
             <p className="mt-1 text-sm text-royal-200">
               {founder.title} · {founder.credentials} · {founder.role}

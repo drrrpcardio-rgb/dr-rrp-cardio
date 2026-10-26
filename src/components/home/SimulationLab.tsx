@@ -37,6 +37,7 @@ export function SimulationLab() {
           tone="dark"
           eyebrow="Free simulation lab"
           title="Learn it. Then practise it."
+          accent="practise"
           description="Courses give you the theory. The simulators let you practise echo, ECG and cath lab skills before you meet a patient, free in your browser."
         />
 
@@ -114,7 +115,7 @@ export function SimulationLab() {
               <motion.div key={t.id} variants={staggerItem}>
                 <Link
                   href={t.href}
-                  className="group hover:border-gold-400/60 flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition-colors hover:bg-white/10"
+                  className="spotlight spotlight-dark group hover:border-gold-400/60 flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition-[background-color,border-color,transform] duration-300 hover:-translate-y-1 hover:bg-white/10"
                 >
                   <div className="bg-royal-900 relative aspect-[16/10] overflow-hidden">
                     <Image

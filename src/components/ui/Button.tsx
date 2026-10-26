@@ -29,11 +29,11 @@ type ButtonProps = ButtonAsLink | ButtonAsButton;
 
 const variants = {
   primary:
-    "bg-royal-700 text-white hover:bg-royal-800 shadow-sm hover:shadow-md",
+    "btn-shine bg-royal-700 text-white hover:bg-royal-800 shadow-sm hover:shadow-md",
   secondary:
     "bg-white text-royal-800 border border-royal-200 hover:border-royal-400 hover:bg-royal-50",
   ghost: "bg-transparent text-royal-800 hover:bg-royal-50",
-  gold: "bg-gold-400 text-ink hover:bg-gold-300 shadow-sm hover:shadow-md",
+  gold: "btn-shine bg-gold-400 text-ink hover:bg-gold-300 shadow-sm hover:shadow-md",
 };
 
 const sizes = {
@@ -52,7 +52,7 @@ export function Button(props: ButtonProps) {
   } = props;
 
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-wide transition-colors duration-200 cursor-pointer",
+    "inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-wide transition-[color,background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 cursor-pointer",
     variants[variant],
     sizes[size],
     className,

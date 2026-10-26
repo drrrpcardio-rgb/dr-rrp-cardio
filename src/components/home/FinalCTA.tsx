@@ -1,60 +1,39 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-import { ArrowRight } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { Reveal } from "@/components/ui/Reveal";
+import { Aurora, HeartbeatLine } from "@/components/ui/Motion";
 
-gsap.registerPlugin(ScrollTrigger);
-
+/** Closing call to action on the home page. */
 export function FinalCTA() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const reduced = useReducedMotion();
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || reduced) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        el,
-        { backgroundPosition: "50% 30%" },
-        {
-          backgroundPosition: "50% 70%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: el,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        },
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, [reduced]);
-
   return (
-    <section
-      ref={sectionRef}
-      className="bg-[length:200%_200%] bg-[radial-gradient(circle_at_center,var(--color-royal-600)_0%,var(--color-royal-900)_75%)] py-24"
-    >
-      <div className="mx-auto max-w-3xl px-5 text-center sm:px-8">
-        <h2 className="font-heading text-3xl leading-tight font-semibold text-white sm:text-4xl">
-          Ready to learn cardiology the structured way?
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-royal-100">
-          Register your interest and we&rsquo;ll let you know when the next
-          course, live class, or workshop opens.
-        </p>
-        <div className="mt-9">
-          <Button href="/contact" variant="gold" size="lg" icon={<ArrowRight size={18} />}>
-            Enquire Now
-          </Button>
-        </div>
+    <section className="relative overflow-hidden bg-royal-950 py-28 text-white">
+      <Aurora />
+      <div aria-hidden="true" className="bg-grid pointer-events-none absolute inset-0 opacity-25" />
+      <HeartbeatLine beats={6} className="absolute inset-x-0 top-1/2 h-32 w-full -translate-y-1/2 opacity-[0.18]" />
+      <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-8">
+        <Reveal>
+          <p className="text-xs font-semibold tracking-[0.2em] text-gold-300 uppercase">Your next step</p>
+          <h2 className="mt-4 font-heading text-4xl leading-tight font-semibold sm:text-5xl">
+            Ready to learn cardiology <span className="text-shimmer">the structured way?</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-royal-100">
+            Tell us what you want to learn and we will let you know when the next course, live class or workshop opens.
+          </p>
+          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+            <Button href="/contact" variant="gold" size="lg" icon={<ArrowRight size={18} />}>
+              Enquire Now
+            </Button>
+            <Button
+              href="/simulators"
+              variant="ghost"
+              size="lg"
+              className="border border-white/30 text-white hover:bg-white/10"
+              icon={<PlayCircle size={18} />}
+            >
+              Try a free simulator
+            </Button>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
