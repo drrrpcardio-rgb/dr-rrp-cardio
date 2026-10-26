@@ -84,9 +84,11 @@ const WATERMARK =
  */
 function withVideos(md: string): string {
   return md.replace(/<!--\s*VIDEO:\s*(\S+?\.mp4)([^>]*)-->/g, (_all, src: string, opts: string) => {
-    const poster = src.replace(/\.mp4$/, ".png");
-    const playback = /\bloop\b/.test(opts) ? 'autoplay muted loop preload="metadata"' : 'preload="none"';
-    return `<span class="media-brand">${WATERMARK}<video controls controlsList="nodownload noremoteplayback" disablePictureInPicture ${playback} playsinline oncontextmenu="return false" poster="${poster}" src="${src}"></video></span>`;
+    const posterPath = src.replace(/\.mp4$/, ".png");
+    const poster = fs.existsSync(path.join(process.cwd(), "public", posterPath)) ? ` poster="${posterPath}"` : "";
+    // Looping clips start (and download) only when scrolled into view: see LazyVideos in the post page.
+    const playback = /\bloop\b/.test(opts) ? 'muted loop preload="none" data-autoplay' : 'preload="none"';
+    return `<span class="media-brand">${WATERMARK}<video controls controlsList="nodownload noremoteplayback" disablePictureInPicture ${playback} playsinline oncontextmenu="return false"${poster} src="${src}"></video></span>`;
   });
 }
 

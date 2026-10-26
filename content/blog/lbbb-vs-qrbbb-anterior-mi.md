@@ -54,6 +54,32 @@ The ECG showed LBBB with left axis deviation. There were deep QS complexes in V1
 
 What raised suspicion was the patient, not the paper. In an elderly diabetic woman, persistent unexplained back and axillary pain is an acute coronary syndrome until proven otherwise. A bedside echo settled it: the distal septum and apex were severely hypokinetic, LVEF was 30%, and there was an LV thrombus.
 
+<div class="media-trio">
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case1-echo-1.mp4 loop -->
+
+*Figure 3a. Apical four-chamber view.*
+
+</figure>
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case1-echo-2.mp4 loop -->
+
+*Figure 3b. Parasternal long-axis view.*
+
+</figure>
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case1-echo-3.mp4 loop -->
+
+*Figure 3c. Parasternal short-axis view.*
+
+</figure>
+</div>
+
+*Case 1 echo: hypokinetic distal septum and apex, LVEF 30%, with an LV thrombus.*
+
 Angiography showed mild plaque in the proximal LAD and a **100% thrombotic occlusion of the mid-to-distal LAD**. The lesion was treated with balloon pre-dilatation and a 2.75 × 28 mm drug-eluting stent, restoring TIMI III flow to the apex.
 
 <div class="media-pair">
@@ -61,14 +87,14 @@ Angiography showed mild plaque in the proximal LAD and a **100% thrombotic occlu
 
 <!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case1-mid-distal-lad-pre.mp4 loop -->
 
-*Figure 3a. Before: the LAD stops abruptly in its mid segment.*
+*Figure 4a. Before: the LAD stops abruptly in its mid segment.*
 
 </figure>
 <figure>
 
 <!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case1-mid-distal-lad-post.mp4 loop -->
 
-*Figure 3b. After stenting: TIMI III flow to the apex.*
+*Figure 4b. After stenting: TIMI III flow to the apex.*
 
 </figure>
 </div>
@@ -85,11 +111,11 @@ The ECG was unambiguous: RBBB with a **qR in V1**, marked left axis deviation (l
 
 ![12-lead ECG of case 2 showing RBBB pattern, left anterior fascicular block and anterolateral ST elevation](/images/blog/lbbb-vs-qrbbb/case2-qrbbb-ecg-a.jpg)
 
-*Figure 4. Case 2: RBBB pattern with left anterior fascicular block and anterolateral ST elevation.*
+*Figure 5. Case 2: RBBB pattern with left anterior fascicular block and anterolateral ST elevation.*
 
 ![Second 12-lead ECG of case 2 showing qRBBB, left anterior fascicular block and ST elevation in V2 to V6, I and aVL](/images/blog/lbbb-vs-qrbbb/case2-qrbbb-ecg-b.jpg)
 
-*Figure 5. Case 2: qRBBB with left anterior fascicular block and extensive anterolateral ST elevation (V2–V6, I, aVL).*
+*Figure 6. Case 2: qRBBB with left anterior fascicular block and extensive anterolateral ST elevation (V2–V6, I, aVL).*
 
 Every feature pointed to the same place:
 
@@ -99,7 +125,7 @@ Every feature pointed to the same place:
 
 ![Schematic of the ventricular conduction system: the right bundle branch and left anterior fascicle run through the upper septum, supplied by the first septal perforators of the LAD; the left posterior fascicle has a dual supply](/images/blog/lbbb-vs-qrbbb/conduction-system-lad-supply.svg)
 
-*Figure 6. The right bundle branch and the left anterior fascicle share the upper septum and its blood supply from the first septal perforators. An occlusion above those branches knocks out both, producing RBBB + LAFB.*
+*Figure 7. The right bundle branch and the left anterior fascicle share the upper septum and its blood supply from the first septal perforators. An occlusion above those branches knocks out both, producing RBBB + LAFB.*
 
 The ECG said *proximal LAD*, and angiography confirmed it: a **100% thrombus-laden occlusion at the ostium of the LAD**. The lesion was crossed with a wire, thrombus was aspirated, and a 3.5 × 24 mm drug-eluting stent was deployed, followed by high-pressure post-dilatation.
 
@@ -108,19 +134,45 @@ The ECG said *proximal LAD*, and angiography confirmed it: a **100% thrombus-lad
 
 <!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-proximal-lad-pre.mp4 loop -->
 
-*Figure 7a. Before: the LAD is occluded at its origin.*
+*Figure 8a. Before: the LAD is occluded at its origin.*
 
 </figure>
 <figure>
 
 <!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-proximal-lad-post.mp4 loop -->
 
-*Figure 7b. After stenting: the whole LAD and its branches fill again.*
+*Figure 8b. After stenting: the whole LAD and its branches fill again.*
 
 </figure>
 </div>
 
 The cost of a proximal LAD occlusion was still visible on echo: severe LV dysfunction and a layered apical thrombus, a reminder of why every minute counts.
+
+<div class="media-trio">
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-1.mp4 loop -->
+
+*Figure 9a. Parasternal long-axis view.*
+
+</figure>
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-2.mp4 loop -->
+
+*Figure 9b. Parasternal short-axis view.*
+
+</figure>
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-3.mp4 loop -->
+
+*Figure 9c. Apical four-chamber view.*
+
+</figure>
+</div>
+
+*Case 2 echo: severe LV dysfunction with a layered apical thrombus.*
 
 **The lesson:** RBBB does not hide ST elevation. A qR in V1 with LAFB during chest pain means a large septal infarct and a proximal LAD culprit.
 
@@ -128,7 +180,7 @@ The cost of a proximal LAD occlusion was still visible on echo: severe LV dysfun
 
 ![Schematic of the left coronary system in both cases: case 1 with a mid-to-distal LAD occlusion and apical territory at risk, case 2 with an ostial LAD occlusion and the whole septum, anterior wall, lateral wall and apex at risk](/images/blog/lbbb-vs-qrbbb/lad-occlusion-sites.svg)
 
-*Figure 8. The same artery occluded at two levels. In case 1 the septal and diagonal branches were upstream and still perfused; in case 2 the occlusion sat above all of them.*
+*Figure 10. The same artery occluded at two levels. In case 1 the septal and diagonal branches were upstream and still perfused; in case 2 the occlusion sat above all of them.*
 
 | | LBBB (Case 1) | qRBBB (Case 2) |
 |---|---|---|
@@ -149,7 +201,7 @@ When LBBB clouds the picture, look for ST changes that break the block's own rul
 
 ![Schematic of the Sgarbossa and Smith criteria: expected proportionate discordant ST elevation in LBBB, concordant ST elevation, concordant ST depression in V1 to V3, and excessively discordant ST elevation with an ST/S ratio of at least 25%](/images/blog/lbbb-vs-qrbbb/sgarbossa-smith-criteria.svg)
 
-*Figure 9. What is expected in LBBB (left) and the three patterns that suggest an acute coronary occlusion.*
+*Figure 11. What is expected in LBBB (left) and the three patterns that suggest an acute coronary occlusion.*
 
 Any one of these warrants activation of the cath lab. A negative result does not exclude MI in LBBB, as our first patient showed.
 

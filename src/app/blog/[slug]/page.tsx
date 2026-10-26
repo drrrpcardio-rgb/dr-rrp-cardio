@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
+import { LazyVideos } from "@/components/blog/LazyVideos";
 import { ReadingProgress, TableOfContents } from "@/components/blog/PostSidebar";
 import { PageHero } from "@/components/ui/PageHero";
 import { Button } from "@/components/ui/Button";
@@ -81,7 +82,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             )}
 
             {/* Trusted HTML: rendered at build time from a Markdown file in the repository (see src/lib/blog.ts). */}
-            <div className="blog-prose" dangerouslySetInnerHTML={{ __html: post.html }} />
+            <div id="post-content" className="blog-prose" dangerouslySetInnerHTML={{ __html: post.html }} />
+            <LazyVideos rootId="post-content" />
 
             {post.tags.length > 0 && (
               <div className="mt-12 flex flex-wrap gap-1.5 border-t border-mist-200 pt-6">

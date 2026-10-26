@@ -234,6 +234,12 @@ textarea:focus-visible,
 .blog-prose .media-pair .media-brand { margin-top: 0; }
 .blog-prose .media-pair p > em:only-child { margin-bottom: 0; }
 @media (min-width: 640px) { .blog-prose .media-pair { grid-template-columns: 1fr 1fr; } }
+/* Three equal clips in a row (echo views), stacked on phones. */
+.blog-prose .media-trio { display: grid; gap: 1rem; margin: 2rem 0 1.75rem; }
+.blog-prose .media-trio figure { margin: 0; }
+.blog-prose .media-trio .media-brand { margin-top: 0; }
+.blog-prose .media-trio p > em:only-child { margin-bottom: 0; }
+@media (min-width: 640px) { .blog-prose .media-trio { grid-template-columns: repeat(3, 1fr); } }
 
 /* Logo + name laid over blog videos and the ECG. Sits top-left, clear of the frame counters in the angiograms. */
 .blog-prose .media-brand { position: relative; display: block; margin: 2rem 0 .75rem; }
