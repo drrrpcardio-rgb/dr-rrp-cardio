@@ -781,6 +781,7 @@ const AORTA_R = [1.35, 1.35, 1.3, 1.25, 1.15, 1.1, 1.05, 1.0, 0.95, 0.85];
 const PA_BIF = follow(V3(2.4, 1.4, 6.8), 0.85);
 const PA = [PVw, follow(V3(2.6, 3.4, 6.2), 0.9), PA_BIF];
 const LPA = [PA_BIF, follow(V3(5.0, -0.8, 7.0), 0.6)];
+// RPA runs right, just behind the ascending aorta and above the LA (seen lengthwise in the crab view)
 const RPA = [PA_BIF, follow(V3(0.0, 0.6, 6.9), 0.7), follow(V3(-2.8, 0.4, 6.6), 0.6)];
 // IVC: enters the posterior-inferior RA, then runs down just in front of the spine through the liver
 const IVC = [V3(-3.5, 2.0, 1.1), V3(-4.7, 2.3, -2.2), V3(-3.4, -0.8, -7.0), V3(-2.2, -2.8, -12), V3(-1.5, -3.4, -26)];
@@ -788,11 +789,12 @@ const HEPV = [V3(-4.05, 0.8, -4.5), V3(-7.5, 2.5, -9.0)];
 const SVC = [follow(V3(-3.4, 3.8, 3.5)), follow(V3(-3.6, 3.0, 9.5), 0.4)];
 // Pulmonary veins: four veins (right and left, upper and lower) enter the back of the LA. They lie in one plane
 // with the transverse arch and the RPA, which is the suprasternal short-axis 'crab' view.
-const LA_BACK = Lw(-2.4, -0.2, -0.3).add(V3(0, -0.6, 0));
-// CRAB_UP (the plane's up direction, from the LA toward the suprasternal window) is set by crabPlane()
-let CRAB_UP = V3(0, 0.3, 1).normalize(), PVEINS = [];
-const pvVein = (sx, sz) => [LA_BACK.clone().add(V3(sx * 0.9, 0, 0)).addScaledVector(CRAB_UP, sz * 0.7),
-  LA_BACK.clone().add(V3(sx * 2.6, 0, 0)).addScaledVector(CRAB_UP, sz * 1.2), LA_BACK.clone().add(V3(sx * 4.6, 0, 0)).addScaledVector(CRAB_UP, sz * 1.9)];
+// LA_BACK (where the plane crosses the LA) and CRAB_UP (the plane's up direction) are set by crabPlane()
+let LA_BACK = Lw(-2.4, -0.2, -0.3).add(V3(0, -0.6, 0)), CRAB_UP = V3(0, 0.3, 1).normalize(), PVEINS = [];
+// Each vein leaves the LA corner and curves outward like a crab's leg: out sideways, then up (upper veins)
+// or down (lower veins) toward the lung hilum
+const pvVein = (sx, sz) => [[0.8, 0.55], [1.9, 1.0], [3.0, 1.25], [4.4, 1.85]].map(([o, u]) =>
+  LA_BACK.clone().add(V3(sx * o, 0, 0)).addScaledVector(CRAB_UP, sz * u));
 const buildPVeins = () => { PVEINS = [pvVein(-1, 1), pvVein(-1, -1), pvVein(1, 1), pvVein(1, -1)]; };
 buildPVeins();
 // Arch branches: brachiocephalic (innominate), left common carotid, left subclavian
@@ -822,7 +824,7 @@ function buildVessels() {
   tube(1, AORTA, aoR); for (const [a, b, r] of ARCH_BRANCHES) tube(1, [a, b], r);
   tube(2, PA, [p, p, p * 0.92]); tube(2, LPA, p * 0.7); tube(2, RPA, p * 0.7);
   tube(3, IVC, [v, v, v * 0.95, v * 0.9, v * 0.9], 1); tube(4, HEPV, 0.45 * v, 1); tube(3, SVC, 0.9);
-  for (const pv of PVEINS) tube(5, pv, [0.62, 0.58, 0.52]);
+  for (const pv of PVEINS) tube(5, pv, [0.66, 0.6, 0.55, 0.5]);
 }
 let VSD = 3, VSEGI = -1;
 function vesselSD(x, y, z) {
@@ -1558,7 +1560,12 @@ const VIEWS = [
 // with the patient's left-right line lying in it
 function crabPlane() {
   const ssn = makeView({ id: 'ssn', N: SSN_N, target: SSN_T, seed: V3(0, 6, 16).sub(SSN_T), hint: AORTA[5].clone().sub(AORTA[2]) });
-  const P = ssn.frame.pos, d = P.clone().sub(LA_BACK);
+  // probe down in the notch at the base of the neck, angled steeply back: the cut runs just behind the RPA's
+  // centre and through the back half of the LA, so the arch, the RPA lengthwise and the LA with its veins all show
+  const P = projectToSkin(V3(ssn.frame.pos.x, 10, 17.5));
+  const LAc = Lw(...LAC);
+  LA_BACK = LAc.clone().add(V3(0, -1.45, 0));
+  const d = P.clone().sub(LA_BACK);
   CRAB_UP = V3(0, d.y, d.z).normalize(); buildPVeins();
   return { N: cross(V3(1, 0, 0), d), target: LA_BACK.clone().addScaledVector(d, 0.35), seed: d };
 }
@@ -1627,7 +1634,8 @@ function drawLabels(ctx, fr, depth) {
     if (apical && L.noApical) continue;
     if (ssn && !SSN_LABELS.has(L.t) && !(L.t === 'LA' || L.onlyView === 'crab')) continue;
     // in the crab view the aorta is cut once, across the arch
-    if (L.t === 'Ao' && Math.abs(fr.normal.dot(VIEWS.find(v => v.id === 'crab').frame.normal)) > 0.95) continue;
+    // (and only the RPA of the pulmonary arteries is in it)
+    if ((L.t === 'Ao' || L.t === 'PA' || L.t === 'LPA') && Math.abs(fr.normal.dot(VIEWS.find(v => v.id === 'crab').frame.normal)) > 0.95) continue;
     if (L.subOnly && !ivcView) continue;
     if (L.onlyView && Math.abs(fr.normal.dot(VIEWS.find(v => v.id === L.onlyView).frame.normal)) < 0.95) continue;
     const cand = [];
