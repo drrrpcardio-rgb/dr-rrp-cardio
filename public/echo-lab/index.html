@@ -242,7 +242,7 @@ body.gridmode #grid{display:block}
 <div class="app">
   <header>
     <a class="brand" href="/" target="_top" aria-label="Dr. RRP Cardio home"><svg viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="#fff" stroke="#1E3A8A" stroke-width="2.6"/><path d="M6.5 24H14C15 21.8 17 21.8 18 24H19.5L21 27L24 9.5L27.5 34L29.5 24H31C32.5 20.4 35 20.4 36.5 24H37.5" stroke="#F5B301" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Dr. RRP</b><small>Cardio</small></span><i></i><em>Echo <span>Lab</span></em></a>
-    <p class="tag">3D transthoracic echo simulator · 15 TTE views · 2D, M-mode, color, PW / CW / TDI · 22 pathology cases</p>
+    <p class="tag">3D transthoracic echo simulator · 16 TTE views · 2D, M-mode, color, PW / CW / TDI · 22 pathology cases</p>
     <div class="hdr-right"><span id="casePill" class="pill case">Normal heart</span><span id="liveView" class="pill">Free scan</span></div>
   </header>
   <div class="main">
@@ -426,7 +426,7 @@ body.gridmode #grid{display:block}
         <div class="ctl"><label for="skinOp">Skin opacity</label><input type="range" id="skinOp" min="0" max="1" step="0.02" value="0.22"><output id="skinOpO">22%</output></div>
         <div class="row">
           <label class="chip" title="Tissue harmonic imaging: cleaner cavities and a narrower beam, as on modern scanners"><input type="checkbox" id="thiOn" checked> Harmonics</label>
-          <label class="chip"><input type="checkbox" id="labels"> Structure labels</label>
+          <label class="chip"><input type="checkbox" id="labels" checked> Structure labels</label>
           <label class="chip" title="Breathing cycle: IVC collapse, heart motion, respiratory flow variation"><input type="checkbox" id="respOn" checked> Respiration</label>
         </div>
         <p class="note">Educational model with simplified anatomy. Not a diagnostic device.</p>
@@ -786,6 +786,15 @@ const RPA = [PA_BIF, follow(V3(0.0, 0.6, 6.9), 0.7), follow(V3(-2.8, 0.4, 6.6), 
 const IVC = [V3(-3.5, 2.0, 1.1), V3(-4.7, 2.3, -2.2), V3(-3.4, -0.8, -7.0), V3(-2.2, -2.8, -12), V3(-1.5, -3.4, -26)];
 const HEPV = [V3(-4.05, 0.8, -4.5), V3(-7.5, 2.5, -9.0)];
 const SVC = [follow(V3(-3.4, 3.8, 3.5)), follow(V3(-3.6, 3.0, 9.5), 0.4)];
+// Pulmonary veins: four veins (right and left, upper and lower) enter the back of the LA. They lie in one plane
+// with the transverse arch and the RPA, which is the suprasternal short-axis 'crab' view.
+const LA_BACK = Lw(-2.4, -0.2, -0.3).add(V3(0, -0.6, 0));
+// CRAB_UP (the plane's up direction, from the LA toward the suprasternal window) is set by crabPlane()
+let CRAB_UP = V3(0, 0.3, 1).normalize(), PVEINS = [];
+const pvVein = (sx, sz) => [LA_BACK.clone().add(V3(sx * 0.9, 0, 0)).addScaledVector(CRAB_UP, sz * 0.7),
+  LA_BACK.clone().add(V3(sx * 2.6, 0, 0)).addScaledVector(CRAB_UP, sz * 1.2), LA_BACK.clone().add(V3(sx * 4.6, 0, 0)).addScaledVector(CRAB_UP, sz * 1.9)];
+const buildPVeins = () => { PVEINS = [pvVein(-1, 1), pvVein(-1, -1), pvVein(1, 1), pvVein(1, -1)]; };
+buildPVeins();
 // Arch branches: brachiocephalic (innominate), left common carotid, left subclavian
 const ARCH_BRANCHES = [[0.55, V3(-1.6, 0.6, 4.2), 0.5], [0.25, V3(0.2, -0.2, 4.2), 0.36], [0.7, V3(0.9, -0.8, 4.0), 0.4]].map(([t, d, r], i) => {
   const p = i === 0 ? AORTA[2].clone().lerp(AORTA[3], t + 0.3) : AORTA[3].clone().lerp(AORTA[4], t);
@@ -813,6 +822,7 @@ function buildVessels() {
   tube(1, AORTA, aoR); for (const [a, b, r] of ARCH_BRANCHES) tube(1, [a, b], r);
   tube(2, PA, [p, p, p * 0.92]); tube(2, LPA, p * 0.7); tube(2, RPA, p * 0.7);
   tube(3, IVC, [v, v, v * 0.95, v * 0.9, v * 0.9], 1); tube(4, HEPV, 0.45 * v, 1); tube(3, SVC, 0.9);
+  for (const pv of PVEINS) tube(5, pv, [0.62, 0.58, 0.52]);
 }
 let VSD = 3, VSEGI = -1;
 function vesselSD(x, y, z) {
@@ -1144,6 +1154,8 @@ function flowAt() {
     else if (s.id === 4 && MODEL.hvExp && PHASE > 0.5 && INSP < 0.35) v = 0.3 * (1 - INSP / 0.35) * sm(0.5, 0.6, PHASE);
     // Severe TR pushes blood back up the hepatic veins in systole
     else if (s.id === 4 && MODEL.hvRev && SYS > 0.05) v = 0.55 * SYS;
+    // Pulmonary veins: S and D forward flow into the LA, small reversal with atrial contraction
+    else if (s.id === 5) v = MODEL.af ? -(0.15 + 0.35 * MVO) : -(0.45 * SYS + 0.4 * MVO) + (PHASE > 0.82 && PHASE < 0.96 ? 0.2 : 0) - 0.08;
     else v =-(0.28 + 0.12 * SYS + 0.1 * MVO) * TVR;
     v *= 0.35 + 0.65 * prof;
     FLOW.world = true; FLOW.wx = s.dx / len * v; FLOW.wy = s.dy / len * v; FLOW.wz = s.dz / len * v; return;
@@ -1532,7 +1544,18 @@ const VIEWS = [
   { id: 'abdao', name: 'Abd Ao', full: 'Abdominal aorta', group: 'Subcostal', N: cross(ZUP, V3(0, 1, 0.05)), target: V3(1.4, -4.6, -14), seed: V3(0, 1, 0.05), hint: ZUP, depth: 18 },
   // SSN: the plane holding the ascending aorta, the arch and the descending aorta (built from the aorta itself)
   { id: 'ssn', name: 'SSN', full: 'Suprasternal aortic arch', group: 'Suprasternal', N: SSN_N, target: SSN_T, seed: V3(0, 6, 16).sub(SSN_T), hint: AORTA[5].clone().sub(AORTA[2]), depth: 14 },
+  // Crab view: suprasternal short axis, turned 90° from the arch view; arch in cross-section, RPA, then the LA with
+  // its four pulmonary veins (the 'legs'). Marker to the patient's left.
+  { id: 'crab', name: 'Crab', full: 'Suprasternal short axis (crab view)', group: 'Suprasternal', ...crabPlane(), hint: V3(1, 0, 0), depth: 19 },
 ].map(makeView);
+// The crab plane runs from the suprasternal window (same probe spot as the arch view) to the back of the LA,
+// with the patient's left-right line lying in it
+function crabPlane() {
+  const ssn = makeView({ id: 'ssn', N: SSN_N, target: SSN_T, seed: V3(0, 6, 16).sub(SSN_T), hint: AORTA[5].clone().sub(AORTA[2]) });
+  const P = ssn.frame.pos, d = P.clone().sub(LA_BACK);
+  CRAB_UP = V3(0, d.y, d.z).normalize(); buildPVeins();
+  return { N: cross(V3(1, 0, 0), d), target: LA_BACK.clone().addScaledVector(d, 0.35), seed: d };
+}
 const viewIndexByName = name => VIEWS.findIndex(v => v.name === name);
 
 // ---------- Labels ----------
@@ -1556,6 +1579,8 @@ function buildLabels() {
     { t: 'RVOT', tol: 0.9, onlyView: 'rvout', pts: samplePoly([RVOT_W, PVw], 0, 1) },
     { t: 'RPA', tol: 0.8, noApical: true, pts: samplePoly(RPA, 0, 2) },
     { t: 'LPA', tol: 0.8, noApical: true, pts: samplePoly(LPA, 0, 1) },
+    ...['RUPV', 'RLPV', 'LUPV', 'LLPV'].map((t, i) => ({ t, tol: 0.7, onlyView: 'crab', pts: samplePoly(PVEINS[i], 1, 2) })),
+    { t: 'SVC', tol: 0.9, onlyView: 'crab', pts: samplePoly(SVC, 0, 1) },
     { t: 'IVC', tol: 0.8, subOnly: true, pts: samplePoly(IVC, 0, 4) },
     { t: 'Liver', tol: 2.0, pts: [V3(-4, 2, -12), V3(-1, 4, -10), V3(-6, 1, -14), V3(-2, 3, -15), V3(1, 3, -12)] },
     { t: 'MV', tol: 0.7, pts: [Lw(0.4, 0, 0), Lw(0.4, 0, 0.8), Lw(0.4, 0, -0.8), Lw(1.3, 0.3, 1.0), Lw(1.3, -0.3, -0.9)] },
@@ -1594,7 +1619,9 @@ function drawLabels(ctx, fr, depth) {
   const ssn = fr.beam.z < -0.6;
   for (const L of LABELS) {
     if (apical && L.noApical) continue;
-    if (ssn && !SSN_LABELS.has(L.t)) continue;
+    if (ssn && !SSN_LABELS.has(L.t) && !(L.t === 'LA' || L.onlyView === 'crab')) continue;
+    // in the crab view the aorta is cut once, across the arch
+    if (L.t === 'Ao' && Math.abs(fr.normal.dot(VIEWS.find(v => v.id === 'crab').frame.normal)) > 0.95) continue;
     if (L.subOnly && !ivcView) continue;
     if (L.onlyView && Math.abs(fr.normal.dot(VIEWS.find(v => v.id === L.onlyView).frame.normal)) < 0.95) continue;
     const cand = [];
@@ -1737,7 +1764,7 @@ const COLOR_AIM = {
   plax: () => Lw(-0.2, 0.2, 1.0), rvin: () => TVw, rvout: () => PVw.clone().lerp(PA[1], 0.3), psaxav: () => AVw,
   psaxmv: () => Lw(0.9, 0, 0), psaxpm: () => Lw(3.4, 0.4, 0), psaxap: () => Lw(6.0, 0.3, 0),
   a4c: () => Lw(0.2, 0.6, 0), a5c: () => AVw.clone().lerp(Lw(0.3, 0, 0), 0.4), a2c: () => Lw(0.2, 0, 0), a3c: () => AVw.clone().lerp(Lw(0.3, 0, 0), 0.5),
-  sc4c: () => Lw(-2.2, 1.6, -0.4), ivc: () => IVC[1], abdao: () => V3(1.4, -4.6, -14), ssn: () => AORTA[3],
+  sc4c: () => Lw(-2.2, 1.6, -0.4), ivc: () => IVC[1], abdao: () => V3(1.4, -4.6, -14), ssn: () => AORTA[3], crab: () => LA_BACK,
 };
 function aimColorBox(v) {
   const aim = COLOR_AIM[v.id]; if (!aim) return;
@@ -1787,14 +1814,17 @@ function startApp() {
   const spImg = spCtx.createImageData(SP_W, SP_H); for (let k = 3; k < spImg.data.length; k += 4) spImg.data[k] = 255;
   const SP_COLS_PER_S = SP_W / 4;
 
-  const st = { pose: { ...VIEWS[0].pose, S: VIEWS[0].pose.S.clone() }, depth: VIEWS[0].depth, gain: 1, hr: 72, labels: false, frozen: false,
+  const st = { pose: { ...VIEWS[0].pose, S: VIEWS[0].pose.S.clone() }, depth: VIEWS[0].depth, gain: 1, hr: 72, labels: true, frozen: false,
     practice: false, target: 7, tween: null, phase: 0, beat: 0, rr: 1, caseIdx: 0, mmode: false, mTheta: 0,
     calOn: false, traceOn: false, clickMode: 'm', resp: true, respT: 0, saved: [], curView: null };
 
   // Scene
   const scene = new THREE.Scene();
+  // Anatomy uses +x = patient left, +y = anterior, +z = head, which is left-handed.
+  // three.js is right-handed, so mirror x on screen to keep left and right true.
+  scene.scale.x = -1;
   const camera = new THREE.PerspectiveCamera(38, 1, 1, 600);
-  const camHome = { pos: V3(44, 50, -34), target: V3(1, 1, -1) };
+  const camHome = { pos: V3(-44, 50, -34), target: V3(-1, 1, -1) };
   camera.position.copy(camHome.pos);
   scene.add(new THREE.HemisphereLight(0xdfe9f0, 0x2a2018, 1.1));
   const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(20, 60, 10); scene.add(sun);
@@ -1837,6 +1867,7 @@ function startApp() {
   const tubeMesh = (pts, r, color, grp) => grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 80, r, 14), new THREE.MeshStandardMaterial({ color, roughness: 0.5, transparent: true, opacity: 0.92 })));
   tubeMesh(AORTA, 1.15, 0xcf4a3f, vessels); tubeMesh(PA, 1.15, 0x6a64b8, vessels); tubeMesh(LPA, 0.8, 0x6a64b8, vessels); tubeMesh(RPA, 0.8, 0x6a64b8, vessels);
   tubeMesh(IVC, 1.0, 0x4f6fb5, vessels); tubeMesh(HEPV, 0.45, 0x4f6fb5, vessels); tubeMesh(SVC, 0.9, 0x4f6fb5, vessels);
+  for (const pv of PVEINS) tubeMesh(pv, 0.55, 0xc4675c, vessels);
   const liver = new THREE.Mesh(sphere, new THREE.MeshStandardMaterial({ color: 0x8a4a35, roughness: 0.7, transparent: true, opacity: 0.4, depthWrite: false }));
   liver.scale.set(11, 8, 7.5); liver.position.set(-4, 0.5, -12.5); liverG.add(liver);
 
@@ -1886,7 +1917,7 @@ function startApp() {
   canvas.addEventListener('pointermove', e => {
     setNDC(e);
     if (!dragging) { canvas.style.cursor = ray.intersectObject(probe, true).length ? 'grab' : 'default'; return; }
-    const hit = ray.intersectObject(hitMesh, false)[0]; if (hit) st.pose.S = projectToSkin(hit.point);
+    const hit = ray.intersectObject(hitMesh, false)[0]; if (hit) st.pose.S = projectToSkin(scene.worldToLocal(hit.point.clone()));
   });
   const endDrag = () => { if (!dragging) return; dragging = false; if (controls) controls.enabled = true; canvas.classList.remove('dragging'); };
   canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
@@ -2261,7 +2292,7 @@ function startApp() {
       return 'CW';
     }
     at(spec.gate); const a = TA, b = TB, c = TC;
-    if (OUT.kind === 1 && VSD < 0 && VSEGI >= 0) return ['', 'Aorta', 'Pulmonary artery', 'IVC / hepatic vein'][SEG[VSEGI].id] + ' (PW)';
+    if (OUT.kind === 1 && VSD < 0 && VSEGI >= 0) return ['', 'Aorta', 'Pulmonary artery', 'IVC / hepatic vein', 'IVC / hepatic vein', 'Pulmonary vein'][SEG[VSEGI].id] + ' (PW)';
     if (a > -1.3 && a < 0.6 && b * b + c * c < 2.1) return 'Mitral inflow (PW)';
     if (capsule(a, b, c, LVOT0, LVOT1, 1.0)) return 'LVOT (PW)';
     if (a > -1.1 && a < 0.7 + TVA && (b - TVB) ** 2 + (c - TVC) ** 2 < TVR2) return 'Tricuspid inflow (PW)';

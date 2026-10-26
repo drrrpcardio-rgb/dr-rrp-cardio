@@ -4,7 +4,7 @@ export const simulators = [
     id: "echo",
     title: "Echo Simulator",
     tag: "New",
-    text: "Move a probe on a 3D patient and get a realistic echo image: 15 views, colour and spectral Doppler, M-mode, measurements, 22 pathology cases, a quiz and a guided lesson.",
+    text: "Move a probe on a 3D patient and get a realistic echo image: 16 views, colour and spectral Doppler, M-mode, measurements, 22 pathology cases, a quiz and a guided lesson.",
     href: "/echo-simulator",
     image: "/images/echo-sim-lab.jpg",
     points: ["15 standard TTE views", "Colour, PW, CW and tissue Doppler", "22 cases with quiz and report"],

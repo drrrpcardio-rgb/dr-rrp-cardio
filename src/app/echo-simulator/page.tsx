@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { EchoLabFrame } from "@/components/ui/EchoLabFrame";
 import { brand } from "@/lib/site-data";
 
-const description = `Scan a 3D heart with a virtual probe and see a realistic transthoracic echo image: 15 views, colour, PW, CW and tissue Doppler, M-mode, measurements and 22 pathology cases. Free from ${brand.name}.`;
+const description = `Scan a 3D heart with a virtual probe and see a realistic transthoracic echo image: 16 views, colour, PW, CW and tissue Doppler, M-mode, measurements and 22 pathology cases. Free from ${brand.name}.`;
 
 export const metadata: Metadata = {
   title: "Echo Simulator",
