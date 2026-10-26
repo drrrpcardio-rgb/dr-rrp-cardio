@@ -2,7 +2,7 @@
 title: "One Artery, Two Disguises: LBBB vs qRBBB in Anterior MI"
 description: "Two LAD occlusions in one week, both with bundle branch block. One ECG hid the infarct; the other pointed straight to the culprit. What LBBB and qRBBB each tell you in acute MI."
 date: 2026-10-26
-tags: [Case Report, ECG, LBBB, RBBB, Anterior STEMI, Sgarbossa, Primary PCI]
+tags: [Case Report, ECG, LBBB, RBBB, Anterior STEMI, Sgarbossa, Echo, Primary PCI]
 draft: false
 cover: "/images/blog/lbbb-vs-qrbbb/cover.svg"
 key_points:
@@ -33,8 +33,8 @@ The difference was the type of block: **left bundle branch block (LBBB)** in the
 ## Why the type of block matters
 
 - **LBBB changes the whole QRS.** The septum activates from right to left, the left ventricle depolarises late and slowly, and the ST segments are abnormal before any infarct begins. ST elevation in V1–V3 is *expected*: the sign we look for in a STEMI is part of the block's own pattern.
-- **RBBB changes only the end of the QRS.** The first 40–60 ms, which reflects left ventricular activation, is preserved. Q waves and ST elevation can still be read in the usual way.
-- **qRBBB is RBBB with a qR in V1** instead of the usual rsR′. The small initial r wave, produced by septal activation, has been lost. That missing r wave is a marker of septal necrosis: RBBB *plus* an anteroseptal infarct.
+- **RBBB changes only the end of the QRS.** The first 40–60 ms, which reflects septal and left ventricular activation, is preserved. Q waves and ST elevation can still be read in the usual way.
+- **qRBBB is RBBB with a qR in V1** instead of the usual rsR′. The small initial r wave, produced by septal activation, has been lost. In a patient with chest pain and anterior ST elevation, that missing r wave is a marker of septal necrosis: RBBB *plus* an anteroseptal infarct. (A qR in V1 has other causes too, such as RV hypertrophy and acute RV strain, so always read it in context.)
 
 ![Schematic of lead V1 in normal conduction (rS), RBBB (rsR′), qRBBB with acute MI (qR with ST elevation) and LBBB (QS with discordant ST elevation)](/images/blog/lbbb-vs-qrbbb/v1-morphology.svg)
 
@@ -111,11 +111,13 @@ The ECG was unambiguous: RBBB with a **qR in V1**, marked left axis deviation (l
 
 ![12-lead ECG of case 2 showing RBBB pattern, left anterior fascicular block and anterolateral ST elevation](/images/blog/lbbb-vs-qrbbb/case2-qrbbb-ecg-a.jpg)
 
-*Figure 5. Case 2: RBBB pattern with left anterior fascicular block and anterolateral ST elevation.*
+*Figure 5. Case 2: left anterior fascicular block and anterolateral ST elevation. On this tracing the QRS measured 92 ms, an incomplete RBBB pattern.*
 
 ![Second 12-lead ECG of case 2 showing qRBBB, left anterior fascicular block and ST elevation in V2 to V6, I and aVL](/images/blog/lbbb-vs-qrbbb/case2-qrbbb-ecg-b.jpg)
 
-*Figure 6. Case 2: qRBBB with left anterior fascicular block and extensive anterolateral ST elevation (V2–V6, I, aVL).*
+*Figure 6. Case 2: complete RBBB (QRS 129 ms) with a qR in V1, left anterior fascicular block and extensive anterolateral ST elevation (V2–V6, I, aVL).*
+
+The QRS width differed between the two tracings: 92 ms on one, 129 ms on the other. Conduction in the septum was unstable, which is itself a warning sign in a proximal LAD occlusion.
 
 Every feature pointed to the same place:
 
@@ -203,17 +205,48 @@ When LBBB clouds the picture, look for ST changes that break the block's own rul
 
 *Figure 11. What is expected in LBBB (left) and the three patterns that suggest an acute coronary occlusion.*
 
-Any one of these warrants activation of the cath lab. A negative result does not exclude MI in LBBB, as our first patient showed.
+Any one of these warrants activation of the cath lab. A negative result does not exclude MI in LBBB, as our first patient showed. Try them on her ECG in Figure 2: check each lead for concordance, then compare the ST elevation in V1–V3 with the depth of the S wave before it.
 
 The 2023 ESC guidelines are clear: in a patient with suspected ongoing ischaemia, LBBB or RBBB should prompt a primary PCI strategy, as for STEMI, **whether or not the block was known to be old**.
 
-## Five take-home points
+## Six take-home points
 
 1. **LBBB hides; qRBBB reveals.**
 2. In LBBB, when the ECG is quiet, trust the symptoms and the echo.
-3. A **qR in V1** means septal infarction: look for anterior ST elevation.
+3. In a patient with chest pain, a **qR in V1** means septal infarction: look for anterior ST elevation.
 4. **RBBB + LAFB + anterior ST elevation = proximal LAD** until proven otherwise. Watch for progression to complete heart block.
 5. Elderly and diabetic women often present with back, jaw or arm pain rather than chest pain. Think of the heart first.
+6. **Image the apex after every anterior MI.** Both patients had an LV thrombus, a reason to change their antithrombotic treatment and follow them up with imaging.
+
+## Test yourself
+
+<details>
+<summary>1. Why can ST elevation in V1–V3 be normal in LBBB but not in RBBB?</summary>
+
+In LBBB the whole sequence of ventricular activation is abnormal, so repolarisation is too: ST segments move opposite (discordant) to the main QRS deflection, and V1–V3 are mostly negative. In RBBB the early QRS and the ST segment are largely unaffected, so ST elevation there means what it usually means.
+
+</details>
+
+<details>
+<summary>2. What does the "q" in qRBBB tell you?</summary>
+
+The small initial r wave in V1 comes from septal activation. When it is replaced by a q wave, septal myocardium has been lost. With chest pain and anterior ST elevation, that means an anteroseptal infarct.
+
+</details>
+
+<details>
+<summary>3. RBBB, left anterior fascicular block and ST elevation in V2–V6, I and aVL: where is the culprit?</summary>
+
+The proximal LAD, above the first septal and diagonal branches. The right bundle and the left anterior fascicle both depend on the first septal perforators, and the lateral leads point to loss of the first diagonal.
+
+</details>
+
+<details>
+<summary>4. In LBBB, the ST elevation in V2 is 4 mm and the S wave before it is 12 mm deep. Is the Smith criterion met?</summary>
+
+Yes. The ST elevation is at least 1 mm and the ratio is 4 / 12 ≈ 33%, above the 25% threshold. That is excessively discordant ST elevation, which suggests an acute coronary occlusion.
+
+</details>
 
 ## Practise reading these patterns
 

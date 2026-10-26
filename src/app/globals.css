@@ -228,6 +228,12 @@ textarea:focus-visible,
 .blog-prose thead th { background: var(--color-royal-50); color: var(--color-ink); font-weight: 600; border-bottom: 2px solid var(--color-royal-100); }
 .blog-prose tbody td:first-child { font-weight: 600; color: var(--color-ink); }
 
+/* Self-test questions: click to reveal the answer. */
+.blog-prose details { margin: 0 0 .75rem; border: 1px solid var(--color-mist-200); border-radius: .75rem; background: #fff; }
+.blog-prose details[open] { border-color: var(--color-royal-100); background: var(--color-royal-50); }
+.blog-prose summary { cursor: pointer; padding: .85rem 1.1rem; font-weight: 600; color: var(--color-ink); list-style-position: inside; }
+.blog-prose details > p { margin: 0; padding: 0 1.1rem 1rem; }
+
 /* Before/after pairs: side by side from tablet width up, stacked on phones. */
 .blog-prose .media-pair { display: grid; gap: 1.25rem; margin: 2rem 0 1.75rem; }
 .blog-prose .media-pair figure { margin: 0; }
