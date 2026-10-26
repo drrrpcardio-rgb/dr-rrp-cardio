@@ -1,22 +1,22 @@
 ---
-title: "Primary PCI of an Anomalous Right Coronary Artery Arising From the Left Sinus"
-description: "Inferior STEMI with right ventricular infarction, complete heart block and cardiogenic shock: angiographic diagnosis and guide catheter selection."
+title: "Wrong Sinus, Right Guide: Primary PCI of an Anomalous RCA in Shock"
+description: "Inferior STEMI, complete heart block and cardiogenic shock, and a right coronary artery that was not in the right sinus. How we found it, and the left guide that opened it."
 date: 2026-10-21
-tags: [Case Report, Anomalous RCA, ACAOS, Primary PCI, Guide Catheter, Complete Heart Block]
+tags: [Clinical Case, Anomalous RCA, ACAOS, Primary PCI, Guide Catheter, Complete Heart Block]
 draft: false
 cover: "/images/blog/anomalous-rca/aortic-root-schematic.svg"
 key_points:
   - "Inferior STEMI with right ventricular infarction, complete heart block and cardiogenic shock. The culprit was a right coronary artery arising from the left sinus (ACAOS)."
   - "The challenge: right-coronary catheters do not seat in an anterior, slit-like ostium."
   - "What worked: a temporary pacemaker first, then an EBU 3.0 left guide, which seated coaxially and gave stable backup. The RCA reopened with TIMI III flow."
-kicker: "Case Report · Interventional Cardiology"
+kicker: "From the Cath Lab · Interventional Cardiology"
 author: "Dr. A. Rajaram Prasad"
 author_title: "MD, DM, FSCAI · Consultant Interventional Cardiologist"
 author_bio: "Founder & Course Director, Dr. RRP Cardio."
 coauthors:
   - name: "Kalaiyarasan G"
     title: "Cardiovascular Technologist"
-    bio: "Co-author of this case report."
+    bio: "Co-author of this article."
 tagline: "Learn. Understand. Apply."
 cta:
   - label: "Open the Cath Lab simulator"
@@ -29,7 +29,7 @@ cta:
 
 ## Introduction
 
-Anomalous origin of the right coronary artery from the opposite (left) sinus of Valsalva, a form of ACAOS, can make primary PCI technically demanding. The ostium is typically anterior and slit-like, and standard right-coronary catheters do not seat in it. We describe a patient in whom this anomaly was the culprit of an inferior STEMI complicated by shock and complete heart block, and the guide strategy that allowed successful primary PCI.
+Anomalous origin of the right coronary artery from the opposite (left) sinus of Valsalva, a form of anomalous coronary artery from the opposite sinus (ACAOS), can make primary PCI technically demanding. The ostium is typically anterior and slit-like, and standard right-coronary catheters do not seat in it. We describe a patient in whom this anomaly was the culprit of an inferior STEMI complicated by shock and complete heart block, and the guide strategy that allowed successful primary PCI.
 
 ## Case presentation
 
@@ -49,21 +49,21 @@ A temporary pacemaker was inserted first to secure the rhythm, and the patient p
 
 The left coronary system was imaged first. The LMCA, LAD and LCx showed no flow-limiting disease, so the culprit was not in the left system.
 
-<!-- VIDEO: /images/blog/anomalous-rca/left-system.mp4 (or add YouTube ID) -->
+<!-- VIDEO: /images/blog/anomalous-rca/left-system.mp4 -->
 
 *Figure 2. Left coronary system: no flow-limiting lesion.*
 
-<!-- VIDEO: /images/blog/anomalous-rca/rca-origin-lateral.mp4 (or add YouTube ID) -->
+<!-- VIDEO: /images/blog/anomalous-rca/rca-origin-lateral.mp4 -->
 
 *Figure 3. Lateral aortography to locate the RCA ostium.*
 
-Lateral and LAO aortography separate the sinuses and show the true origin of each vessel. No separate RCA ostium was present in the right sinus. The RCA arose from the **left (opposite) sinus of Valsalva**, with an anterior, slit-like ostium. CT angiography was planned at follow-up to define the proximal course.
+Lateral and LAO aortography separate the sinuses and show the true origin of each vessel. No separate RCA ostium was present in the right sinus. The RCA arose from the **left (opposite) sinus of Valsalva**, with an anterior, slit-like ostium. CT angiography was planned at follow-up to define the proximal course. That matters: an RCA that runs between the aorta and the pulmonary artery (an inter-arterial course) carries a risk of ischaemia and sudden death, and may need surgical review.
 
 ![Schematic of the aortic root: the RCA arises from the left sinus and the right sinus has no RCA ostium](/images/blog/anomalous-rca/aortic-root-schematic.svg)
 
 *Figure 4. Schematic of the aortic root (LAO 30–35°): the RCA arises from the left sinus, and the right sinus has no RCA ostium.*
 
-<!-- VIDEO: /images/blog/anomalous-rca/anomalous-rca-left-sinus.mp4 (or add YouTube ID) -->
+<!-- VIDEO: /images/blog/anomalous-rca/anomalous-rca-left-sinus.mp4 -->
 
 *Figure 5. Aortogram showing the anomalous origin.*
 
@@ -71,13 +71,13 @@ Lateral and LAO aortography separate the sinuses and show the true origin of eac
 
 Because a right-coronary catheter does not seat in this ostium, a left guide catheter was used. An **EBU 3.0** matched the anterior ostium and seated coaxially, providing stable backup for wiring and stent delivery. The temporary pacemaker remained in place throughout.
 
-<!-- VIDEO: /images/blog/anomalous-rca/ebu-3-engaged.mp4 (or add YouTube ID) -->
+<!-- VIDEO: /images/blog/anomalous-rca/ebu-3-engaged.mp4 -->
 
 *Figure 6. EBU 3.0 guide engaged in the anomalous RCA ostium.*
 
 The culprit was crossed with a wire, pre-dilated, and treated with a drug-eluting stent. Haemodynamic support continued throughout revascularisation.
 
-<!-- VIDEO: /images/blog/anomalous-rca/stent-deployment.mp4 (or add YouTube ID) -->
+<!-- VIDEO: /images/blog/anomalous-rca/stent-deployment.mp4 -->
 
 *Figure 7. Wire, pre-dilatation and stent deployment in the culprit RCA.*
 
@@ -85,7 +85,7 @@ The culprit was crossed with a wire, pre-dilated, and treated with a drug-elutin
 
 The final angiogram showed the culprit RCA reopened with TIMI III antegrade flow and a good angiographic result. The complete heart block was managed with temporary pacing. The procedure was performed in a peripheral set-up.
 
-<!-- VIDEO: /images/blog/anomalous-rca/final-result.mp4 (or add YouTube ID) -->
+<!-- VIDEO: /images/blog/anomalous-rca/final-result.mp4 -->
 
 *Figure 8. Final angiogram: RCA reopened with TIMI III flow.*
 
@@ -109,14 +109,12 @@ The EBU 3.0 and 3.5 are well suited to this anatomy. Their enhanced secondary cu
 
 1. **Match the guide to the sinus.** A left-sinus RCA has a slit-like ostium that right-coronary shapes will not seat in. A left guide such as the EBU 3.0 can.
 2. **Secure rhythm and pressure first.** In inferior STEMI with RV infarction and heart block, a temporary pacemaker and haemodynamic support precede revascularisation.
-3. **Use the right views.** Lateral or LAO aortography defines the origin. RAO is the working view for a left-sinus RCA, and CT angiography at follow-up maps the proximal course.
+3. **Use the right views.** Lateral or LAO aortography defines the origin, and CT angiography at follow-up maps the proximal course, including an inter-arterial segment.
 4. **Prepare thoroughly.** Primary PCI of an anomalous, hard-to-engage culprit is feasible in a peripheral centre with careful planning.
 
-## Learn the cath lab the structured way
+## Practise guide selection
 
-Practise guide selection and engagement in the [Cath Lab simulator](https://rrpcardio.com/cath-lab/), or join the Cath Lab course.
-
-[View the Cath Lab course](https://rrpcardio.com/courses/cath-lab/) · [Enquire Now](https://rrpcardio.com/contact/)
+Try engaging different guide shapes in the [Cath Lab simulator](/cath-lab/), and compare their curves in the [equipment library](/cath-sim/equipment/?step=guide).
 
 ## References
 

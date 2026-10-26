@@ -2,7 +2,7 @@
 title: "One Artery, Two Disguises: LBBB vs qRBBB in Anterior MI"
 description: "Two LAD occlusions in one week, both with bundle branch block. One ECG hid the infarct; the other pointed straight to the culprit. What LBBB and qRBBB each tell you in acute MI."
 date: 2026-10-26
-tags: [Case Report, ECG, LBBB, RBBB, Anterior STEMI, Sgarbossa, Echo, Primary PCI]
+tags: [Clinical Case, ECG, LBBB, RBBB, Anterior STEMI, Sgarbossa, Echo, Primary PCI]
 draft: false
 cover: "/images/blog/lbbb-vs-qrbbb/cover.svg"
 key_points:
@@ -10,14 +10,14 @@ key_points:
   - "LBBB hid the infarct. The diagnosis came from the symptoms and a bedside echo, and the culprit was a mid-to-distal LAD occlusion."
   - "qRBBB gave it away. A qR in V1, left anterior fascicular block and anterolateral ST elevation pointed to the proximal LAD before the angiogram did."
   - "With ongoing ischaemic symptoms, treat LBBB or RBBB as a STEMI equivalent, whether the block is old or new."
-kicker: "Case Report · ECG & Interventional Cardiology"
+kicker: "Cover Story · ECG & Interventional Cardiology"
 author: "Dr. A. Rajaram Prasad"
 author_title: "MD, DM, FSCAI · Consultant Interventional Cardiologist"
 author_bio: "Founder & Course Director, Dr. RRP Cardio."
 coauthors:
   - name: "Kalaiyarasan G"
     title: "Cardiovascular Technologist"
-    bio: "Co-author of this case report."
+    bio: "Co-author of this article."
 tagline: "Learn. Understand. Apply."
 cta_title: "Read ECGs with confidence"
 cta:
@@ -114,7 +114,7 @@ By discharge, LV function had already improved, with **LVEF up from 30% to 40%**
 
 ## Case 2: the infarct that qRBBB gave away
 
-A 61-year-old man woke with a classic presentation: crushing left-sided chest pain from 9:30 a.m., with vomiting and profuse sweating. An angiogram earlier in the year had shown triple-vessel disease.
+A 61-year-old man had a classic presentation: crushing left-sided chest pain from 9:30 a.m., with vomiting and profuse sweating. An angiogram earlier in the year had shown triple-vessel disease.
 
 The ECG was unambiguous: RBBB with a **qR in V1**, marked left axis deviation (left anterior fascicular block), and **ST elevation in V2–V6, I and aVL**.
 
@@ -228,7 +228,7 @@ The 2023 ESC guidelines are clear: in a patient with suspected ongoing ischaemia
 2. In LBBB, when the ECG is quiet, trust the symptoms and the echo.
 3. In a patient with chest pain, a **qR in V1** means septal infarction: look for anterior ST elevation.
 4. **RBBB + LAFB + anterior ST elevation = proximal LAD** until proven otherwise. Watch for progression to complete heart block.
-5. Elderly and diabetic women often present with back, jaw or arm pain rather than chest pain. Think of the heart first.
+5. Older patients, women and people with diabetes often present with back, jaw or arm pain rather than chest pain. Think of the heart first.
 6. **Image the apex after every anterior MI.** Both patients had an LV thrombus, a reason to change their antithrombotic treatment and follow them up with imaging.
 
 ## Test yourself

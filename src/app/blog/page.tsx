@@ -6,7 +6,7 @@ import { brand } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: `Case reports, ECG and cath lab explainers and teaching notes from ${brand.name}.`,
+  description: `Clinical cases, ECG and cath lab explainers and teaching notes from ${brand.name}.`,
 };
 
 export default function BlogPage() {
@@ -17,7 +17,7 @@ export default function BlogPage() {
       <PageHero
         eyebrow="Blog"
         title="Cases and teaching notes"
-        description="Case reports, ECG and cath lab explainers and practical teaching notes."
+        description="Clinical cases, ECG and cath lab explainers and practical teaching notes."
       />
       <section className="mx-auto max-w-5xl px-5 py-20 sm:px-8">
         {posts.length === 0 ? (
