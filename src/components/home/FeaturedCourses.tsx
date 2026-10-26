@@ -5,15 +5,16 @@ import { courseCategories } from "@/lib/courses-data";
 
 export function FeaturedCourses() {
   return (
-    <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
+    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24">
       <SectionHeading
         eyebrow="Curriculum"
         title="Featured courses"
         description="Five focused tracks, each built around structured interpretation and real clinical cases."
       />
-      <StaggerGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {courseCategories.map((course) => (
-          <CourseCard key={course.slug} slug={course.slug} />
+      <StaggerGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
+        {courseCategories.map((course, i) => (
+          // Five cards: three on the first row, two wider ones on the second, so no gap is left
+          <CourseCard key={course.slug} slug={course.slug} className={i < 3 ? "lg:col-span-2" : "lg:col-span-3"} />
         ))}
       </StaggerGroup>
     </section>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ArrowRight, PlayCircle } from "lucide-react";
@@ -10,6 +11,13 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { brand, founder } from "@/lib/site-data";
 
 const headline = "Learn. Understand. Apply.";
+
+const heroTools = [
+  { label: "Echo simulator", href: "/echo-simulator" },
+  { label: "ECG simulator", href: "/ecg-mastery" },
+  { label: "Cath lab", href: "/cath-lab" },
+  { label: "Echo calculators", href: "/echo-calculators" },
+];
 
 const container = {
   hidden: {},
@@ -103,14 +111,29 @@ export function Hero() {
               Explore Courses
             </Button>
             <Button
-              href="/free-learning"
+              href="/simulators"
               variant="ghost"
               size="lg"
               className="border border-white/30 text-white hover:bg-white/10"
               icon={<PlayCircle size={18} />}
             >
-              Watch Free Lessons
+              Try the Free Simulators
             </Button>
+          </motion.div>
+
+          <motion.div variants={item} className="mt-8">
+            <p className="text-xs font-semibold tracking-[0.16em] text-royal-200 uppercase">Free, in your browser</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {heroTools.map((t) => (
+                <Link
+                  key={t.href}
+                  href={t.href}
+                  className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm text-white backdrop-blur transition-colors hover:border-gold-400 hover:text-gold-300"
+                >
+                  {t.label}
+                </Link>
+              ))}
+            </div>
           </motion.div>
         </motion.div>
 

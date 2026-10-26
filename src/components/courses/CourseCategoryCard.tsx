@@ -6,13 +6,13 @@ import { ArrowUpRight } from "lucide-react";
 import { getCourseCategory } from "@/lib/courses-data";
 import { staggerItem } from "@/components/ui/Reveal";
 
-export function CourseCategoryCard({ slug }: { slug: string }) {
+export function CourseCategoryCard({ slug, className }: { slug: string; className?: string }) {
   const course = getCourseCategory(slug);
   if (!course) return null;
   const Icon = course.icon;
 
   return (
-    <motion.div variants={staggerItem}>
+    <motion.div variants={staggerItem} className={className}>
       <Link
         href={`/courses/${course.slug}`}
         className="group flex h-full flex-col rounded-2xl border border-mist-200 bg-white p-8 transition-shadow hover:shadow-xl hover:shadow-royal-900/5"
