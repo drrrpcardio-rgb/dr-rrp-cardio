@@ -285,13 +285,13 @@
   }
 
   // cancellous (marrow) bone with a trabecular texture
-  const marrow = (x, y, z, base) => Math.round(base + 55 * vnoise(x * 0.75, y * 0.75, z * 0.75));
+  const marrow = (x, y, z, base) => Math.round(base + 50 * vnoise(x * 0.75, y * 0.75, z * 0.75) + 40 * vnoise(x * 1.7 + 3.1, y * 1.7, z * 1.7));
 
   function chestWall(x, y, z, dOut) {
     // sternum: flat bone with a cortex; the manubrium higher up is wider
     {
       const sw = 15 + 7 * sstep(30, 48, z), u = x / sw, v = (y + 87) / 6.5, q = u * u + v * v;
-      if (q < 1) return put(q > 0.66 ? 780 : marrow(x, y, z, 230), tg(L_BONE, 0));
+      if (q < 1) return put(q > 0.8 ? 720 : marrow(x, y, z, 300), tg(L_BONE, 0));
     }
     const ph = Math.atan2(y - 8, x);
     if (dOut < 12) {
@@ -334,8 +334,8 @@
     const bq = (u / 16) ** 2 + (v / (v < 0 ? 13 : 12)) ** 2, back = v - (10 + 2.4 * (u / 11) ** 2);
     if (bq < 1 && back < 0 && tubeD(T_DESC, x, y, z) > 1.5) {
       if (disc) return put(bq > 0.7 ? 105 : 84, tg(L_BONE, 0));
-      if (lv < 0.23 || lv > 0.965 || bq > 0.84 || back > -1.3) return put(800, tg(L_BONE, 0));
-      return put(marrow(x, y, z, 210), tg(L_BONE, 0));
+      if (lv < 0.23 || lv > 0.965 || bq > 0.88 || back > -1.1) return put(720, tg(L_BONE, 0));
+      return put(marrow(x, y, z, 280) + Math.round(45 * vnoise(x * 2.3, y * 2.3, z * 1.2)), tg(L_BONE, 0));
     }
     const cv = v - 19, cr = hyp(u, cv * 1.1);
     if (cr < 7.5) return put(cr < 4.6 ? 34 : 8, tg(L_BODY, 0)); // cord in CSF
@@ -344,7 +344,7 @@
       if (cr < 11.6 && cv > -10) return put(58, tg(L_BODY, 0));
     } else {
       // pedicles and laminae
-      if (cr < 11.6 && cv > -10) return put(cr > 10.4 || cr < 8.6 ? 780 : marrow(x, y, z, 260), tg(L_BONE, 0));
+      if (cr < 11.6 && cv > -10) return put(cr > 10.6 ? 760 : cr < 8.2 ? 520 : marrow(x, y, z, 360), tg(L_BONE, 0));
       // transverse processes reach out and back toward the rib heads
       const au = Math.abs(u), tv = cv - 0.3 * (au - 9);
       if (au > 8 && au < 29 && Math.abs(tv) < 3.4) return put(Math.abs(tv) > 2.2 ? 760 : marrow(x, y, z, 250), tg(L_BONE, 0));
@@ -395,11 +395,14 @@
   }
 
   function scene(x, y, z) {
-    let u = x / 165, v = (y - 5) / 118;
+    // body and chest outlines are not true ellipses: a slow wobble at the sides (none at the sternum or spine)
+    const wf = sstep(18, 55, Math.abs(x));
+    const bx = x + wf * 5 * vnoise(y * 0.018 + 1.3, z * 0.012, 2.1), by = y + wf * 4 * vnoise(x * 0.018 + 4.7, z * 0.012, 7.3);
+    let u = bx / 165, v = (by - 5) / 118;
     const qo = u * u + v * v;
     if (qo > 1) return put(-1000, 0);
     if ((1 - Math.sqrt(qo)) * 118 < 1.6) return put(28, tg(L_BODY, 0)); // skin
-    u = x / 135; v = (y - 8) / 88;
+    u = bx / 135; v = (by - 8) / 88;
     const qc = u * u + v * v;
     if (spine(x, y, z, qc < 1)) return true;
     if (qc >= 1) return chestWall(x, y, z, (Math.sqrt(qc) - 1) * 100);
@@ -433,10 +436,10 @@
     for (let k = Math.max(1, k0); k < Math.min(NZ - 1, k1); k++) {
       const z = Z0 + (k + 0.5) * DZ;
       for (let j = 1; j < NY - 1; j++) {
-        const y = Y0 + (j + 0.5) * DX, vy = (y - 5) / 118;
+        const y = Y0 + (j + 0.5) * DX, vy = (y - 5) / 123;
         for (let i = 1; i < NX - 1; i++) {
           const x = X0 + (i + 0.5) * DX;
-          if ((x / 165) ** 2 + vy * vy > 1) continue;
+          if ((x / 171) ** 2 + vy * vy > 1) continue;
           const o = ((k - kb) * NY + j) * NX + i, t = tag0[o], h = hu0[o], c0 = t & 7;
           // contrast boundaries, and big density steps (air, bone, fat against soft tissue)
           if (!(((tag0[o - 1] & 7) !== c0) || ((tag0[o + 1] & 7) !== c0) || ((tag0[o - NX] & 7) !== c0) || ((tag0[o + NX] & 7) !== c0) ||
@@ -1253,11 +1256,11 @@
     if (fx < 0 || fy < 0 || fx >= NX - 1 || fy >= NY - 1) return -1024;
     if (fz < 0) fz = 0; else if (fz >= NZ - 1) fz = NZ - 1.001;
     const i = fx | 0, j = fy | 0, k = fz | 0, tx = fx - i, ty = fy - j, tz = fz - k;
-    const o = (k * NY + j) * NX + i, o2 = o + NXY;
-    const h0 = hv(o) + NAMP * NOISE[o], h1 = hv(o + 1) + NAMP * NOISE[o + 1];
-    const h2 = hv(o + NX) + NAMP * NOISE[o + NX], h3 = hv(o + NX + 1) + NAMP * NOISE[o + NX + 1];
-    const h4 = hv(o2) + NAMP * NOISE[o2], h5 = hv(o2 + 1) + NAMP * NOISE[o2 + 1];
-    const h6 = hv(o2 + NX) + NAMP * NOISE[o2 + NX], h7 = hv(o2 + NX + 1) + NAMP * NOISE[o2 + NX + 1];
+    const o = (k * NY + j) * NX + i, o2 = o + NXY, na = NAMP * NW;
+    const h0 = hv(o) + na * NOISE[o], h1 = hv(o + 1) + na * NOISE[o + 1];
+    const h2 = hv(o + NX) + na * NOISE[o + NX], h3 = hv(o + NX + 1) + na * NOISE[o + NX + 1];
+    const h4 = hv(o2) + na * NOISE[o2], h5 = hv(o2 + 1) + na * NOISE[o2 + 1];
+    const h6 = hv(o2 + NX) + na * NOISE[o2 + NX], h7 = hv(o2 + NX + 1) + na * NOISE[o2 + NX + 1];
     const a = h0 + (h1 - h0) * tx, b = h2 + (h3 - h2) * tx, c = h4 + (h5 - h4) * tx, d = h6 + (h7 - h6) * tx;
     const e = a + (b - a) * ty, f = c + (d - c) * ty;
     return e + (f - e) * tz;
@@ -1283,10 +1286,47 @@
     const e = a + (b - a) * ty, f = c + (d - c) * ty;
     return NAMP * (e + (f - e) * tz) * 1.35;
   }
+  // Fine grain. Real CCTA noise is finer than the 0.9 mm voxels, so the images take part of their noise from a small
+  // tile of lightly smoothed white noise on a 0.42 mm grid (odd periods, so the repeat does not show) and the rest from
+  // the noise volume. Only the displayed images get it: the calcium score and the bolus ROI read the volume alone.
+  let NW = 1;
+  const GT = [53, 59, 47], GTS = 0.42;
+  let GRAIN = null;
+  function genGrain() {
+    const n = GT[0] * GT[1] * GT[2], f = new Float32Array(n), g = new Float32Array(n);
+    let s = 12345;
+    const r = () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+    for (let o = 0; o < n; o++) f[o] = r() + r() + r() - 1.5;
+    const at = (i, j, k) => f[((((k + GT[2]) % GT[2]) * GT[1] + (j + GT[1]) % GT[1]) * GT[0]) + (i + GT[0]) % GT[0]];
+    let s2 = 0;
+    for (let k = 0; k < GT[2]; k++) for (let j = 0; j < GT[1]; j++) for (let i = 0; i < GT[0]; i++) {
+      const v = 4 * at(i, j, k) + 2 * (at(i - 1, j, k) + at(i + 1, j, k) + at(i, j - 1, k) + at(i, j + 1, k)) + at(i, j, k - 1) + at(i, j, k + 1);
+      g[(k * GT[1] + j) * GT[0] + i] = v; s2 += v * v;
+    }
+    const sd = Math.sqrt(s2 / n);
+    for (let o = 0; o < n; o++) g[o] /= sd;
+    GRAIN = g;
+  }
+  function grainAt(x, y, z) {
+    if (!GRAIN) genGrain();
+    let fx = (x / GTS) % GT[0], fy = (y / GTS) % GT[1], fz = (z / GTS) % GT[2];
+    if (fx < 0) fx += GT[0]; if (fy < 0) fy += GT[1]; if (fz < 0) fz += GT[2];
+    const i = fx | 0, j = fy | 0, k = fz | 0, tx = fx - i, ty = fy - j, tz = fz - k;
+    const i1 = i + 1 === GT[0] ? 0 : i + 1, j1 = j + 1 === GT[1] ? 0 : j + 1, k1 = k + 1 === GT[2] ? 0 : k + 1;
+    const G = GRAIN, X = GT[0], XY = GT[0] * GT[1];
+    const a0 = k * XY + j * X, a1 = k * XY + j1 * X, b0 = k1 * XY + j * X, b1 = k1 * XY + j1 * X;
+    const a = G[a0 + i] + (G[a0 + i1] - G[a0 + i]) * tx, b = G[a1 + i] + (G[a1 + i1] - G[a1 + i]) * tx;
+    const c = G[b0 + i] + (G[b0 + i1] - G[b0 + i]) * tx, d = G[b1 + i] + (G[b1 + i1] - G[b1 + i]) * tx;
+    const e = a + (b - a) * ty, f = c + (d - c) * ty;
+    return e + (f - e) * tz;
+  }
   let USE_MOTION = false, USE_RANGE = true;
   function sampleScan(x, y, z) {
     if (USE_RANGE && (z < S.range[0] || z > S.range[1])) return NODATA;
-    return USE_ART ? sampleMoving(x, y, z) + artAt(x, y, z) : sampleMoving(x, y, z);
+    NW = 0.7;
+    const h = (USE_ART ? sampleMoving(x, y, z) + artAt(x, y, z) : sampleMoving(x, y, z)) + NAMP * 32 * grainAt(x, y, z);
+    NW = 1;
+    return h;
   }
   function sampleMoving(x, y, z) {
     if (!USE_MOTION) return tri(x, y, z);
@@ -1852,7 +1892,7 @@
     const dir = [Math.sin(y) * Math.cos(p), Math.cos(y) * Math.cos(p), -Math.sin(p)];
     const right = [Math.cos(y), -Math.sin(y), 0];
     const up = cross(right, dir);
-    return { dir, right, up, ext: 82 / S.read.zoomVr };
+    return { dir, right, up, ext: 74 / S.read.zoomVr };
   }
   let vrCache = null;
 
@@ -1863,13 +1903,74 @@
   const TG_CELL = 4;
   let treeGeo = null;
   const treeCache = {};
-  function treeKey(outer) { return `${outer ? 'o' : 'l'}|${S.cs && S.cs.id}|${GA[C_LEFT] | 0}|${GA[C_COLL] | 0}|${S.range[0] | 0}|${S.range[1] | 0}|${VLIST.length}`; }
+  function treeKey(outer) { return `${outer ? 'o' : 'l'}|${S.cs && S.cs.id}|${GA[C_LEFT] | 0}|${GA[C_COLL] | 0}|${S.range[0] | 0}|${S.range[1] | 0}|${VLIST.length}|${outer && heartField ? heartField.key : ''}`; }
   // outer = false: contrast-filled lumen at a high threshold (tree view: stenoses narrow, occlusions leave gaps).
   // outer = true: whole vessel with its wall and plaque, as a low-threshold heart VRT shows it.
   function useTreeGeo(outer) {
     const key = treeKey(outer);
     if (!treeCache[outer] || treeCache[outer].key !== key) { buildTreeGeo(190, outer); treeCache[outer] = treeGeo; }
     treeGeo = treeCache[outer];
+  }
+  // Heart view only: the small side branches a real VRT shows, too small to grade. They are laid along the heart
+  // surface and drawn in 3D only, so the slices, calcium score and report are unchanged.
+  function addTwigs(segs) {
+    let sd = 1;
+    const rnd = () => { sd = (sd + 0x6D2B79F5) | 0; let t = Math.imul(sd ^ (sd >>> 15), 1 | sd); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const inside = (p) => hfAt(p[0], p[1], p[2]) > HF_THR;
+    // where the line through q along n meets the heart surface, searching from 6 mm out to 12 mm in
+    const onSurf = (q, n) => {
+      if (inside(add(q, mul(n, 6)))) return null;
+      let a = 6, b = null;
+      for (let t = 5.5; t >= -12; t -= 0.5) { if (inside(add(q, mul(n, t)))) { b = t; break; } a = t; }
+      if (b === null) return null;
+      for (let it = 0; it < 5; it++) { const m = (a + b) / 2; if (inside(add(q, mul(n, m)))) b = m; else a = m; }
+      return add(q, mul(n, b));
+    };
+    const normal = (s) => {
+      const e = 1.2;
+      const g = [hfAt(s[0] - e, s[1], s[2]) - hfAt(s[0] + e, s[1], s[2]), hfAt(s[0], s[1] - e, s[2]) - hfAt(s[0], s[1] + e, s[2]), hfAt(s[0], s[1], s[2] - e) - hfAt(s[0], s[1], s[2] + e)];
+      const l = hyp(g[0], g[1], g[2]);
+      return l > 1e-6 ? [g[0] / l, g[1] / l, g[2] / l] : null;
+    };
+    // twigs stay on the heart: stop where the surface below belongs to the aorta or anything else
+    const onHeart = (s, n) => {
+      const i = Math.floor((s[0] - n[0] * 1.5 - X0) / DX), j = Math.floor((s[1] - n[1] * 1.5 - Y0) / DX), k = Math.floor((s[2] - n[2] * 1.5 - Z0) / DZ);
+      return i >= 0 && j >= 0 && k >= 0 && i < NX && j < NY && k < NZ && (TAG[(k * NY + j) * NX + i] >> 3) === L_HEART;
+    };
+    const lo = S.range[0], hi = S.range[1];
+    for (let vi = 0; vi < VLIST.length; vi++) {
+      const v = VLIST[vi];
+      if (v.id === 'LM' || v.id === 'S1' || v.id === 'S2') continue;
+      sd = 7; for (const ch of v.id) sd = Math.imul(sd ^ ch.charCodeAt(0), 16777619);
+      let side = rnd() < 0.5 ? 1 : -1;
+      for (let mm = 5 + rnd() * 4; mm < v.len - 7; mm += 6 + rnd() * 7) {
+        const i = Math.round(mm / 0.5), p = v.pts[i];
+        if (p[2] < lo || p[2] > hi) continue;
+        const tg = nrm(sub(v.pts[Math.min(v.n - 1, i + 2)], v.pts[Math.max(0, i - 2)]));
+        const h = toH(p);
+        let n = nrm(sub(p, H2W(clamp(h[0], 0, HL * 0.55), 0, 0)));
+        const s = onSurf(p, n); if (!s) continue;
+        n = normal(s); if (!n) continue;
+        const r0 = clamp(v.rad[i] * 0.42, 0.32, 0.75), L = (7 + rnd() * 13) * clamp(v.rad[i] / 1.3, 0.55, 1.15);
+        side = rnd() < 0.7 ? -side : side;
+        const th = (45 + rnd() * 35) * DEG;
+        const t = nrm(sub(tg, mul(n, dot(tg, n)))), bn = nrm(cross(n, t));
+        let d = nrm(add(mul(t, Math.cos(th)), mul(bn, side * Math.sin(th))));
+        const curl = (rnd() - 0.5) * 0.12, steps = Math.max(3, Math.round(L / 1.2));
+        let prev = p, prevR = r0 + 0.35, cur = s;
+        for (let k = 1; k <= steps; k++) {
+          const r = r0 * (1 - 0.7 * k / steps) + 0.3 * (1 - 0.6 * k / steps);
+          const s2 = onSurf(add(cur, mul(d, 1.2)), n); if (!s2 || s2[2] < lo || s2[2] > hi) break;
+          const n2 = normal(s2); if (!n2 || !onHeart(s2, n2)) break;
+          const c = add(s2, mul(n2, r * 0.75)), dd = sub(c, prev);
+          segs.push([prev[0], prev[1], prev[2], dd[0], dd[1], dd[2], dot(dd, dd) || 1e-6, prevR, r, 0, vi]);
+          prev = c; prevR = r; cur = s2; n = n2;
+          // follow the surface, bending gently back toward the parent's course with a little wander
+          d = sub(d, mul(n, dot(d, n)));
+          d = nrm(add(add(d, mul(t, 0.05)), mul(cross(n, d), curl + (rnd() - 0.5) * 0.25)));
+        }
+      }
+    }
   }
   function buildTreeGeo(thr, outer) {
     const segs = []; // [ax, ay, az, dx, dy, dz, len², r0, r1, kind, artery]  kind: 0 lumen, 1 calcium, 2 stent
@@ -1882,7 +1983,8 @@
         let r = 0, kind = 0;
         if (v.stent[i]) { r = v.rad[i] + 0.1; kind = 2; }
         else if (v.typ[i] === TYP.calc && v.bmp[i] > 0.25) { r = v.rad[i] * 0.95; kind = 1; }
-        else if (outer) r = v.rad[i] * (1 + 0.25 * v.bmp[i] * (v.rem[i] + 0.3)) + 0.45;
+        // heart view: the outer wall, a little wider as a VRT shows it, tapering over the last centimetre
+        else if (outer) r = (v.rad[i] * (1 + 0.25 * v.bmp[i] * (v.rem[i] + 0.3)) + 0.7) * (0.4 + 0.6 * sstep(0, 10, (v.n - 1 - i) * 0.5));
         else if (lumHU > thr + 15) r = lumenAt(v, i).lum / 2 * clamp(0.55 + (lumHU - thr) / 350, 0.55, 1);
         if (p[2] < S.range[0] || p[2] > S.range[1]) r = 0;
         const cur = r > 0.15 ? { p, r, kind } : null;
@@ -1893,6 +1995,7 @@
         prev = cur;
       }
     }
+    if (outer && heartField) addTwigs(segs);
     // uniform grid over the 3D box; each cell lists the capsules that reach into it
     const gx = Math.ceil((VRBOX[1] - VRBOX[0]) / TG_CELL), gy = Math.ceil((VRBOX[3] - VRBOX[2]) / TG_CELL), gz = Math.ceil((VRBOX[5] - VRBOX[4]) / TG_CELL);
     const cells = new Array(gx * gy * gz);
@@ -1945,13 +2048,47 @@
     }
     const nx = i1 - i0 + 1, ny = j1 - j0 + 1, nz = k1 - k0 + 1, n = nx * ny * nz;
     let a = new Float32Array(n), b = new Float32Array(n);
+    // heart isolation, as a cardiac VRT preset does it: the pulmonary arteries and veins are cut off a little way from
+    // the heart (a capsule around the long axis); the aorta is kept
+    const HC = { r: 60, a0: -30, a1: 92 }, P0 = add(B, mul(e1, HC.a0)), AX = mul(e1, HC.a1 - HC.a0), AL = dot(AX, AX);
     for (let k = 0; k < nz; k++) {
       const z = Z0 + (k + k0 + 0.5) * DZ, inR = z >= S.range[0] && z <= S.range[1];
       for (let j = 0; j < ny; j++) {
+        const y = Y0 + (j + j0 + 0.5) * DX;
         let o = ((k + k0) * NY + j + j0) * NX + i0, q = (k * ny + j) * nx;
         for (let i = 0; i < nx; i++, o++, q++) {
           const lab = TAG[o] >> 3;
-          a[q] = inR && (lab === L_HEART || lab === L_AORTA) ? Math.min(900, hv(o)) : HF_OUT;
+          if (!inR || (lab !== L_HEART && lab !== L_AORTA)) { a[q] = HF_OUT; continue; }
+          const h = Math.min(900, hv(o));
+          if (lab === L_AORTA) { a[q] = h; continue; }
+          const x = X0 + (i + i0 + 0.5) * DX, px = x - P0[0], py = y - P0[1], pz = z - P0[2];
+          const s = clamp((px * AX[0] + py * AX[1] + pz * AX[2]) / AL, 0, 1);
+          const dd = hyp(px - AX[0] * s, py - AX[1] * s, pz - AX[2] * s);
+          a[q] = lerp(HF_OUT, h, clamp((HC.r - dd) / 3 + 0.5, 0, 1));
+        }
+      }
+    }
+    // shallow grooves: the epicardial fat round each artery is see-through in a VRT, so the arteries lie in channels
+    const GD = 1.2;
+    for (const v of VLIST) {
+      if (v.id === 'LM' || v.id === 'S1' || v.id === 'S2') continue;
+      for (let n0 = v.parent ? 0 : 8; n0 < v.n; n0 += 2) {
+        const p = v.pts[n0], rc = v.rad[n0] + GD + 0.8, R = rc + 1;
+        if (p[2] < S.range[0] - R || p[2] > S.range[1] + R) continue;
+        const ia = Math.max(0, Math.floor((p[0] - R - X0) / DX) - i0), ib = Math.min(nx - 1, Math.ceil((p[0] + R - X0) / DX) - i0);
+        const ja = Math.max(0, Math.floor((p[1] - R - Y0) / DX) - j0), jb = Math.min(ny - 1, Math.ceil((p[1] + R - Y0) / DX) - j0);
+        const ka = Math.max(0, Math.floor((p[2] - R - Z0) / DZ) - k0), kb = Math.min(nz - 1, Math.ceil((p[2] + R - Z0) / DZ) - k0);
+        for (let k = ka; k <= kb; k++) {
+          const dz = Z0 + (k + k0 + 0.5) * DZ - p[2];
+          for (let j = ja; j <= jb; j++) {
+            const dy = Y0 + (j + j0 + 0.5) * DX - p[1];
+            for (let i = ia; i <= ib; i++) {
+              const q = (k * ny + j) * nx + i;
+              if (a[q] === HF_OUT || (TAG[((k + k0) * NY + j + j0) * NX + i + i0] >> 3) !== L_HEART) continue;
+              const dx = X0 + (i + i0 + 0.5) * DX - p[0], dd = Math.sqrt(dx * dx + dy * dy + dz * dz);
+              if (dd < R) a[q] = lerp(HF_OUT, a[q], sstep(rc - 1, R, dd));
+            }
+          }
         }
       }
     }
@@ -2055,7 +2192,7 @@
       h = h < 0 ? 0 : h > 1 ? 1 : h;
       const qx = s[0] + s[3] * h, qy = s[1] + s[4] * h, qz = s[2] + s[5] * h;
       const d = hyp(x - qx, y - qy, z - qz) - (s[7] + (s[8] - s[7]) * h);
-      if (d < best) { best = d; TREE_HIT.qx = qx; TREE_HIT.qy = qy; TREE_HIT.qz = qz; TREE_HIT.kind = s[9]; TREE_HIT.vi = s[10]; }
+      if (d < best) { best = d; TREE_HIT.qx = qx; TREE_HIT.qy = qy; TREE_HIT.qz = qz; TREE_HIT.kind = s[9]; TREE_HIT.vi = s[10]; TREE_HIT.r = s[7] + (s[8] - s[7]) * h; }
     }
     return best;
   }
@@ -2088,6 +2225,16 @@
     }
     return -1;
   }
+  // trilinear sample of the detector noise volume (NOISE units, SD about 30)
+  function noiseRaw(x, y, z) {
+    const fx = (x - X0) / DX - 0.5, fy = (y - Y0) / DX - 0.5, fz = (z - Z0) / DZ - 0.5;
+    if (fx < 0 || fy < 0 || fz < 0 || fx >= NX - 1 || fy >= NY - 1 || fz >= NZ - 1) return 0;
+    const i = fx | 0, j = fy | 0, k = fz | 0, tx = fx - i, ty = fy - j, tz = fz - k, o = (k * NY + j) * NX + i, o2 = o + NXY;
+    const a = NOISE[o] + (NOISE[o + 1] - NOISE[o]) * tx, b = NOISE[o + NX] + (NOISE[o + NX + 1] - NOISE[o + NX]) * tx;
+    const c = NOISE[o2] + (NOISE[o2 + 1] - NOISE[o2]) * tx, d = NOISE[o2 + NX] + (NOISE[o2 + NX + 1] - NOISE[o2 + NX]) * tx;
+    const e = a + (b - a) * ty, f = c + (d - c) * ty;
+    return e + (f - e) * tz;
+  }
   const VR_FR0 = { heart: 150, tree: 200, mip: 150 }, VR_FR = { ...VR_FR0 };
   function renderVR(vp, fast) {
     const cam = camera(), mode = S.read.vr;
@@ -2100,8 +2247,8 @@
     const mask = new Uint8Array(8);
     mask[L_HEART] = 1; mask[L_COR] = 1; mask[L_AORTA] = 1;
     // Heart: smoothed heart field plus analytic coronaries. Tree: analytic coronaries and aortic root only.
-    useTreeGeo(mode === 'heart');
     if (mode === 'heart' && (!heartField || heartField.key !== heartKey())) buildHeartField();
+    useTreeGeo(mode === 'heart');
     TREE_AORTA = mode === 'tree';
     const step = fast ? 1.1 : 0.7;
     const { dir, right, up } = cam;
@@ -2122,16 +2269,36 @@
       for (let q = 0; q < nAO; q++) { const dd = AO_D[q]; occ += AO_W[q] * solid(x + nx * dd, y + ny * dd, z + nz * dd); wsum += AO_W[q]; }
       return 1 - 0.85 * (occ / wsum);
     };
-    let R = 0, G = 0, Bc = 0;
+    let R = 0, G = 0, Bc = 0, AMB = 0.2;
+    const rimK = mode === 'heart' ? 0.07 : 0.22;
     const shade = (base, nx, ny, nz, occl, depth, sp, sk) => {
       const lam = Math.max(0, nx * light[0] + ny * light[1] + nz * light[2]);
       const lam2 = Math.max(0, nx * lightR[0] + ny * lightR[1] + nz * lightR[2]);
       const spec = Math.pow(Math.max(0, nx * half[0] + ny * half[1] + nz * half[2]), sp) * sk * (0.4 + 0.6 * occl);
-      const rim = Math.pow(1 - Math.abs(nx * dir[0] + ny * dir[1] + nz * dir[2]), 3) * 0.22;
-      const sh = ((0.2 + 0.62 * lam + 0.2 * lam2) * (0.3 + 0.7 * occl) + rim) * depth;
+      const rim = Math.pow(1 - Math.abs(nx * dir[0] + ny * dir[1] + nz * dir[2]), 3) * rimK;
+      const sh = ((AMB + 0.62 * lam + 0.2 * lam2) * (0.3 + 0.7 * occl) + rim) * depth;
       R = clamp(base[0] * sh + 160 * spec, 0, 255); G = clamp(base[1] * sh + 140 * spec, 0, 255); Bc = clamp(base[2] * sh + 130 * spec, 0, 255);
     };
-    const C_MUSCLE = [148, 54, 42], C_BLOOD = [206, 86, 66], C_BRIGHT = [236, 130, 100];
+    // cardiac VRT preset: muted brown-red muscle, contrast-filled structures pink to white
+    const C_MUSCLE = [138, 68, 56], C_BLOOD = [196, 112, 96], C_BRIGHT = [244, 214, 200];
+    // arteries: thick, dense contrast renders cream-white; thin distal branches (partial volume) go red
+    const C_ART = [252, 230, 196], C_ART_THIN = [206, 78, 64];
+    // surface grain: a real VRT takes its normals from noisy data, so the surface is finely rough, more so in noisy scans
+    const rough = mode === 'heart' ? clamp(NAMP * 0.004, 0.003, 0.02) : 0;
+    let BX = 0, BY = 0, BZ = 0;
+    const bump = (x, y, z, nx, ny, nz, k) => {
+      if (k <= 0) { BX = nx; BY = ny; BZ = nz; return; }
+      const e = 0.6, f = 3.2, F = 6, W = 0.25;
+      let gx = W * (noiseRaw(x + e, y, z) - noiseRaw(x - e, y, z)), gy = W * (noiseRaw(x, y + e, z) - noiseRaw(x, y - e, z)), gz = W * (noiseRaw(x, y, z + e) - noiseRaw(x, y, z - e));
+      // plus a finer grain than the 0.9 mm voxels can carry
+      gx += F * (vnoise((x + 0.3) * f, y * f, z * f) - vnoise((x - 0.3) * f, y * f, z * f));
+      gy += F * (vnoise(x * f, (y + 0.3) * f, z * f) - vnoise(x * f, (y - 0.3) * f, z * f));
+      gz += F * (vnoise(x * f, y * f, (z + 0.3) * f) - vnoise(x * f, y * f, (z - 0.3) * f));
+      const gn = gx * nx + gy * ny + gz * nz;
+      gx -= gn * nx; gy -= gn * ny; gz -= gn * nz;
+      BX = nx - k * gx; BY = ny - k * gy; BZ = nz - k * gz;
+      const l = hyp(BX, BY, BZ) || 1; BX /= l; BY /= l; BZ /= l;
+    };
     // what each pixel shows: artery index, -2 aorta (tree view), -3 heart surface, -1 nothing; and the hit distance
     const hitV = new Int16Array(cols * rows).fill(-1), hitT = new Float32Array(cols * rows);
     for (let r = 0; r < rows; r++) {
@@ -2204,20 +2371,32 @@
               else { nx = x - TREE_HIT.qx; ny = y - TREE_HIT.qy; nz = z - TREE_HIT.qz; }
               const nl = hyp(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
               // arteries lying in their grooves would go too dark with full occlusion, so soften it for them
-              const occl = mode === 'heart' && kind !== 3 ? 0.45 + 0.55 * ao(x, y, z, nx, ny, nz) : ao(x, y, z, nx, ny, nz);
-              const base = kind === 3 ? [214, 92, 78] : kind === 2 ? [196, 202, 214] : kind === 1 ? [240, 234, 218] : mode === 'heart' ? [248, 148, 110] : [236, 118, 94];
-              shade(base, nx, ny, nz, occl, 1 - clamp((th - t0) / 170, 0, 0.55), kind === 2 ? 60 : 28, kind === 2 ? 1.6 : kind === 1 ? 0.6 : 1);
+              const occl = mode === 'heart' && kind !== 3 ? 0.68 + 0.32 * ao(x, y, z, nx, ny, nz) : ao(x, y, z, nx, ny, nz);
+              let base;
+              if (mode === 'heart' && kind === 0) {
+                const wv = sstep(1.4, 2.4, TREE_HIT.r);
+                base = [0, 1, 2].map((q) => lerp(C_ART_THIN[q], C_ART[q], wv));
+              } else base = kind === 3 ? [214, 92, 78] : kind === 2 ? [196, 202, 214] : kind === 1 ? (mode === 'heart' ? [252, 252, 250] : [240, 234, 218]) : [236, 118, 94];
+              bump(x, y, z, nx, ny, nz, rough * 0.45);
+              // contrast-filled arteries glow a little in a VRT: lift their ambient light
+              if (mode === 'heart' && kind < 2) AMB = 0.8;
+              shade(base, BX, BY, BZ, occl, 1 - clamp((th - t0) / 170, 0, 0.55), kind === 2 ? 60 : 28, kind === 2 ? 1.6 : kind === 1 ? 0.6 : mode === 'heart' ? 0.8 : 1);
+              AMB = 0.2;
             } else if (hb >= 0) {
               hitV[r * cols + c] = -3; hitT[r * cols + c] = hb;
               const x = o0[0] + dir[0] * hb, y = o0[1] + dir[1] * hb, z = o0[2] + dir[2] * hb, e = 1.4;
               let nx = hfAt(x - e, y, z) - hfAt(x + e, y, z), ny = hfAt(x, y - e, z) - hfAt(x, y + e, z), nz = hfAt(x, y, z - e) - hfAt(x, y, z + e);
               const nl = hyp(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
               // colour by what lies just under the surface: muscle is darker, contrast-filled chambers and vessels brighter
-              const inner = hfAt(x - nx * 2.2, y - ny * 2.2, z - nz * 2.2);
-              const t1c = sstep(70, 300, inner), t2c = sstep(300, 560, inner);
-              const base = [0, 1, 2].map((q) => lerp(lerp(C_MUSCLE[q], C_BLOOD[q], t1c), C_BRIGHT[q], t2c));
+              // (two depths, so a thin wall over a bright lumen, like the aorta, takes the lumen colour)
+              const inner = Math.max(hfAt(x - nx * 2.2, y - ny * 2.2, z - nz * 2.2), hfAt(x - nx * 3.5, y - ny * 3.5, z - nz * 3.5));
+              const t1c = sstep(150, 260, inner), t2c = sstep(260, 440, inner);
+              // slight blotchy variation in the muscle colour, as the fat and muscle under the surface vary
+              const mot = 1 + 0.07 * vnoise(x * 0.11, y * 0.11, z * 0.11) + 0.035 * vnoise(x * 0.45, y * 0.45, z * 0.45);
+              const base = [0, 1, 2].map((q) => lerp(lerp(C_MUSCLE[q], C_BLOOD[q], t1c), C_BRIGHT[q], t2c) * mot);
               const occl = ao(x, y, z, nx, ny, nz);
-              shade(base, nx, ny, nz, occl, 1 - clamp((hb - t0) / 170, 0, 0.55), 22, 0.75);
+              bump(x, y, z, nx, ny, nz, rough);
+              shade(base, BX, BY, BZ, occl, 1 - clamp((hb - t0) / 170, 0, 0.55), 12, 0.38 + 0.4 * t2c);
             }
           }
         }
