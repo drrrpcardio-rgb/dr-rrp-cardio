@@ -3,10 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Expand, Loader2, Minimize } from "lucide-react";
 
-const SRC = "/echo-lab/index.html";
+interface LabFrameProps {
+  src?: string;
+  title?: string;
+  loadingText?: string;
+}
 
-/** The echo lab iframe with a loading cover and a fullscreen button (opens the lab on its own page where fullscreen is not supported). */
-export function EchoLabFrame() {
+/** A static lab (echo, CT) in an iframe with a loading cover and a fullscreen button (opens the lab on its own page where fullscreen is not supported). */
+export function EchoLabFrame({
+  src: SRC = "/echo-lab/index.html",
+  title = "Dr. RRP Cardio Echo Lab",
+  loadingText = "Loading the echo lab…",
+}: LabFrameProps = {}) {
   const wrap = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +56,7 @@ export function EchoLabFrame() {
       <iframe
         ref={frame}
         src={SRC}
-        title="Dr. RRP Cardio Echo Lab"
+        title={title}
         allow="fullscreen; clipboard-write"
         allowFullScreen
         onLoad={() => setLoading(false)}
@@ -57,7 +65,7 @@ export function EchoLabFrame() {
       {loading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-royal-950 text-royal-100" role="status">
           <Loader2 className="size-8 animate-spin text-gold-400" aria-hidden="true" />
-          <p className="text-sm">Loading the echo lab…</p>
+          <p className="text-sm">{loadingText}</p>
         </div>
       )}
       <div className="flex shrink-0 items-center justify-end border-t border-royal-800 bg-royal-950 px-3 py-1.5">

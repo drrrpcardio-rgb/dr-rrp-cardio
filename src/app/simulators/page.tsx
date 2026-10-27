@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Activity, ArrowRight, Calculator, Check, HeartPulse, Waves, type LucideIcon } from "lucide-react";
+import { Activity, ArrowRight, Calculator, Check, HeartPulse, ScanHeart, Waves, type LucideIcon } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { simulators } from "@/lib/tools-data";
 import { brand } from "@/lib/site-data";
 
-const description = `Free cardiology simulators and tools from ${brand.name}: a 3D echo simulator, a 12-lead ECG simulator, a virtual cath lab and 30 graded echo calculators. Practise in your browser.`;
+const description = `Free cardiology simulators and tools from ${brand.name}: a 3D echo simulator, a cardiac CT simulator, a 12-lead ECG simulator, a virtual cath lab and 30 graded echo calculators. Practise in your browser.`;
 
 export const metadata: Metadata = {
   title: "Simulators",
@@ -22,6 +22,7 @@ const jsonLd = {
 
 const heroIcons: Record<(typeof simulators)[number]["id"], LucideIcon> = {
   echo: Waves,
+  ct: ScanHeart,
   ecg: Activity,
   cath: HeartPulse,
   calc: Calculator,
@@ -40,9 +41,9 @@ export default function SimulatorsPage() {
       <PageHero
         eyebrow="Free simulation lab"
         title="Practise cardiology hands-on"
-        description="Four free tools for echo, ECG and the cath lab. Pick one and start practising in your browser, no sign-up."
+        description="Five free tools for echo, cardiac CT, ECG and the cath lab. Pick one and start practising in your browser, no sign-up."
       >
-        <div className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mx-auto mt-8 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-5">
           {simulators.map((s) => {
             const Icon = heroIcons[s.id];
             return (
@@ -70,7 +71,7 @@ export default function SimulatorsPage() {
               href={s.href}
               className="group flex flex-col overflow-hidden rounded-3xl border border-royal-100 bg-white shadow-sm transition-shadow hover:shadow-xl"
             >
-              {s.image ? (
+              {"image" in s ? (
                 <div className="relative aspect-[16/10] overflow-hidden bg-royal-950">
                   <Image src={s.image} alt={`${s.title} screenshot`} fill sizes="(max-width: 768px) 100vw, 600px" className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]" />
                 </div>

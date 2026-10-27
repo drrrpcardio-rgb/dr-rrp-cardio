@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // `next dev` does not serve index.html for folders inside /public, so the prebuilt
-// tools (/ecg-simulator, /cath-sim) would 404 on their folder URLs while developing.
+// tools (/ecg-simulator, /cath-sim, /ct-lab) would 404 on their folder URLs while developing.
 // Static hosts do this natively, and rewrites are not allowed in a static export,
 // so they are only added for the dev server.
 const devRewrites =
@@ -11,6 +11,7 @@ const devRewrites =
           return [
             { source: "/ecg-simulator/", destination: "/ecg-simulator/index.html" },
             { source: "/cath-sim/", destination: "/cath-sim/index.html" },
+            { source: "/ct-lab/", destination: "/ct-lab/index.html" },
             { source: "/cath-sim/:page/", destination: "/cath-sim/:page/index.html" },
           ];
         },

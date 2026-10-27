@@ -30,6 +30,7 @@ export const navGroups: NavGroup[] = [
       { label: "ECG Mastery", href: "/ecg-mastery", description: "12-lead ECG simulator and library" },
       { label: "Cath Lab", href: "/cath-lab", description: "Virtual angiography, devices, procedures" },
       { label: "Echo Simulator", href: "/echo-simulator", description: "Practise probe placement and echo windows" },
+      { label: "CT Simulator", href: "/ct-simulator", description: "Cardiac CT and CT coronary angiography" },
       { label: "Echo Calculators", href: "/echo-calculators", description: "Graded echo measurements and formulas" },
     ],
   },

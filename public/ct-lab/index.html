@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CT Lab · Dr. RRP Cardio</title>
+<meta name="description" content="Cardiac CT and CT coronary angiography simulator: plan the scan, score calcium, time the contrast bolus, then read MPR, curved MPR and 3D images and write a CAD-RADS report.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<style>
+/* CT console: workflow panel on the left, the scanner monitor on the right. One dark look, like a CT reading room. */
+:root{
+  --bg:#070d26;
+  --panel:#0c1640;
+  --panel-2:#111e52;
+  --line:#21316f;
+  --fg:#e6eaf6;
+  --muted:#8f9cc2;
+  --accent:#f5b301;
+  --accent-soft:rgba(245,179,1,.14);
+  --ok:#4fd1a1;
+  --ok-soft:rgba(79,209,161,.14);
+  --warn:#ff7a6b;
+  --warn-soft:rgba(255,122,107,.14);
+  --info:#6fb3ff;
+  --screen:#000;
+  --f-brand:"Fraunces",Georgia,serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:13.5px;line-height:1.45;
+  box-sizing:border-box;overflow:hidden;
+  padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));
+}
+*,*::before,*::after{box-sizing:border-box}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px}
+
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;line-height:1}
+.brand svg{width:32px;height:32px;flex:none}
+.brand b{display:block;font-family:var(--f-brand);font-weight:700;font-size:19px}
+.brand small{display:block;margin-top:3px;font-weight:700;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent)}
+.brand i{width:1px;height:28px;background:var(--line);margin:0 4px}
+.brand em{font-style:normal;font-weight:800;font-size:15px;letter-spacing:.14em;text-transform:uppercase}
+.brand em span{color:var(--accent)}
+.tag{color:var(--muted);margin:0;font-size:12.5px}
+.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font-family:var(--f-mono);font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.case{color:var(--accent);border-color:rgba(245,179,1,.4)}
+.navbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--fg);text-decoration:none}
+.navbtn:hover{border-color:var(--accent);color:var(--accent)}
+.navbtn svg{width:14px;height:14px}
+
+.main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:10px;min-height:0}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--line);flex:none}
+.steps button{background:none;border:0;border-right:1px solid var(--line);padding:9px 2px 8px;cursor:pointer;color:var(--muted);font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:3px}
+.steps button:last-child{border-right:0}
+.steps button b{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);font-size:11px;color:var(--muted)}
+.steps button.on{color:var(--fg);background:var(--panel-2)}
+.steps button.on b{border-color:var(--accent);color:var(--accent)}
+.steps button.done b{background:var(--ok);border-color:var(--ok);color:#06231a}
+.steps button:disabled{opacity:.4;cursor:not-allowed}
+.panels{flex:1;min-height:0;overflow:auto;padding:14px 14px 18px}
+.panel{display:none}
+.panel.on{display:block}
+h2{font-size:15px;margin:0 0 4px;font-weight:800}
+h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;font-weight:700}
+p{margin:0 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.mono{font-family:var(--f-mono)}
+.card{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+.row{display:flex;align-items:center;gap:8px;margin:7px 0}
+.row label{flex:1;color:var(--muted);font-size:12.5px}
+.row output{font-family:var(--f-mono);font-size:12px;min-width:62px;text-align:right}
+select,input[type=number]{background:#081032;border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:12.5px;min-width:0}
+select{max-width:190px}
+input[type=range]{accent-color:var(--accent);flex:1.2;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);border-radius:10px;padding:7px 12px;font-weight:700;font-size:12.5px;cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.gold{background:var(--accent);border-color:var(--accent);color:#1b1300}
+.btn.gold:hover:not(:disabled){filter:brightness(1.08)}
+.btn.block{width:100%}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
+.seg button{flex:1;background:none;border:0;border-right:1px solid var(--line);padding:5px 8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent-soft);color:var(--accent)}
+.note{border-left:3px solid var(--info);background:rgba(111,179,255,.08);padding:7px 10px;border-radius:0 8px 8px 0;font-size:12.5px;margin:8px 0}
+.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.note.gold{border-color:var(--accent);background:var(--accent-soft)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12.5px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-family:var(--f-mono);text-align:right}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:600;font-size:11.5px}
+td.n{text-align:right;font-family:var(--f-mono)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.artbtns{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}
+.artbtns button{border:1.5px solid var(--line);background:#081032;border-radius:8px;padding:6px 0;font-weight:800;font-size:12px;cursor:pointer}
+.artbtns button.on{border-color:currentColor;box-shadow:0 0 0 2px rgba(255,255,255,.08) inset}
+details{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:8px 0;background:rgba(255,255,255,.02)}
+summary{cursor:pointer;font-weight:700;font-size:12.5px}
+details ul{margin:6px 0 2px;padding-left:18px}
+details li{margin:2px 0;font-size:12.5px}
+ul.tight{margin:4px 0;padding-left:18px}
+ul.tight li{margin:2px 0}
+.fb li{margin:4px 0}
+.fb .good{color:var(--ok)}
+.fb .bad{color:var(--warn)}
+.chk{display:flex;gap:6px;flex-wrap:wrap}
+.chk label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer}
+.chk input{accent-color:var(--accent)}
+.score{font-size:30px;font-weight:800;font-family:var(--f-mono);color:var(--accent);line-height:1}
+
+/* monitor */
+.stage{position:relative;background:var(--screen);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:0}
+.view{position:absolute;inset:0;display:none}
+.view.on{display:grid}
+.vp{position:relative;background:#000;min-width:0;min-height:0;overflow:hidden;border:1px solid #11193d;touch-action:none}
+.vp canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.vp .lbl{position:absolute;left:8px;top:6px;font-family:var(--f-mono);font-size:11px;color:#cfd6ee;pointer-events:none;text-shadow:0 1px 2px #000;line-height:1.35;z-index:2}
+.vp .lbl b{color:var(--accent);font-weight:500}
+.vp .lbr{position:absolute;right:8px;bottom:6px;font-family:var(--f-mono);font-size:11px;color:#9aa6cc;pointer-events:none;text-align:right;text-shadow:0 1px 2px #000;z-index:2}
+.vp .lbl2{position:absolute;left:8px;bottom:6px;font-family:var(--f-mono);font-size:11px;color:#9aa6cc;pointer-events:none;text-shadow:0 1px 2px #000;z-index:2}
+.vp .tools{position:absolute;right:6px;top:6px;display:flex;gap:4px;z-index:3}
+.vp .tools button{background:rgba(12,22,64,.85);border:1px solid var(--line);border-radius:7px;font-size:11px;padding:2px 7px;cursor:pointer;color:var(--fg)}
+.vp .tools button.on{border-color:var(--accent);color:var(--accent)}
+#vPlan{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) 150px}
+#vPlan .ecg{grid-column:1 / -1}
+#vCac{grid-template-columns:minmax(0,1fr)}
+#vBolus{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#vRead{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(170px,.62fr);grid-template-areas:"ax mpr vr" "cpr cpr xs"}
+#vpAx{grid-area:ax}#vpMpr{grid-area:mpr}#vpVr{grid-area:vr}#vpCpr{grid-area:cpr}#vpXs{grid-area:xs}
+.loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#000;z-index:20;color:var(--muted)}
+.loading .bar{width:240px;height:6px;border-radius:9px;background:#111a44;overflow:hidden}
+.loading .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+.hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);font-size:11.5px;color:#9aa6cc;background:rgba(7,13,38,.85);border:1px solid var(--line);padding:4px 10px;border-radius:999px;pointer-events:none;white-space:nowrap;z-index:4}
+.disclaim{font-size:11px;color:var(--muted);margin-top:14px}
+
+@media (max-width:1000px){
+  body{overflow:auto;height:auto}
+  .app{height:auto}
+  .main{grid-template-columns:1fr}
+  .stage{height:auto;order:-1}
+  .view.on{position:relative}
+  #vRead{grid-template-columns:1fr 1fr;grid-template-rows:300px 300px 220px 220px;grid-template-areas:"ax mpr" "vr vr" "cpr cpr" "xs xs"}
+  #vPlan{grid-template-rows:320px 130px}
+  #vCac{grid-template-rows:440px}
+  #vBolus{grid-template-rows:340px}
+  .side{max-height:none}
+  .panels{overflow:visible}
+  .tag{display:none}
+}
+@media (max-width:620px){
+  #vRead{grid-template-columns:1fr;grid-template-rows:300px 260px 300px 220px 240px;grid-template-areas:"ax" "mpr" "vr" "cpr" "xs"}
+  #vPlan{grid-template-columns:1fr;grid-template-rows:300px 300px 120px}
+  #vBolus{grid-template-columns:1fr;grid-template-rows:300px 240px}
+  #vCac{grid-template-rows:360px}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="brand" href="/" target="_top" aria-label="Dr. RRP Cardio home"><svg viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="#fff" stroke="#1E3A8A" stroke-width="2.6"/><path d="M6.5 24H14C15 21.8 17 21.8 18 24H19.5L21 27L24 9.5L27.5 34L29.5 24H31C32.5 20.4 35 20.4 36.5 24H37.5" stroke="#F5B301" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Dr. RRP</b><small>Cardio</small></span><i></i><em>CT <span>Lab</span></em></a>
+    <p class="tag">Cardiac CT simulator · calcium score · bolus tracking · CT coronary angiography · MPR, CPR, 3D · CAD-RADS 2.0</p>
+    <div class="hdr-right"><a class="navbtn" href="/" target="_top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a><a class="navbtn" href="/simulators/" target="_top">All simulators</a><script>if (window.top !== window.self) document.querySelectorAll('.navbtn').forEach((a) => (a.style.display = 'none'));</script><span id="casePill" class="pill case">Case</span><span id="stepPill" class="pill">Plan</span></div>
+  </header>
+
+  <div class="main">
+    <aside class="side" aria-label="Scan workflow">
+      <nav class="steps" id="steps" aria-label="Workflow steps">
+        <button data-step="plan" class="on"><b>1</b>Plan</button>
+        <button data-step="cac"><b>2</b>Calcium</button>
+        <button data-step="bolus"><b>3</b>Contrast</button>
+        <button data-step="read" disabled><b>4</b>Read</button>
+        <button data-step="report" disabled><b>5</b>Report</button>
+      </nav>
+      <div class="panels">
+
+        <!-- 1. PLAN -->
+        <section class="panel on" data-panel="plan">
+          <h2>Patient and scan plan</h2>
+          <div class="row"><label for="caseSel">Case</label><select id="caseSel"></select></div>
+          <div class="card" id="caseCard"></div>
+
+          <h3>Heart rate control</h3>
+          <div class="kv" id="hrKv"></div>
+          <div class="btns">
+            <button class="btn" id="btnMeto">Metoprolol 5 mg IV</button>
+            <label class="chk"><label><input type="checkbox" id="chkGtn" checked> GTN 0.8 mg SL</label></label>
+          </div>
+          <div id="hrNote"></div>
+
+          <h3>Scanner and protocol</h3>
+          <div class="row"><label for="scanSel">Scanner</label><select id="scanSel">
+            <option value="ds">Dual-source (66 ms)</option>
+            <option value="wide" selected>256-row wide detector (135 ms)</option>
+            <option value="s64">64-slice (165 ms)</option>
+          </select></div>
+          <div class="row"><label>Tube voltage</label><div class="seg" id="kvSeg"><button data-v="80">80</button><button data-v="100" class="on">100</button><button data-v="120">120 kV</button></div></div>
+          <div class="row"><label for="masR">Tube current</label><input type="range" id="masR" min="100" max="500" step="10" value="250"><output id="masO">250 mAs</output></div>
+          <div class="row"><label>ECG gating</label><div class="seg" id="gateSeg"><button data-v="pro" class="on">Prospective</button><button data-v="retro">Retro</button><button data-v="flash">High-pitch</button></div></div>
+          <div class="row" id="phaseRow"><label for="phaseR">Phase (% R–R)</label><input type="range" id="phaseR" min="30" max="85" step="1" value="75"><output id="phaseO">75%</output></div>
+          <div class="row" id="padRow"><label for="padR">Padding</label><input type="range" id="padR" min="0" max="20" step="1" value="5"><output id="padO">±5%</output></div>
+          <p class="small muted">Drag the yellow lines on the topogram to set the scan range: from just below the carina to below the heart.</p>
+          <div class="card"><dl class="kv" id="planKv"></dl></div>
+          <div id="planNotes"></div>
+          <div class="btns">
+            <button class="btn gold" id="btnToCac">Next: calcium score →</button>
+            <button class="btn" id="btnQuick" title="Skip the workflow with an ideal scan">Skip to reading</button>
+          </div>
+        </section>
+
+        <!-- 2. CALCIUM -->
+        <section class="panel" data-panel="cac">
+          <h2>Calcium score (Agatston)</h2>
+          <p class="small muted">Non-contrast, 120 kV, prospective ECG-gated, 3 mm slices. Pixels of 130 HU or more are shown in pink. Pick an artery, then click each coronary calcium on the images to assign it. Leave bone and valve calcium alone.</p>
+          <div class="artbtns" id="artBtns">
+            <button data-a="LM" style="color:#f5b301">LM</button>
+            <button data-a="LAD" style="color:#ff6b6b" class="on">LAD</button>
+            <button data-a="LCX" style="color:#4fd1a1">LCx</button>
+            <button data-a="RCA" style="color:#5aa9ff">RCA</button>
+            <button data-a="X" style="color:#8f9cc2" title="Remove a label">Clear</button>
+          </div>
+          <div class="row"><label for="cacSlice">Slice</label><input type="range" id="cacSlice" min="0" max="45" value="20"><output id="cacSliceO"></output></div>
+          <table id="cacTable"></table>
+          <div class="btns">
+            <button class="btn" id="btnCacCheck">Check my score</button>
+            <button class="btn" id="btnCacAuto">Auto-assign</button>
+          </div>
+          <div id="cacFb"></div>
+          <details><summary>How the Agatston score works</summary>
+            <ul>
+              <li>Each lesion of at least 1 mm² and 130 HU or more on a 3 mm slice is scored.</li>
+              <li>Score = area (mm²) × density factor from the peak HU: 130–199 → 1, 200–299 → 2, 300–399 → 3, 400+ → 4.</li>
+              <li>Sum all lesions on all slices. CAC-DRS: 0 = none, 1 = 1–99, 2 = 100–299, 3 = 300+.</li>
+              <li>A zero score lowers risk but does not exclude non-calcified plaque in a symptomatic patient.</li>
+            </ul>
+          </details>
+          <div class="btns"><button class="btn gold" id="btnToBolus">Next: contrast →</button></div>
+        </section>
+
+        <!-- 3. BOLUS -->
+        <section class="panel" data-panel="bolus">
+          <h2>Contrast and bolus tracking</h2>
+          <div class="row"><label for="rateR">Injection rate</label><input type="range" id="rateR" min="3" max="7" step="0.5" value="5"><output id="rateO">5 ml/s</output></div>
+          <div class="row"><label for="volR">Contrast volume</label><input type="range" id="volR" min="30" max="100" step="5" value="60"><output id="volO">60 ml</output></div>
+          <div class="row"><label for="concSel">Iodine</label><select id="concSel"><option value="300">300 mgI/ml</option><option value="350" selected>350 mgI/ml</option><option value="370">370 mgI/ml</option></select></div>
+          <div class="row"><label><input type="checkbox" id="chkChaser" checked> Saline chaser 40 ml</label></div>
+          <div class="row"><label for="thrR">Trigger threshold</label><input type="range" id="thrR" min="60" max="250" step="10" value="150"><output id="thrO">150 HU</output></div>
+          <div class="row"><label for="delayR">Delay after trigger</label><input type="range" id="delayR" min="2" max="16" step="1" value="6"><output id="delayO">6 s</output></div>
+          <p class="small muted">The region of interest (ROI) sits in the ascending aorta. Click the monitoring image to move it.</p>
+          <div class="btns">
+            <button class="btn gold" id="btnInject">Start injection</button>
+            <button class="btn" id="btnTrigger" disabled>Trigger now</button>
+          </div>
+          <div id="bolusStatus"></div>
+          <div id="scanResult"></div>
+          <div class="btns"><button class="btn gold" id="btnToRead" disabled>Next: read the scan →</button></div>
+        </section>
+
+        <!-- 4. READ -->
+        <section class="panel" data-panel="read">
+          <h2>Read the CTA</h2>
+          <div class="row"><label for="trackSel">Vessel (CPR)</label><select id="trackSel"></select></div>
+          <div class="row"><label for="rotR">CPR rotation</label><input type="range" id="rotR" min="0" max="355" step="5" value="0"><output id="rotO">0°</output></div>
+          <div class="row"><label for="wlSel">Window</label><select id="wlSel">
+            <option value="800,250" selected>Coronary CTA (800 / 250)</option>
+            <option value="1500,450">Calcium and stent (1500 / 450)</option>
+            <option value="400,50">Soft tissue (400 / 50)</option>
+            <option value="1500,-550">Lung (1500 / −550)</option>
+          </select></div>
+          <div class="row"><label for="slabSel">Slab (MPR)</label><select id="slabSel"><option value="0">Thin 0.9 mm</option><option value="3">MIP 3 mm</option><option value="5">MIP 5 mm</option><option value="10">MIP 10 mm</option></select></div>
+          <div class="row" id="reconRow"><label for="reconR">Recon phase</label><input type="range" id="reconR" min="0" max="95" step="1" value="75"><output id="reconO">75%</output></div>
+          <div class="row"><label>3D</label><div class="seg" id="vrSeg"><button data-v="heart" class="on">Heart VRT</button><button data-v="tree">Tree</button><button data-v="mip">MIP</button></div></div>
+          <div class="card"><dl class="kv" id="readKv"></dl></div>
+          <div id="readNotes"></div>
+          <details open><summary>How to read</summary>
+            <ul>
+              <li>Pick a vessel. The straightened CPR shows the whole artery; click it to move the cursor and see the cross-section.</li>
+              <li>Turn the CPR with the rotation slider: an eccentric plaque can look mild in one plane and tight in another.</li>
+              <li>The graph under the CPR shows lumen diameter against the expected (reference) diameter.</li>
+              <li>Click or drag on the axial, MPR or 3D images to move the crosshair. Wheel scrolls the slice. Right-drag or Shift-drag sets the window.</li>
+              <li>Use the calcium and stent window to reduce blooming.</li>
+            </ul>
+          </details>
+          <div class="btns"><button class="btn gold" id="btnToReport">Next: write the report →</button></div>
+        </section>
+
+        <!-- 5. REPORT -->
+        <section class="panel" data-panel="report">
+          <h2>Structured report</h2>
+          <p class="small muted">Grade the worst stenosis in each artery (branches count with their parent), then give the CAD-RADS 2.0 category and modifiers.</p>
+          <table id="repTable"></table>
+          <div class="row"><label for="repCr">CAD-RADS</label><select id="repCr"><option value="">Choose…</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4A</option><option>4B</option><option>5</option><option>N</option></select></div>
+          <div class="row"><label>Plaque burden</label><select id="repP"><option value="">None / not given</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option></select></div>
+          <div class="chk" id="repMods">
+            <label><input type="checkbox" value="HRP"> HRP</label>
+            <label><input type="checkbox" value="S"> S (stent)</label>
+            <label><input type="checkbox" value="G"> G (graft)</label>
+            <label><input type="checkbox" value="E"> E (exception)</label>
+            <label><input type="checkbox" value="N"> N (non-diagnostic)</label>
+          </div>
+          <div class="btns"><button class="btn gold" id="btnCheck">Check report</button><button class="btn" id="btnAnswer">Show answer</button></div>
+          <div id="repFb"></div>
+          <details><summary>CAD-RADS 2.0 at a glance</summary>
+            <ul>
+              <li><b>0</b> 0% — no plaque or stenosis</li>
+              <li><b>1</b> 1–24% — minimal</li>
+              <li><b>2</b> 25–49% — mild</li>
+              <li><b>3</b> 50–69% — moderate</li>
+              <li><b>4A</b> 70–99% in one or two vessels</li>
+              <li><b>4B</b> left main ≥50% or three-vessel ≥70%</li>
+              <li><b>5</b> 100% total occlusion</li>
+              <li><b>N</b> non-diagnostic study</li>
+              <li>Plaque burden P1–P4 (from CAC: 1–100, 101–300, 301–999, &gt;999). Modifiers: HRP high-risk plaque, S stent, G graft, E exceptions (anomaly, dissection, aneurysm), I ischaemia.</li>
+            </ul>
+          </details>
+          <div class="btns"><button class="btn" id="btnNewCase">Try another case</button></div>
+          <p class="disclaim">Simulated images from a synthetic heart model, for teaching only. Not real patient data and not for clinical decisions.</p>
+        </section>
+      </div>
+    </aside>
+
+    <section class="stage" id="stage" aria-label="CT monitor">
+      <div class="view on" id="vPlan">
+        <div class="vp" id="vpTopo"><canvas></canvas><div class="lbl"><b>TOPOGRAM</b> AP · 120 kV<br><span id="topoLbl"></span></div></div>
+        <div class="vp" id="vpPlanAx"><canvas></canvas><div class="lbl"><b>PLANNING</b> axial, non-contrast<br><span id="planAxLbl"></span></div></div>
+        <div class="vp ecg" id="vpEcg"><canvas></canvas><div class="lbl"><b>ECG</b> <span id="ecgLbl"></span></div></div>
+      </div>
+      <div class="view" id="vCac">
+        <div class="vp" id="vpCac"><canvas></canvas><div class="lbl"><b>CALCIUM SCORE</b> 120 kV · 3 mm<br><span id="cacLbl"></span></div><div class="lbr">W 400 L 40</div><div class="lbl2" id="cacHu"></div></div>
+      </div>
+      <div class="view" id="vBolus">
+        <div class="vp" id="vpMon"><canvas></canvas><div class="lbl"><b>BOLUS TRACKING</b> monitoring scan<br><span id="monLbl"></span></div><div class="lbr">W 600 L 150</div></div>
+        <div class="vp" id="vpTac"><canvas></canvas><div class="lbl"><b>TIME–ATTENUATION</b> ROI</div></div>
+      </div>
+      <div class="view" id="vRead">
+        <div class="vp" id="vpAx"><canvas></canvas><div class="lbl"><b>AXIAL</b> <span id="axLbl"></span></div><div class="lbr" id="axWl"></div><div class="lbl2" id="axHu"></div></div>
+        <div class="vp" id="vpMpr"><canvas></canvas><div class="lbl"><b id="mprName">CORONAL</b> <span id="mprLbl"></span></div><div class="tools"><button data-o="cor" class="on">Cor</button><button data-o="sag">Sag</button></div></div>
+        <div class="vp" id="vpVr"><canvas></canvas><div class="lbl"><b>3D</b> <span id="vrLbl"></span></div><div class="tools"><button data-p="ant">Ant</button><button data-p="lao">LAO</button><button data-p="rao">RAO</button><button data-p="inf">Inf</button></div></div>
+        <div class="vp" id="vpCpr"><canvas></canvas><div class="lbl"><b>CPR</b> <span id="cprLbl"></span></div></div>
+        <div class="vp" id="vpXs"><canvas></canvas><div class="lbl"><b>CROSS-SECTION</b> <span id="xsLbl"></span></div></div>
+      </div>
+      <div class="hint" id="hint"></div>
+      <div class="loading" id="loading"><div>Building the patient…</div><div class="bar"><i id="loadBar"></i></div><div class="small" id="loadTxt"></div></div>
+    </section>
+  </div>
+</div>
+<script src="ct-lab.js"></script>
+</body>
+</html>

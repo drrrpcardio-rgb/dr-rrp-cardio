@@ -9,6 +9,7 @@ import {
   Calculator,
   Check,
   HeartPulse,
+  ScanHeart,
   Waves,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -18,6 +19,7 @@ import { simulators } from "@/lib/tools-data";
 
 const ICONS = {
   echo: Waves,
+  ct: ScanHeart,
   ecg: Activity,
   cath: HeartPulse,
   calc: Calculator,
@@ -38,7 +40,7 @@ export function SimulationLab() {
           eyebrow="Free simulation lab"
           title="Learn it. Then practise it."
           accent="practise"
-          description="Courses give you the theory. The simulators let you practise echo, ECG and cath lab skills before you meet a patient, free in your browser."
+          description="Courses give you the theory. The simulators let you practise echo, cardiac CT, ECG and cath lab skills before you meet a patient, free in your browser."
         />
 
         {/* Featured: echo simulator */}
@@ -108,7 +110,7 @@ export function SimulationLab() {
         </Reveal>
 
         {/* The other tools */}
-        <StaggerGroup className="mt-6 grid gap-6 md:grid-cols-3">
+        <StaggerGroup className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {rest.map((t) => {
             const Icon = ICONS[t.id];
             return (
@@ -118,13 +120,19 @@ export function SimulationLab() {
                   className="spotlight spotlight-dark group hover:border-gold-400/60 flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition-[background-color,border-color,transform] duration-300 hover:-translate-y-1 hover:bg-white/10"
                 >
                   <div className="bg-royal-900 relative aspect-[16/10] overflow-hidden">
-                    <Image
-                      src={t.image}
-                      alt={`${t.title} screenshot`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 400px"
-                      className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
+                    {"image" in t ? (
+                      <Image
+                        src={t.image}
+                        alt={`${t.title} screenshot`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                      />
+                    ) : (
+                      <div className="from-royal-800 via-royal-900 to-royal-950 flex h-full items-center justify-center bg-gradient-to-br">
+                        <Icon size={56} className="text-gold-400/80" aria-hidden="true" />
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-1 flex-col p-7">
                     <div className="flex items-center justify-between">

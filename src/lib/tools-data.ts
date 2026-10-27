@@ -10,6 +10,14 @@ export const simulators = [
     points: ["16 TTE views", "Colour, PW, CW and tissue Doppler", "22 cases with quiz and report"],
   },
   {
+    id: "ct",
+    title: "CT Simulator",
+    tag: "New",
+    text: "Run a cardiac CT from start to finish: plan the scan, score calcium, time the contrast bolus, then read CT coronary angiography in MPR, curved MPR and 3D and write a CAD-RADS report.",
+    href: "/ct-simulator",
+    points: ["Calcium score and bolus tracking", "MPR, CPR, cross-section and 3D", "10 cases with CAD-RADS 2.0"],
+  },
+  {
     id: "ecg",
     title: "ECG Mastery",
     tag: "Simulator",
