@@ -222,6 +222,7 @@ ul.tight li{margin:2px 0}
           <div class="row"><label>ECG gating</label><div class="seg" id="gateSeg"><button data-v="pro" class="on">Prospective</button><button data-v="retro">Retro</button><button data-v="flash">High-pitch</button></div></div>
           <div class="row" id="phaseRow"><label for="phaseR">Phase (% R–R)</label><input type="range" id="phaseR" min="30" max="85" step="1" value="75"><output id="phaseO">75%</output></div>
           <div class="row" id="padRow"><label for="padR">Padding</label><input type="range" id="padR" min="0" max="20" step="1" value="5"><output id="padO">±5%</output></div>
+          <div class="row"><label>Labels</label><div class="seg" id="lblSegPlan"><button data-v="1" class="on">Anatomy on</button><button data-v="0">Off</button></div></div>
           <p class="small muted">Drag the yellow lines on the topogram to set the scan range: from just below the carina to below the heart.</p>
           <div class="card"><dl class="kv" id="planKv"></dl></div>
           <div id="planNotes"></div>
@@ -243,6 +244,7 @@ ul.tight li{margin:2px 0}
             <button data-a="X" style="color:#8f9cc2" title="Remove a label">Clear</button>
           </div>
           <div class="row"><label for="cacSlice">Slice</label><input type="range" id="cacSlice" min="0" max="45" value="20"><output id="cacSliceO"></output></div>
+          <div class="row"><label>Labels</label><div class="seg" id="lblSegCac"><button data-v="1" class="on">Anatomy on</button><button data-v="0">Off</button></div></div>
           <table id="cacTable"></table>
           <div class="btns">
             <button class="btn" id="btnCacCheck">Check my score</button>
@@ -269,6 +271,7 @@ ul.tight li{margin:2px 0}
           <div class="row"><label><input type="checkbox" id="chkChaser" checked> Saline chaser 40 ml</label></div>
           <div class="row"><label for="thrR">Trigger threshold</label><input type="range" id="thrR" min="60" max="250" step="10" value="150"><output id="thrO">150 HU</output></div>
           <div class="row"><label for="delayR">Delay after trigger</label><input type="range" id="delayR" min="2" max="16" step="1" value="6"><output id="delayO">6 s</output></div>
+          <div class="row"><label>Labels</label><div class="seg" id="lblSegBolus"><button data-v="1" class="on">Anatomy on</button><button data-v="0">Off</button></div></div>
           <p class="small muted">The region of interest (ROI) sits in the ascending aorta. Click the monitoring image to move it.</p>
           <div class="btns">
             <button class="btn gold" id="btnInject">Start injection</button>

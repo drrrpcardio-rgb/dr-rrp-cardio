@@ -1681,7 +1681,8 @@
   const ANAT = ['Ao root', 'Asc Ao', 'Desc Ao', 'SVC', 'IVC', 'PV', 'LV', 'MPA', 'LPA', 'RPA', 'RV', 'LA', 'LAA', 'RA', 'Oes', 'Trachea', 'L bronchus', 'R bronchus', 'Sternum', 'Vertebra', 'R lung', 'L lung', 'Liver', 'Stomach', 'Spleen'];
   const AN = Object.fromEntries(ANAT.map((n, i) => [n, i]));
   function structAt(x, y, z) {
-    if (rootD(x, y, z) < 0) return AN['Ao root'];
+    // the root (sinuses) ends at the sinotubular junction, about 8 mm above the valve centre; above it is the ascending aorta
+    if (rootD(x, y, z) < 0) return (x - ROOT[0]) * AV_AX[0] + (y - ROOT[1]) * AV_AX[1] + (z - ROOT[2]) * AV_AX[2] > 8 ? AN['Asc Ao'] : AN['Ao root'];
     if (tubeD(T_ASC, x, y, z) < 0) return AN['Asc Ao'];
     if (tubeD(T_LVOT, x, y, z) < 0) return AN.LV;
     if (tubeD(T_DESC, x, y, z) < 0) return AN['Desc Ao'];
@@ -1762,7 +1763,10 @@
       const r = e.getBoundingClientRect();
       boxes.push({ x0: (r.left - er.left - 2) * k, x1: (r.right - er.left + 2) * k, y0: (r.top - er.top - 2) * k, y1: (r.bottom - er.top + 2) * k });
     }
-    for (const it of items) if (it.pin) boxes.push({ x0: it.x - it.r, x1: it.x + it.r, y0: it.y - it.r, y1: it.y + it.r });
+    for (const it of items) {
+      if (it.block) boxes.push(it.block);
+      else if (it.pin) boxes.push({ x0: it.x - it.r, x1: it.x + it.r, y0: it.y - it.r, y1: it.y + it.r });
+    }
     for (const it of items) {
       if (!it.pin) continue;
       const w = c.measureText(it.text).width, g = (it.r + 7 * k) * 0.7071;
@@ -1780,7 +1784,7 @@
     }
     c.textAlign = 'center';
     for (const it of items) {
-      if (it.pin) continue;
+      if (it.pin || it.block) continue;
       const w = c.measureText(it.text).width;
       for (const dy of [0, -hT, hT, -2 * hT, 2 * hT]) {
         const b = { x0: it.x - w / 2 - 2 * k, x1: it.x + w / 2 + 2 * k, y0: it.y + dy - hT / 2, y1: it.y + dy + hT / 2 };
@@ -1790,28 +1794,34 @@
     }
     c.restore();
   }
-  // labels for an axial / coronal / sagittal image: arteries where they cross the plane, then the structures
-  function planeLabels(vp) {
+  // labels for an axial / coronal / sagittal image: arteries where they cross the plane, then the structures.
+  // opt: z (the plane's position, default the crosshair), slab (mm), vessels (false: structures only),
+  // range (false: label outside the scan range too), key (cache key), block (areas to keep clear)
+  function planeLabels(vp, opt = {}) {
     const pl = vp.plane;
     if (!pl || !S.read.labels) return;
-    const lk = vp.mprKey.replace(/\|lod$/, '') + '|' + S.read.slab;
-    if (vp.lblKey === lk) return drawLabels(vp, vp.lblItems);
-    const o = pl.orient, sp = Math.max(pl.w, pl.h) / 64;
+    const blocks = opt.block || [];
+    const lk = opt.key || vp.mprKey.replace(/\|lod$/, '') + '|' + S.read.slab;
+    if (vp.lblKey === lk) return drawLabels(vp, vp.lblItems.concat(blocks));
+    const o = pl.orient, sp = Math.max(pl.w, pl.h) / 64, ax = o === 'ax' ? 2 : o === 'cor' ? 1 : 0;
+    const cpv = opt.z ?? S.cp[ax], slab = opt.slab ?? (S.read.slab || 0);
+    const inRange = (z) => opt.range === false || (z >= S.range[0] && z <= S.range[1]);
     const nc = Math.max(4, Math.round(pl.w / sp)), nr = Math.max(4, Math.round(pl.h / sp));
     const ids = new Int8Array(nc * nr).fill(-1);
     for (let r = 0; r < nr; r++) for (let c = 0; c < nc; c++) {
       const p = planePt(o, pl.u0 + ((c + 0.5) * pl.w) / nc, pl.v0 + ((r + 0.5) * pl.h) / nr);
-      if (p[2] >= S.range[0] && p[2] <= S.range[1]) ids[r * nc + c] = structAt(p[0], p[1], p[2]);
+      p[ax] = cpv;
+      if (inRange(p[2])) ids[r * nc + c] = structAt(p[0], p[1], p[2]);
     }
-    const items = [], ax = o === 'ax' ? 2 : o === 'cor' ? 1 : 0, slab = S.read.slab || 0;
-    for (const id of LBL_VES) {
+    const items = [];
+    if (opt.vessels !== false) for (const id of LBL_VES) {
       const v = VES[id];
       if (!v) continue;
       let best = -1, bs = -1e9;
       for (let i = 0; i < v.n; i += 2) {
         const p = v.pts[i];
-        if (p[2] < S.range[0] || p[2] > S.range[1]) continue;
-        const d = Math.abs(p[ax] - S.cp[ax]);
+        if (!inRange(p[2])) continue;
+        const d = Math.abs(p[ax] - cpv);
         if (d > v.rad[i] + 0.5 + slab / 2) continue;
         const q = worldToView(vp, p);
         if (q[0] < 0 || q[1] < 0 || q[0] > vp.W || q[1] > vp.H) continue;
@@ -1827,7 +1837,17 @@
       items.push({ x: q[0], y: q[1], text: ANAT[a.id] });
     }
     vp.lblKey = lk; vp.lblItems = items;
-    drawLabels(vp, items);
+    drawLabels(vp, items.concat(blocks));
+  }
+  // topogram: the landmarks used to set the scan range
+  const TOPO_LBL = [['Carina', 0, 52, 1], ['Heart', 6, 2, 0], ['R lung', -66, 22, 0], ['L lung', 70, 26, 0], ['Liver', -58, -60, 0], ['Stomach', 52, -66, 0]];
+  function topoLabels(v, blocks) {
+    if (!S.read.labels) return;
+    const items = TOPO_LBL.map(([text, x, z, pin]) => {
+      const q = v.fromMM(x - X0, ZTOP - z);
+      return pin ? { x: q[0], y: q[1], text, pin: true, color: '#9fd3ff', r: 4 * v.dpr } : { x: q[0], y: q[1], text };
+    });
+    drawLabels(v, items.concat(blocks));
   }
   // labels for the 3D view, from what each pixel's ray hit: an artery is named where its own surface is visible,
   // the chambers and great vessels at the middle of their visible surface
@@ -2736,10 +2756,13 @@
       c.strokeStyle = '#f5b301'; c.lineWidth = 2 * v.dpr;
       for (const y of [yT, yB]) { c.beginPath(); c.moveTo(f.x, y); c.lineTo(f.x + FOV * f.s, y); c.stroke(); }
       c.fillStyle = '#f5b301'; c.font = `${11 * v.dpr}px "IBM Plex Mono", monospace`;
-      c.fillText(`start ${S.range[1].toFixed(0)} mm`, f.x + 6 * v.dpr, yT - 5 * v.dpr);
-      c.fillText(`end ${S.range[0].toFixed(0)} mm`, f.x + 6 * v.dpr, yB + 14 * v.dpr);
+      const tS = `start ${S.range[1].toFixed(0)} mm`, tE = `end ${S.range[0].toFixed(0)} mm`;
+      c.fillText(tS, f.x + 6 * v.dpr, yT - 5 * v.dpr);
+      c.fillText(tE, f.x + 6 * v.dpr, yB + 14 * v.dpr);
       const yz = f.y + (ZTOP - planZ) * f.s;
       c.strokeStyle = 'rgba(111,179,255,.6)'; c.lineWidth = 1 * v.dpr; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(f.x, yz); c.lineTo(f.x + FOV * f.s, yz); c.stroke(); c.setLineDash([]);
+      const k = v.dpr, bw = (t) => f.x + 10 * k + c.measureText(t).width;
+      topoLabels(v, [{ block: { x0: f.x, x1: bw(tS), y0: yT - 18 * k, y1: yT + 2 * k } }, { block: { x0: f.x, x1: bw(tE), y0: yB, y1: yB + 19 * k } }]);
       $('#topoLbl').textContent = `range ${(S.range[1] - S.range[0]).toFixed(0)} mm`;
     },
     planAx() {
@@ -2747,6 +2770,7 @@
       const cp = S.cp.slice(); S.cp[2] = planZ;
       withNonContrast(() => { const r0 = USE_RANGE; USE_RANGE = false; renderMPR(v, 'ax', { zoom: 1, wl: [400, 40], slab: 0, maxPx: 400 }); USE_RANGE = r0; });
       orientLabels(v, 'ax');
+      planeLabels(v, { z: planZ, slab: 0, vessels: false, range: false, key: `pa|${S.caseIdx}|${planZ.toFixed(1)}|${v.W}|${v.H}` });
       S.cp = cp;
       $('#planAxLbl').textContent = `z ${planZ.toFixed(0)} mm · hover the topogram to move`;
     },
@@ -2874,8 +2898,10 @@
     const f = v.fit, cx = v.ctx, k0 = CAC_CROP[0] / CAC_SP, k1 = CAC_CROP[1] / CAC_SP, kw = CAC_CROP[2] / CAC_SP;
     cx.setTransform(1, 0, 0, 1, 0, 0); cx.fillStyle = '#000'; cx.fillRect(0, 0, v.W, v.H);
     cx.imageSmoothingEnabled = true; cx.drawImage(v.off, k0, k1, kw, kw, f.x, f.y, CAC_CROP[2] * f.s, CAC_CROP[2] * f.s);
-    orientLabels(Object.assign(v, { plane: { w: CAC_CROP[2], h: CAC_CROP[2] } }), 'ax');
+    v.plane = { orient: 'ax', u0: CAC_CROP[0], v0: CAC_CROP[1], w: CAC_CROP[2], h: CAC_CROP[2] };
+    orientLabels(v, 'ax');
     const zc = S.range[1] - (s + 0.5) * CAC_T;
+    planeLabels(v, { z: zc, slab: CAC_T, key: `cac|${S.caseIdx}|${s}|${S.range[0]}|${S.range[1]}|${v.W}|${v.H}` });
     $('#cacLbl').textContent = `slice ${s + 1} / ${S.cac.nS} · z ${zc.toFixed(0)} mm`;
     $('#cacSliceO').textContent = `${s + 1} / ${S.cac.nS}`;
   }
@@ -2901,8 +2927,10 @@
     const pl = v.plane, c = v.ctx;
     const q = v.fromMM(b.roi[0] - X0 - pl.u0, b.roi[1] - Y0 - pl.v0);
     c.strokeStyle = '#f5b301'; c.lineWidth = 2 * v.dpr; c.beginPath(); c.arc(q[0], q[1], 5 * v.fit.s, 0, Math.PI * 2); c.stroke();
-    const roi = roiHU(b.t);
-    c.fillStyle = '#f5b301'; c.font = `${12 * v.dpr}px "IBM Plex Mono", monospace`; c.fillText(`${Math.round(roi)} HU`, q[0] + 7 * v.fit.s, q[1] - 6 * v.fit.s);
+    const roi = roiHU(b.t), rt = `${Math.round(roi)} HU`, rr = 5 * v.fit.s;
+    c.fillStyle = '#f5b301'; c.font = `${12 * v.dpr}px "IBM Plex Mono", monospace`; c.fillText(rt, q[0] + 7 * v.fit.s, q[1] - 6 * v.fit.s);
+    const rb = { x0: q[0] - rr - 3, x1: q[0] + 7 * v.fit.s + c.measureText(rt).width + 4, y0: q[1] - 6 * v.fit.s - 14 * v.dpr, y1: q[1] + rr + 3 };
+    planeLabels(v, { z: b.z, slab: 0, vessels: false, range: false, key: `mon|${S.caseIdx}|${b.z}|${pl.u0}|${pl.v0}|${pl.w}|${v.W}|${v.H}`, block: [{ block: rb }] });
     $('#monLbl').textContent = `z ${b.z} mm (carina level) · t = ${b.t.toFixed(1)} s`;
   }
   function roiHU(t) {
@@ -3214,7 +3242,13 @@
   seg('kvSeg', (v) => { S.kv = +v; invalidateScan(); updatePlan(); });
   seg('gateSeg', (v) => { S.gating = v; invalidateScan(); updatePlan(); });
   seg('vrSeg', (v) => { S.read.vr = v; vrQuick(30); });
-  seg('lblSeg', (v) => { S.read.labels = v === '1'; mark('ax', 'mpr', 'vr'); });
+  const LBL_SEGS = ['lblSegPlan', 'lblSegCac', 'lblSegBolus', 'lblSeg'];
+  const setLabels = (on) => {
+    S.read.labels = on;
+    for (const id of LBL_SEGS) $$(`#${id} button`).forEach((x) => x.classList.toggle('on', (x.dataset.v === '1') === on));
+    mark('topo', 'planAx', 'cac', 'mon', 'ax', 'mpr', 'vr');
+  };
+  for (const id of LBL_SEGS) $$(`#${id} button`).forEach((b) => b.addEventListener('click', () => setLabels(b.dataset.v === '1')));
   seg('kerSeg', (v) => { S.read.kernel = v; mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); });
   seg('irSeg', (v) => { S.read.ir = +v; mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); });
   const range = (id, out, fn, f = (x) => x) => { const el = $('#' + id); const h = () => { const v = +el.value; $('#' + out).textContent = f(v); fn(v); }; el.addEventListener('input', h); };
