@@ -285,6 +285,8 @@ ul.tight li{margin:2px 0}
             <option value="1500,-550">Lung (1500 / −550)</option>
           </select></div>
           <div class="row"><label for="slabSel">Slab (MPR)</label><select id="slabSel"><option value="0">Thin 0.9 mm</option><option value="3">MIP 3 mm</option><option value="5">MIP 5 mm</option><option value="10">MIP 10 mm</option></select></div>
+          <div class="row"><label>Kernel</label><div class="seg" id="kerSeg"><button data-v="smooth">Smooth</button><button data-v="std" class="on">Standard</button><button data-v="sharp">Sharp</button></div></div>
+          <div class="row"><label>Iterative</label><div class="seg" id="irSeg"><button data-v="0">Off (FBP)</button><button data-v="1" class="on">Medium</button><button data-v="2">Strong</button></div></div>
           <div class="row" id="reconRow"><label for="reconR">Recon phase</label><input type="range" id="reconR" min="0" max="95" step="1" value="75"><output id="reconO">75%</output></div>
           <div class="row"><label>3D</label><div class="seg" id="vrSeg"><button data-v="heart" class="on">Heart VRT</button><button data-v="tree">Tree</button><button data-v="mip">MIP</button></div></div>
           <div class="card"><dl class="kv" id="readKv"></dl></div>
@@ -295,7 +297,9 @@ ul.tight li{margin:2px 0}
               <li>Turn the CPR with the rotation slider: an eccentric plaque can look mild in one plane and tight in another.</li>
               <li>The graph under the CPR shows lumen diameter against the expected (reference) diameter.</li>
               <li>Click or drag on the axial, MPR or 3D images to move the crosshair. Wheel scrolls the slice. Right-drag or Shift-drag sets the window.</li>
-              <li>Use the calcium and stent window to reduce blooming.</li>
+              <li>Use the calcium and stent window to reduce blooming. For stents, add the sharp kernel.</li>
+              <li>Iterative reconstruction lowers noise but makes the texture smoother. The sharp kernel sharpens edges and raises noise.</li>
+              <li>Learn the artefacts: streaks from dense contrast in the SVC and dark beam-hardening bands between dense structures can mimic plaque or perfusion defects.</li>
             </ul>
           </details>
           <div class="btns"><button class="btn gold" id="btnToReport">Next: write the report →</button></div>
