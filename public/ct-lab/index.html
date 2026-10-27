@@ -132,8 +132,12 @@ ul.tight li{margin:2px 0}
 .vp canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .vp .lbl{position:absolute;left:8px;top:6px;font-family:var(--f-mono);font-size:11px;color:#cfd6ee;pointer-events:none;text-shadow:0 1px 2px #000;line-height:1.35;z-index:2}
 .vp .lbl b{color:var(--accent);font-weight:500}
-.vp .lbr{position:absolute;right:8px;bottom:6px;font-family:var(--f-mono);font-size:11px;color:#9aa6cc;pointer-events:none;text-align:right;text-shadow:0 1px 2px #000;z-index:2}
-.vp .lbl2{position:absolute;left:8px;bottom:6px;font-family:var(--f-mono);font-size:11px;color:#9aa6cc;pointer-events:none;text-shadow:0 1px 2px #000;z-index:2}
+/* corner text in the style a scanner prints on each image */
+.vp .lbr,.vp .lbl2,.vp .lbtr{position:absolute;font-family:var(--f-mono);font-size:10.5px;line-height:1.35;color:#c3c9d6;pointer-events:none;text-shadow:0 1px 2px #000,0 0 3px #000;z-index:2}
+.vp .lbr{right:8px;bottom:6px;text-align:right}
+.vp .lbl2{left:8px;bottom:6px}
+.vp .lbtr{right:8px;top:6px;text-align:right}
+#axHu{display:block;color:#e3e7f0}
 .vp .tools{position:absolute;right:6px;top:6px;display:flex;gap:4px;z-index:3}
 .vp .tools button{background:rgba(12,22,64,.85);border:1px solid var(--line);border-radius:7px;font-size:11px;padding:2px 7px;cursor:pointer;color:var(--fg)}
 .vp .tools button.on{border-color:var(--accent);color:var(--accent)}
@@ -162,6 +166,7 @@ ul.tight li{margin:2px 0}
   .side{max-height:none}
   .panels{overflow:visible}
   .tag{display:none}
+  #axTr{display:none}
 }
 @media (max-width:620px){
   #vRead{grid-template-columns:1fr;grid-template-rows:300px 260px 300px 220px 240px;grid-template-areas:"ax" "mpr" "vr" "cpr" "xs"}
@@ -169,6 +174,7 @@ ul.tight li{margin:2px 0}
   #vBolus{grid-template-columns:1fr;grid-template-rows:300px 240px}
   #vCac{grid-template-rows:360px}
   .hint{display:none}
+  #axBl,#mprBl,#vrBl,#cprTr{display:none}
 }
 </style>
 </head>
@@ -289,6 +295,7 @@ ul.tight li{margin:2px 0}
           <div class="row"><label>Iterative</label><div class="seg" id="irSeg"><button data-v="0">Off (FBP)</button><button data-v="1" class="on">Medium</button><button data-v="2">Strong</button></div></div>
           <div class="row" id="reconRow"><label for="reconR">Recon phase</label><input type="range" id="reconR" min="0" max="95" step="1" value="75"><output id="reconO">75%</output></div>
           <div class="row"><label>3D</label><div class="seg" id="vrSeg"><button data-v="heart" class="on">Heart VRT</button><button data-v="tree">Tree</button><button data-v="mip">MIP</button></div></div>
+          <div class="row"><label>Labels</label><div class="seg" id="lblSeg"><button data-v="1" class="on">Anatomy on</button><button data-v="0">Off</button></div></div>
           <div class="card"><dl class="kv" id="readKv"></dl></div>
           <div id="readNotes"></div>
           <details open><summary>How to read</summary>
@@ -297,6 +304,7 @@ ul.tight li{margin:2px 0}
               <li>Turn the CPR with the rotation slider: an eccentric plaque can look mild in one plane and tight in another.</li>
               <li>The graph under the CPR shows lumen diameter against the expected (reference) diameter.</li>
               <li>Click or drag on the axial, MPR or 3D images to move the crosshair. Wheel scrolls the slice. Right-drag or Shift-drag sets the window.</li>
+              <li>Labels name the chambers, great vessels and arteries on every view. The CPR marks the SCCT segments (for example 6 pLAD, 7 mLAD), the names used in the report. Turn labels off to test yourself.</li>
               <li>Use the calcium and stent window to reduce blooming. For stents, add the sharp kernel.</li>
               <li>Iterative reconstruction lowers noise but makes the texture smoother. The sharp kernel sharpens edges and raises noise.</li>
               <li>Learn the artefacts: streaks from dense contrast in the SVC and dark beam-hardening bands between dense structures can mimic plaque or perfusion defects.</li>
@@ -354,11 +362,11 @@ ul.tight li{margin:2px 0}
         <div class="vp" id="vpTac"><canvas></canvas><div class="lbl"><b>TIME–ATTENUATION</b> ROI</div></div>
       </div>
       <div class="view" id="vRead">
-        <div class="vp" id="vpAx"><canvas></canvas><div class="lbl"><b>AXIAL</b> <span id="axLbl"></span></div><div class="lbr" id="axWl"></div><div class="lbl2" id="axHu"></div></div>
-        <div class="vp" id="vpMpr"><canvas></canvas><div class="lbl"><b id="mprName">CORONAL</b> <span id="mprLbl"></span></div><div class="tools"><button data-o="cor" class="on">Cor</button><button data-o="sag">Sag</button></div></div>
-        <div class="vp" id="vpVr"><canvas></canvas><div class="lbl"><b>3D</b> <span id="vrLbl"></span></div><div class="tools"><button data-p="ant">Ant</button><button data-p="lao">LAO</button><button data-p="rao">RAO</button><button data-p="inf">Inf</button></div></div>
-        <div class="vp" id="vpCpr"><canvas></canvas><div class="lbl"><b>CPR</b> <span id="cprLbl"></span></div></div>
-        <div class="vp" id="vpXs"><canvas></canvas><div class="lbl"><b>CROSS-SECTION</b> <span id="xsLbl"></span></div></div>
+        <div class="vp" id="vpAx"><canvas></canvas><div class="lbl"><b>AXIAL</b> <span id="axLbl"></span></div><div class="lbtr" id="axTr"></div><div class="lbr" id="axWl"></div><div class="lbl2"><span id="axBl"></span><span id="axHu"></span></div></div>
+        <div class="vp" id="vpMpr"><canvas></canvas><div class="lbl"><b id="mprName">CORONAL</b> <span id="mprLbl"></span></div><div class="tools"><button data-o="cor" class="on">Cor</button><button data-o="sag">Sag</button></div><div class="lbr" id="mprBr"></div><div class="lbl2" id="mprBl"></div></div>
+        <div class="vp" id="vpVr"><canvas></canvas><div class="lbl"><b>3D</b> <span id="vrLbl"></span></div><div class="tools"><button data-p="ant">Ant</button><button data-p="lao">LAO</button><button data-p="rao">RAO</button><button data-p="inf">Inf</button></div><div class="lbr" id="vrBr"></div><div class="lbl2" id="vrBl"></div></div>
+        <div class="vp" id="vpCpr"><canvas></canvas><div class="lbl"><b>CPR</b> <span id="cprLbl"></span></div><div class="lbtr" id="cprTr"></div></div>
+        <div class="vp" id="vpXs"><canvas></canvas><div class="lbl"><b>CROSS-SECTION</b> <span id="xsLbl"></span></div><div class="lbr" id="xsBr"></div></div>
       </div>
       <div class="hint" id="hint"></div>
       <div class="loading" id="loading"><div>Building the patient…</div><div class="bar"><i id="loadBar"></i></div><div class="small" id="loadTxt"></div></div>

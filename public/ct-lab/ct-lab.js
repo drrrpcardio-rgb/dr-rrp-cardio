@@ -192,7 +192,7 @@
   }
 
   // ───────────────────────── base scene ─────────────────────────
-  let OH = 0, OT = 0, SDH = 1e9, SDV = 1e9;
+  let OH = 0, OT = 0, OM = 0, SDH = 1e9, SDV = 1e9; // OM: contrast-mixing code, written to the partial-volume array
   const put = (h, t) => { OH = h; OT = t; return true; };
 
   function heartScene(x, y, z) {
@@ -265,12 +265,23 @@
     if (d < SDH) SDH = d;
     if (d < 0) return d > -4.5 && vnoise(x * 0.55 + 9, y * 0.55, z * 0.55) > 0.3 ? put(40, tg(L_HEART, C_MYO)) : put(43, tg(L_HEART, C_LEFT)); // pectinate muscles
     if (d < 1.6) return put(40, tg(L_HEART, C_MYO));
-    d = ellD(E_RA, x, y, z); if (d < SDH) SDH = d; if (d < 0) return put(43, tg(L_HEART, C_RIGHT)); if (d < 2) return put(40, tg(L_HEART, C_MYO));
+    d = ellD(E_RA, x, y, z); if (d < SDH) SDH = d; if (d < 0) { OM = raMix(x, y, z); return put(43, tg(L_HEART, C_RIGHT)); } if (d < 2) return put(40, tg(L_HEART, C_MYO));
     // oesophagus and airways sit behind the left atrium; the atrium wins where they would overlap
     d = tubeD(T_ESO, x, y, z); if (d < SDV) SDV = d; if (d < 0) return put(z > -40 && d < -5.4 ? -960 : 38, tg(L_BODY, 0));
     for (let i = 0; i < 3; i++) { d = tubeD(T_AIR[i], x, y, z); if (d < SDV) SDV = d; if (d < 0) return put(d < -1.8 ? -990 : 50, tg(L_BODY, 0)); }
     if (wall) return put(46, tg(L_BODY, 0));
     return false;
+  }
+
+  // Contrast mixing in the right atrium, as on most CTAs: unopacified blood from the IVC swirls in from below and the
+  // SVC jet (dense contrast, or saline once the chaser arrives) from above. Coded like partial volume: the second
+  // compartment in the top 3 bits and its share of the voxel in 1/31.
+  function raMix(x, y, z) {
+    const w = 6 * vnoise(x * 0.05 + 3.1, y * 0.05, z * 0.05);
+    const lo = (1 - sstep(2, 24, z)) * sstep(-0.05, 0.4, vnoise((x + w) * 0.12, (y - w) * 0.1, z * 0.075 + w * 0.05)) * 0.85;
+    const hi = sstep(10, 30, z) * sstep(0.15, 0.5, vnoise((x - w) * 0.14 + 7.7, (y + w) * 0.12, z * 0.09)) * 0.7;
+    if (lo < 0.04 && hi < 0.04) return 0;
+    return lo >= hi ? (C_NONE << 5) | Math.round(lo * 31) : (C_SVC << 5) | Math.round(hi * 31);
   }
 
   // cancellous (marrow) bone with a trabecular texture
@@ -404,13 +415,13 @@
 
   // ───────────────────────── building the volume in slabs ─────────────────────────
   // Sample the scene at voxel centres for slices [k0, k1) into slab arrays whose first slice is kb.
-  function genSlab(hu, tag, kb, k0, k1) {
+  function genSlab(hu, tag, mix, kb, k0, k1) {
     for (let k = k0; k < k1; k++) {
       const z = Z0 + (k + 0.5) * DZ;
       for (let j = 0; j < NY; j++) {
         const y = Y0 + (j + 0.5) * DX;
         let o = ((k - kb) * NY + j) * NX;
-        for (let i = 0; i < NX; i++, o++) { scene(X0 + (i + 0.5) * DX, y, z); hu[o] = OH; tag[o] = OT; }
+        for (let i = 0; i < NX; i++, o++) { OM = 0; scene(X0 + (i + 0.5) * DX, y, z); hu[o] = OH; tag[o] = OT; mix[o] = OM; }
       }
     }
   }
@@ -446,10 +457,10 @@
   // one finished slab for slices [k0, k1), built with a one-slice halo so edges can be checked across slabs
   function buildSlab(k0, k1) {
     const ka = Math.max(0, k0 - 1), kz = Math.min(NZ, k1 + 1);
-    const hu0 = new Int16Array((kz - ka) * NXY), tag0 = new Uint8Array((kz - ka) * NXY);
-    genSlab(hu0, tag0, ka, ka, kz);
+    const hu0 = new Int16Array((kz - ka) * NXY), tag0 = new Uint8Array((kz - ka) * NXY), mix0 = new Uint8Array((kz - ka) * NXY);
+    genSlab(hu0, tag0, mix0, ka, ka, kz);
     const off = (k0 - ka) * NXY, m = (k1 - k0) * NXY;
-    const hu = hu0.slice(off, off + m), tag = tag0.slice(off, off + m), fr = new Uint8Array(m);
+    const hu = hu0.slice(off, off + m), tag = tag0.slice(off, off + m), fr = mix0.slice(off, off + m);
     antialiasSlab(hu0, tag0, hu, fr, ka, k0, k1);
     return { k0, k1, hu, tag, fr };
   }
@@ -1089,7 +1100,7 @@
     range: [-58, 50], step: 'plan', scanDone: false, cacDone: false,
     bolus: { rate: 5, vol: 60, conc: 350, chaser: true, thr: 150, delay: 6, roi: [-18, -21], z: 50, t: 0, running: false, trig: null, tScan: null, curve: [] },
     scan: null, cac: null, cacUser: {}, art: 'LAD',
-    read: { wl: [800, 250], slab: 0, track: 'LAD', alpha: 0, cur: 40, vr: 'heart', yaw: -35, pitch: 18, zoomVr: 1, mpr: 'cor', recon: 75, zoom: 1, kernel: 'std', ir: 1 },
+    read: { wl: [800, 250], slab: 0, track: 'LAD', alpha: 0, cur: 40, vr: 'heart', yaw: -35, pitch: 18, zoomVr: 1, mpr: 'cor', recon: 75, zoom: 1, kernel: 'std', ir: 1, labels: true },
     cp: [0, -20, 10],
   };
   const hrNow = () => Math.max(50, S.cs.hr - 7 * S.meto + (S.gtn ? 3 : 0));
@@ -1442,7 +1453,7 @@
   function paint(d, buf, W, L) {
     for (let o = 0; o < buf.length; o++) {
       const h = buf[o], k = o * 4;
-      if (h === NODATA) { d[k] = 6; d[k + 1] = 8; d[k + 2] = 22; } else { const g = gray(h, W, L); d[k] = d[k + 1] = d[k + 2] = g; }
+      if (h === NODATA) { d[k] = 0; d[k + 1] = 0; d[k + 2] = 0; } else { const g = gray(h, W, L); d[k] = d[k + 1] = d[k + 2] = g; }
       d[k + 3] = 255;
     }
   }
@@ -1536,6 +1547,229 @@
     c.textAlign = 'left';
   }
 
+  // scale bar on the right edge of an image (1 cm ticks), as reading workstations show
+  function drawRuler(vp) {
+    const pl = vp.plane, f = vp.fit, c = vp.ctx, k = vp.dpr;
+    if (!pl) return;
+    // below the L / P orientation letter and above the corner text
+    const y0 = vp.H / 2 + 16 * k, room = vp.H - 46 * k - y0;
+    const len = 50 * f.s < room ? 50 : 20 * f.s < room ? 20 : 10;
+    const x = Math.min(vp.W - 12 * k, f.x + pl.w * f.s - 12 * k);
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+    c.strokeStyle = 'rgba(220,226,238,.75)'; c.lineWidth = 1 * k; c.beginPath();
+    c.moveTo(x, y0); c.lineTo(x, y0 + len * f.s);
+    for (let m = 0; m <= len; m += 5) { const y = y0 + m * f.s, w = m % 10 ? 3 : 6; c.moveTo(x - w * k, y); c.lineTo(x, y); }
+    c.stroke();
+    c.font = `${9.5 * k}px "IBM Plex Mono", monospace`; c.fillStyle = 'rgba(220,226,238,.8)'; c.textAlign = 'right';
+    c.fillText(len >= 10 ? `${len / 10} cm` : `${len} mm`, x - 2 * k, y0 + len * f.s + 12 * k);
+    c.restore();
+  }
+
+  // ───────────────────────── anatomy labels ─────────────────────────
+  // Which structure a point belongs to, worked out from the same analytic anatomy the volume was built from.
+  const ANAT = ['Ao root', 'Asc Ao', 'Desc Ao', 'SVC', 'IVC', 'PV', 'LV', 'MPA', 'LPA', 'RPA', 'RV', 'LA', 'LAA', 'RA', 'Oes', 'Trachea', 'L bronchus', 'R bronchus', 'Sternum', 'Vertebra', 'R lung', 'L lung', 'Liver', 'Stomach', 'Spleen'];
+  const AN = Object.fromEntries(ANAT.map((n, i) => [n, i]));
+  function structAt(x, y, z) {
+    if (rootD(x, y, z) < 0) return AN['Ao root'];
+    if (tubeD(T_ASC, x, y, z) < 0) return AN['Asc Ao'];
+    if (tubeD(T_LVOT, x, y, z) < 0) return AN.LV;
+    if (tubeD(T_DESC, x, y, z) < 0) return AN['Desc Ao'];
+    if (tubeD(T_SVC, x, y, z) < 0) return AN.SVC;
+    if (tubeD(T_IVC, x, y, z) < 0) return AN.IVC;
+    for (let i = 0; i < 4; i++) if (tubeD(T_PVS[i], x, y, z) < 0) return AN.PV;
+    const h = toH([x, y, z]), a = h[0], rho = hyp(h[1], h[2]);
+    if (a >= -2 && a <= HL && rho < Repi(Math.max(0, a))) return AN.LV;
+    if (tubeD(T_PA, x, y, z) < 0) return AN.MPA;
+    if (tubeD(T_LPA, x, y, z) < 0) return AN.LPA;
+    if (tubeD(T_RPA, x, y, z) < 0) return AN.RPA;
+    if (a > -16 && a < 72 && rvQ(a, h[1], h[2], 0) < 1 && (a >= 0 ? rho >= Repi(a) : h[1] > 6)) return AN.RV;
+    if (ellD(E_LA, x, y, z) < 2) return AN.LA;
+    if (ellD(E_LAA, x, y, z) < 1.6) return AN.LAA;
+    if (ellD(E_RA, x, y, z) < 2) return AN.RA;
+    if (tubeD(T_ESO, x, y, z) < 0) return AN.Oes;
+    if (tubeD(T_AIR[0], x, y, z) < 0) return AN.Trachea;
+    if (tubeD(T_AIR[1], x, y, z) < 0) return AN['L bronchus'];
+    if (tubeD(T_AIR[2], x, y, z) < 0) return AN['R bronchus'];
+    { const sw = 15 + 7 * sstep(30, 48, z), u = x / sw, v = (y + 87) / 6.5; if (u * u + v * v < 1) return AN.Sternum; }
+    { const u = x - VB[0], v = y - VB[1]; if ((u / 16) ** 2 + (v / (v < 0 ? 13 : 12)) ** 2 < 1 && v < 10 + 2.4 * (u / 11) ** 2) return AN.Vertebra; }
+    if ((x / 135) ** 2 + ((y - 8) / 88) ** 2 >= 1) return -1;
+    if (z < diaphragmZ(x, y)) {
+      { const u = (x - 50) / 29, v = (y - 2) / 36, w = (z + 66) / 28; if (u * u + v * v + w * w < 1) return AN.Stomach; }
+      { const u = (x - 80) / 20, v = (y - 50) / 30, w = (z + 70) / 32; if (u * u + v * v + w * w < 1) return AN.Spleen; }
+      return x < 30 - 0.28 * y - 0.0025 * (y + 10) ** 2 ? AN.Liver : -1;
+    }
+    const i = Math.floor((x - X0) / DX), j = Math.floor((y - Y0) / DX), k = Math.floor((z - Z0) / DZ);
+    if (i < 0 || j < 0 || k < 0 || i >= NX || j >= NY || k >= NZ) return -1;
+    return TAG[(k * NY + j) * NX + i] >> 3 === L_LUNG ? (x < 0 ? AN['R lung'] : AN['L lung']) : -1;
+  }
+  // For each labelled region on a coarse grid, the sample deepest inside it (most same-label neighbours, then nearest
+  // the centroid), so the label sits well inside the structure even when it is curved.
+  function regionAnchors(ids, nc, nr, minN) {
+    const n = new Int32Array(ANAT.length), sc = new Float64Array(ANAT.length), sr = new Float64Array(ANAT.length);
+    for (let r = 0; r < nr; r++) for (let c = 0; c < nc; c++) { const id = ids[r * nc + c]; if (id >= 0) { n[id]++; sc[id] += c; sr[id] += r; } }
+    const best = new Int32Array(ANAT.length).fill(-1), bs = new Float64Array(ANAT.length).fill(-1);
+    for (let r = 0; r < nr; r++) for (let c = 0; c < nc; c++) {
+      const id = ids[r * nc + c];
+      if (id < 0 || n[id] < minN) continue;
+      let m = 0;
+      for (let dr = -3; dr <= 3; dr++) { const rr = r + dr; if (rr < 0 || rr >= nr) continue; for (let dc = -3; dc <= 3; dc++) { const cc = c + dc; if (cc >= 0 && cc < nc && ids[rr * nc + cc] === id) m++; } }
+      const s = m - 0.001 * ((c - sc[id] / n[id]) ** 2 + (r - sr[id] / n[id]) ** 2);
+      if (s > bs[id]) { bs[id] = s; best[id] = r * nc + c; }
+    }
+    const out = [];
+    for (let id = 0; id < ANAT.length; id++) if (best[id] >= 0 && bs[id] >= minN) out.push({ id, c: best[id] % nc, r: (best[id] / nc) | 0 });
+    return out;
+  }
+  const LBL_VES = ['LM', 'LAD', 'LCX', 'RCA', 'D1', 'D2', 'OM1', 'OM2', 'PDA', 'PLB', 'AM', 'S1', 'CB', 'RVB'];
+  const VES_SHORT = { LM: 'LM', LAD: 'LAD', LCX: 'LCx', RCA: 'RCA', D1: 'D1', D2: 'D2', OM1: 'OM1', OM2: 'OM2', PDA: 'PDA', PLB: 'PLB', AM: 'AM', S1: 'S1', S2: 'S2', CB: 'Conus', RVB: 'RVB' };
+  const vesColor = (v) => `rgb(${ART_COL[v.group].join(',')})`;
+  // SCCT segment of a point on an artery: number (0 if it has none) and short name
+  const SEG_NO = { LM: 5, D1: 9, D2: 10, OM1: 12, OM2: 14, PDA: 4, PLB: 16 };
+  function segOf(v, i) {
+    if (v.id === 'LAD') {
+      const p = Math.min(VES.D1 ? VES.D1.bi : v.n * 0.25, VES.S1 ? VES.S1.bi : v.n), mid = p + (v.n - 1 - p) / 2;
+      return i < p ? [6, 'pLAD'] : i < mid ? [7, 'mLAD'] : [8, 'dLAD'];
+    }
+    if (v.id === 'LCX') return i < (VES.OM1 ? VES.OM1.bi : v.n * 0.4) ? [11, 'pLCx'] : [13, 'dLCx'];
+    if (v.id === 'RCA') { const am = VES.AM ? VES.AM.bi : v.n * 0.6; return i < am / 2 ? [1, 'pRCA'] : i < am ? [2, 'mRCA'] : [3, 'dRCA']; }
+    return [SEG_NO[v.id] || 0, VES_SHORT[v.id] || v.id];
+  }
+  const segText = (v, i) => { const s = segOf(v, i); return s[0] ? `${s[1]} (${s[0]})` : s[1]; };
+
+  // Draw labels without overlaps. Pins (arteries) get a ring and a name on whichever side is free; region labels are
+  // centred on their structure. Anything that cannot be placed is left out.
+  function drawLabels(vp, items) {
+    const c = vp.ctx, k = vp.dpr, boxes = [], hT = 13 * k;
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+    c.font = `700 ${10.5 * k}px Manrope, system-ui, sans-serif`; c.textBaseline = 'middle'; c.lineJoin = 'round';
+    const free = (b) => b.x0 >= 2 && b.y0 >= 2 && b.x1 <= vp.W - 2 && b.y1 <= vp.H - 2 && !boxes.some((o) => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
+    const text = (t, x, y, col) => { c.lineWidth = 3 * k; c.strokeStyle = 'rgba(0,0,0,.85)'; c.strokeText(t, x, y); c.fillStyle = col; c.fillText(t, x, y); };
+    // keep clear of the corner text and buttons laid over the image
+    const er = vp.cv.getBoundingClientRect();
+    for (const e of vp.el.querySelectorAll('.lbl,.lbtr,.lbr,.lbl2,.tools')) {
+      if (!e.offsetParent || !e.textContent.trim()) continue;
+      const r = e.getBoundingClientRect();
+      boxes.push({ x0: (r.left - er.left - 2) * k, x1: (r.right - er.left + 2) * k, y0: (r.top - er.top - 2) * k, y1: (r.bottom - er.top + 2) * k });
+    }
+    for (const it of items) if (it.pin) boxes.push({ x0: it.x - it.r, x1: it.x + it.r, y0: it.y - it.r, y1: it.y + it.r });
+    for (const it of items) {
+      if (!it.pin) continue;
+      const w = c.measureText(it.text).width, g = (it.r + 7 * k) * 0.7071;
+      for (const [sx, sy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]) {
+        const tx = it.x + sx * g, ty = it.y + sy * g;
+        const b = { x0: sx > 0 ? tx : tx - w - 3 * k, x1: sx > 0 ? tx + w + 3 * k : tx, y0: ty - hT / 2, y1: ty + hT / 2 };
+        if (!free(b)) continue;
+        boxes.push(b);
+        c.strokeStyle = it.color; c.lineWidth = 1.4 * k;
+        c.beginPath(); c.arc(it.x, it.y, it.r, 0, Math.PI * 2); c.moveTo(it.x + sx * it.r * 0.7071, it.y + sy * it.r * 0.7071); c.lineTo(tx, ty); c.stroke();
+        c.textAlign = sx > 0 ? 'left' : 'right';
+        text(it.text, tx + sx * 2 * k, ty, it.color);
+        break;
+      }
+    }
+    c.textAlign = 'center';
+    for (const it of items) {
+      if (it.pin) continue;
+      const w = c.measureText(it.text).width;
+      for (const dy of [0, -hT, hT, -2 * hT, 2 * hT]) {
+        const b = { x0: it.x - w / 2 - 2 * k, x1: it.x + w / 2 + 2 * k, y0: it.y + dy - hT / 2, y1: it.y + dy + hT / 2 };
+        if (!free(b)) continue;
+        boxes.push(b); text(it.text, it.x, it.y + dy, it.color || '#ffe7a3'); break;
+      }
+    }
+    c.restore();
+  }
+  // labels for an axial / coronal / sagittal image: arteries where they cross the plane, then the structures
+  function planeLabels(vp) {
+    const pl = vp.plane;
+    if (!pl || !S.read.labels) return;
+    const o = pl.orient, sp = Math.max(pl.w, pl.h) / 64;
+    const nc = Math.max(4, Math.round(pl.w / sp)), nr = Math.max(4, Math.round(pl.h / sp));
+    const ids = new Int8Array(nc * nr).fill(-1);
+    for (let r = 0; r < nr; r++) for (let c = 0; c < nc; c++) {
+      const p = planePt(o, pl.u0 + ((c + 0.5) * pl.w) / nc, pl.v0 + ((r + 0.5) * pl.h) / nr);
+      if (p[2] >= S.range[0] && p[2] <= S.range[1]) ids[r * nc + c] = structAt(p[0], p[1], p[2]);
+    }
+    const items = [], ax = o === 'ax' ? 2 : o === 'cor' ? 1 : 0, slab = S.read.slab || 0;
+    for (const id of LBL_VES) {
+      const v = VES[id];
+      if (!v) continue;
+      let best = -1, bs = -1e9;
+      for (let i = 0; i < v.n; i += 2) {
+        const p = v.pts[i];
+        if (p[2] < S.range[0] || p[2] > S.range[1]) continue;
+        const d = Math.abs(p[ax] - S.cp[ax]);
+        if (d > v.rad[i] + 0.5 + slab / 2) continue;
+        const q = worldToView(vp, p);
+        if (q[0] < 0 || q[1] < 0 || q[0] > vp.W || q[1] > vp.H) continue;
+        const s = v.rad[i] - d * 0.5;
+        if (s > bs) { bs = s; best = i; }
+      }
+      if (best < 0) continue;
+      const q = worldToView(vp, v.pts[best]);
+      items.push({ x: q[0], y: q[1], text: VES_SHORT[id], color: vesColor(v), pin: true, r: Math.max(5 * vp.dpr, v.rad[best] * vp.fit.s + 3 * vp.dpr) });
+    }
+    for (const a of regionAnchors(ids, nc, nr, 4)) {
+      const q = vp.fromMM(((a.c + 0.5) * pl.w) / nc, ((a.r + 0.5) * pl.h) / nr);
+      items.push({ x: q[0], y: q[1], text: ANAT[a.id] });
+    }
+    drawLabels(vp, items);
+  }
+  // labels for the 3D view, from what each pixel's ray hit: an artery is named where its own surface is visible,
+  // the chambers and great vessels at the middle of their visible surface
+  const VR_ANAT = new Set(['Asc Ao', 'MPA', 'LPA', 'RPA', 'PV', 'LV', 'RV', 'LA', 'LAA', 'RA'].map((n) => AN[n]));
+  function vrLabels(cam, ex, ey, cols, rows, hitT, hitV, mode) {
+    const out = [], { dir, right, up } = cam;
+    VLIST.forEach((v, vi) => {
+      if (!LBL_VES.includes(v.id) || v.id === 'S1') return; // septal branches run inside the septum
+      for (const f of [0.35, 0.5, 0.22, 0.65, 0.8, 0.12, 0.42, 0.58, 0.28, 0.72, 0.9, 0.06]) {
+        const i = Math.round(f * (v.n - 1)), P = v.pts[i];
+        if (P[2] < S.range[0] || P[2] > S.range[1]) continue;
+        const q = sub(P, VR_CENTER), pc = ((dot(q, right) + ex) / (2 * ex)) * cols, pr = ((ey - dot(q, up)) / (2 * ey)) * rows;
+        if (pc < 1 || pr < 1 || pc >= cols - 1 || pr >= rows - 1) continue;
+        let ok = mode === 'mip';
+        for (let dr = -1; dr <= 1 && !ok; dr++) for (let dc = -1; dc <= 1 && !ok; dc++) if (hitV[((pr | 0) + dr) * cols + (pc | 0) + dc] === vi) ok = true;
+        if (!ok) continue;
+        out.push({ x: pc / cols, y: pr / rows, text: VES_SHORT[v.id], color: vesColor(v), pin: true, rr: v.rad[i] });
+        break;
+      }
+    });
+    if (mode === 'mip') return out;
+    const st = 3, nc = Math.floor(cols / st), nr = Math.floor(rows / st), ids = new Int8Array(nc * nr).fill(-1);
+    for (let r = 0; r < nr; r++) for (let c = 0; c < nc; c++) {
+      const pc = c * st + 1, pr = r * st + 1, q = pr * cols + pc, h = hitV[q];
+      if (h === -2) { ids[r * nc + c] = AN['Asc Ao']; continue; }
+      if (h !== -3) continue;
+      // a little way under the surface, so the point is inside the wall of the structure it belongs to
+      const u = ((pc + 0.5) / cols) * 2 * ex - ex, w = ey - ((pr + 0.5) / rows) * 2 * ey, t = hitT[q] + 2.5 - 150;
+      let id = structAt(VR_CENTER[0] + u * right[0] + w * up[0] + t * dir[0], VR_CENTER[1] + u * right[1] + w * up[1] + t * dir[1], VR_CENTER[2] + u * right[2] + w * up[2] + t * dir[2]);
+      if (id === AN['Ao root']) id = AN['Asc Ao'];
+      if (VR_ANAT.has(id)) ids[r * nc + c] = id;
+    }
+    for (const a of regionAnchors(ids, nc, nr, 6)) out.push({ x: (a.c * st + 1.5) / cols, y: (a.r * st + 1.5) / rows, text: a.id === AN['Asc Ao'] ? 'Ao' : ANAT[a.id] });
+    return out;
+  }
+
+  // ── corner text, as a scanner prints it on every image ──
+  const KER_NAME = { smooth: 'smooth', std: 'std', sharp: 'sharp' }, IR_NAME = ['FBP', 'IR3', 'IR5'];
+  function dcScan() {
+    const sc = S.scan, when = sc && sc.when ? sc.when : new Date();
+    const date = when.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }), time = when.toTimeString().slice(0, 5);
+    return {
+      pt: `SIM-${String(S.caseIdx + 1).padStart(4, '0')} · ${esc(S.cs.pt)}`,
+      study: `CTA · ${SCANNERS[S.scanner].name}`,
+      date: `${date} ${time}`,
+      kv: `${S.kv} kV · ${S.mas} mAs${sc ? `<br>CTDIvol ${sc.dose.ctdi.toFixed(1)} mGy` : ''}`,
+      recon: `${S.read.slab ? 'MIP ' + S.read.slab.toFixed(1) : '0.9'} mm · ${KER_NAME[S.read.kernel]} · ${IR_NAME[S.read.ir]}`,
+      ecg: `${{ pro: 'Prosp', retro: 'Retro', flash: 'Flash' }[S.gating]} ${S.read.recon}% · HR ${Math.round(hrNow())}`,
+      wl: `W ${S.read.wl[0]} L ${S.read.wl[1]}`,
+    };
+  }
+  function vrAngle() {
+    const yw = ((S.read.yaw % 360) + 540) % 360 - 180, p = S.read.pitch;
+    return `${yw <= 0 ? 'LAO' : 'RAO'} ${Math.abs(Math.round(yw))}° · ${p >= 0 ? 'CRA' : 'CAU'} ${Math.abs(Math.round(p))}°`;
+  }
+
   // ───────────────────────── 3D rendering ─────────────────────────
   const VRBOX = [-72, 98, -88, 66, -80, 64];
   const VR_CENTER = [10, -20, -2];
@@ -1564,8 +1798,9 @@
     treeGeo = treeCache[outer];
   }
   function buildTreeGeo(thr, outer) {
-    const segs = []; // [ax, ay, az, dx, dy, dz, len², r0, r1, kind]  kind: 0 lumen, 1 calcium, 2 stent
-    for (const v of VLIST) {
+    const segs = []; // [ax, ay, az, dx, dy, dz, len², r0, r1, kind, artery]  kind: 0 lumen, 1 calcium, 2 stent
+    for (let vi = 0; vi < VLIST.length; vi++) {
+      const v = VLIST[vi];
       let prev = null;
       for (let i = 0; i < v.n; i += 2) {
         const p = v.pts[i];
@@ -1579,7 +1814,7 @@
         const cur = r > 0.15 ? { p, r, kind } : null;
         if (prev && cur) {
           const d = sub(cur.p, prev.p);
-          segs.push([prev.p[0], prev.p[1], prev.p[2], d[0], d[1], d[2], dot(d, d) || 1e-6, prev.r, cur.r, Math.max(prev.kind, cur.kind)]);
+          segs.push([prev.p[0], prev.p[1], prev.p[2], d[0], d[1], d[2], dot(d, d) || 1e-6, prev.r, cur.r, Math.max(prev.kind, cur.kind), vi]);
         }
         prev = cur;
       }
@@ -1661,11 +1896,11 @@
   }
   // signed distance to the nearest capsule in the cell holding (x, y, z), or to the aorta;
   // TREE_HIT gets the closest centreline point and kind (0 lumen, 1 calcium, 2 stent, 3 aorta)
-  const TREE_HIT = { qx: 0, qy: 0, qz: 0, kind: 0 };
+  const TREE_HIT = { qx: 0, qy: 0, qz: 0, kind: 0, vi: -2 };
   function treeSD(x, y, z) {
     const g = treeGeo;
     let best = aortaSD(x, y, z);
-    TREE_HIT.kind = 3; TREE_HIT.empty = true;
+    TREE_HIT.kind = 3; TREE_HIT.vi = -2; TREE_HIT.empty = true;
     const i = Math.floor((x - VRBOX[0]) / TG_CELL), j = Math.floor((y - VRBOX[2]) / TG_CELL), k = Math.floor((z - VRBOX[4]) / TG_CELL);
     if (i < 0 || j < 0 || k < 0 || i >= g.gx || j >= g.gy || k >= g.gz) return best;
     const list = g.cells[(k * g.gy + j) * g.gx + i];
@@ -1677,7 +1912,7 @@
       h = h < 0 ? 0 : h > 1 ? 1 : h;
       const qx = s[0] + s[3] * h, qy = s[1] + s[4] * h, qz = s[2] + s[5] * h;
       const d = hyp(x - qx, y - qy, z - qz) - (s[7] + (s[8] - s[7]) * h);
-      if (d < best) { best = d; TREE_HIT.qx = qx; TREE_HIT.qy = qy; TREE_HIT.qz = qz; TREE_HIT.kind = s[9]; }
+      if (d < best) { best = d; TREE_HIT.qx = qx; TREE_HIT.qy = qy; TREE_HIT.qz = qz; TREE_HIT.kind = s[9]; TREE_HIT.vi = s[10]; }
     }
     return best;
   }
@@ -1753,6 +1988,8 @@
       R = clamp(base[0] * sh + 160 * spec, 0, 255); G = clamp(base[1] * sh + 140 * spec, 0, 255); Bc = clamp(base[2] * sh + 130 * spec, 0, 255);
     };
     const C_MUSCLE = [148, 54, 42], C_BLOOD = [206, 86, 66], C_BRIGHT = [236, 130, 100];
+    // what each pixel shows: artery index, -2 aorta (tree view), -3 heart surface, -1 nothing; and the hit distance
+    const hitV = new Int16Array(cols * rows).fill(-1), hitT = new Float32Array(cols * rows);
     for (let r = 0; r < rows; r++) {
       const v = ey - ((r + 0.5) / rows) * 2 * ey;
       for (let c = 0; c < cols; c++) {
@@ -1802,6 +2039,7 @@
               const x = o0[0] + dir[0] * th, y = o0[1] + dir[1] * th, z = o0[2] + dir[2] * th;
               treeSD(x, y, z);
               const kind = TREE_HIT.kind;
+              hitV[r * cols + c] = TREE_HIT.vi; hitT[r * cols + c] = th;
               let nx, ny, nz;
               if (kind === 3) { const e = 0.4; nx = treeSD(x + e, y, z) - treeSD(x - e, y, z); ny = treeSD(x, y + e, z) - treeSD(x, y - e, z); nz = treeSD(x, y, z + e) - treeSD(x, y, z - e); }
               else { nx = x - TREE_HIT.qx; ny = y - TREE_HIT.qy; nz = z - TREE_HIT.qz; }
@@ -1811,6 +2049,7 @@
               const base = kind === 3 ? [214, 92, 78] : kind === 2 ? [196, 202, 214] : kind === 1 ? [240, 234, 218] : mode === 'heart' ? [248, 148, 110] : [236, 118, 94];
               shade(base, nx, ny, nz, occl, 1 - clamp((th - t0) / 170, 0, 0.55), kind === 2 ? 60 : 28, kind === 2 ? 1.6 : kind === 1 ? 0.6 : 1);
             } else if (hb >= 0) {
+              hitV[r * cols + c] = -3; hitT[r * cols + c] = hb;
               const x = o0[0] + dir[0] * hb, y = o0[1] + dir[1] * hb, z = o0[2] + dir[2] * hb, e = 1.4;
               let nx = hfAt(x - e, y, z) - hfAt(x + e, y, z), ny = hfAt(x, y - e, z) - hfAt(x, y + e, z), nz = hfAt(x, y, z - e) - hfAt(x, y, z + e);
               const nl = hyp(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
@@ -1830,7 +2069,7 @@
     const ctx = vp.ctx;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, vp.W, vp.H);
     ctx.imageSmoothingEnabled = true; ctx.drawImage(vp.off, 0, 0, vp.W, vp.H);
-    vrCache = { cam, ex, ey };
+    vrCache = { cam, ex, ey, labels: S.read.labels ? vrLabels(cam, ex, ey, cols, rows, hitT, hitV, mode) : [] };
     drawVROverlay(vp);
   }
   function drawVROverlay(vp) {
@@ -1845,6 +2084,8 @@
     }
     const q = proj(S.cp);
     ctx.strokeStyle = '#f5b301'; ctx.lineWidth = 2 * vp.dpr; ctx.beginPath(); ctx.arc(q[0], q[1], 6 * vp.dpr, 0, Math.PI * 2); ctx.stroke();
+    const pxmm = vp.W / (2 * ex);
+    drawLabels(vp, vrCache.labels.map((l) => ({ ...l, x: l.x * vp.W, y: l.y * vp.H, r: l.pin ? Math.max(5 * vp.dpr, l.rr * pxmm + 3 * vp.dpr) : 0 })));
   }
 
   // ───────────────────────── tracks, CPR, cross-section ─────────────────────────
@@ -1865,7 +2106,11 @@
     // vessel boundaries for labels
     const marks = [];
     let acc = 0;
-    for (const [v, i0, i1] of parts) { marks.push({ s: acc * 0.5, name: v.id }); acc += i1 - i0 + 1; }
+    for (const [v, i0, i1] of parts) {
+      let prev = '';
+      for (let i = i0; i <= i1; i++) { const sg = segOf(v, i); if (sg[1] !== prev) { marks.push({ s: (acc + i - i0) * 0.5, name: sg[0] ? `${sg[0]} ${sg[1]}` : sg[1] }); prev = sg[1]; } }
+      acc += i1 - i0 + 1;
+    }
     TRACK = { key, n: p.length, p, tv, ti, T: f.T, N: f.N, Bn: f.Bn, len: (p.length - 1) * 0.5, marks };
     S.read.cur = clamp(S.read.cur, 0, TRACK.n - 1);
   }
@@ -1954,9 +2199,17 @@
     if (!g) return;
     const sx = (s) => g.ox + (s + 2) * g.sc;
     ctx.font = `${10.5 * vp.dpr}px "IBM Plex Mono", monospace`;
-    // segment labels
-    ctx.fillStyle = 'rgba(245,179,1,.85)';
-    for (const m of tr.marks) { const x = sx(m.s); ctx.fillRect(x, g.oy + g.dh - 5 * vp.dpr, 1 * vp.dpr, 5 * vp.dpr); ctx.fillText(m.name, x + 3 * vp.dpr, g.oy + g.dh - 6 * vp.dpr); }
+    // SCCT segment labels
+    ctx.fillStyle = '#f5b301'; ctx.lineJoin = 'round';
+    let lastX = -1e9, lastW = 0, lift = 0;
+    for (const m of tr.marks) {
+      const x = sx(m.s), w = ctx.measureText(m.name).width;
+      lift = x - lastX < lastW + 8 * vp.dpr && !lift ? 12 * vp.dpr : 0; // step up when two names would touch
+      ctx.fillRect(x, g.oy + g.dh - 5 * vp.dpr - lift, 1 * vp.dpr, 5 * vp.dpr + lift);
+      ctx.lineWidth = 3 * vp.dpr; ctx.strokeStyle = 'rgba(0,0,0,.8)'; ctx.strokeText(m.name, x + 3 * vp.dpr, g.oy + g.dh - 6 * vp.dpr - lift);
+      ctx.fillText(m.name, x + 3 * vp.dpr, g.oy + g.dh - 6 * vp.dpr - lift);
+      lastX = x; lastW = w;
+    }
     // cursor
     const cs = S.read.cur * 0.5, cx = sx(cs);
     ctx.strokeStyle = 'rgba(245,179,1,.9)'; ctx.lineWidth = 1 * vp.dpr; ctx.setLineDash([4 * vp.dpr, 4 * vp.dpr]);
@@ -1978,7 +2231,7 @@
     ctx.strokeStyle = 'rgba(245,179,1,.9)'; ctx.beginPath(); ctx.moveTo(cx, y0); ctx.lineTo(cx, y1); ctx.stroke();
     const k = S.read.cur, sten = R[k] > 0 ? 1 - L[k] / R[k] : 0;
     ctx.fillStyle = '#cfd6ee';
-    ctx.fillText(`lumen ${L[k].toFixed(1)} mm / ref ${R[k].toFixed(1)} mm  ·  ${Math.round(sten * 100)}% diameter stenosis  ·  ${TRACK.tv[k].name} ${(TRACK.ti[k] * 0.5).toFixed(0)} mm`, 8 * vp.dpr, vp.H - 2 * vp.dpr);
+    ctx.fillText(`lumen ${L[k].toFixed(1)} mm / ref ${R[k].toFixed(1)} mm  ·  ${Math.round(sten * 100)}% diameter stenosis  ·  ${segText(TRACK.tv[k], TRACK.ti[k])} · ${(TRACK.ti[k] * 0.5).toFixed(0)} mm from origin`, 8 * vp.dpr, vp.H - 2 * vp.dpr);
     ctx.fillStyle = '#9aa6cc'; ctx.textAlign = 'right';
     ctx.fillText('— lumen   - - reference', vp.W - 8 * vp.dpr, g.imgH + 12 * vp.dpr); ctx.textAlign = 'left';
   }
@@ -2013,7 +2266,7 @@
     ctx.font = `${10 * vp.dpr}px "IBM Plex Mono", monospace`; ctx.fillText('2 mm', f.x + 8 * vp.dpr, f.y + size * f.s - 14 * vp.dpr);
     const lm = lumenAt(v, i);
     const area = v.typ[i] === TYP.slit ? Math.PI * v.rad[i] * v.rad[i] * (1 - v.D[i]) : Math.PI * (lm.lum / 2) ** 2;
-    $('#xsLbl').textContent = `${v.name} · MLD ${lm.lum.toFixed(1)} mm · area ${area.toFixed(1)} mm²`;
+    $('#xsLbl').textContent = `${segText(v, i)} · MLD ${lm.lum.toFixed(1)} mm · area ${area.toFixed(1)} mm²`;
   }
 
   // ───────────────────────── Agatston calcium score ─────────────────────────
@@ -2139,19 +2392,30 @@
     mon() { drawMonitor(); },
     tac() { drawTAC(); },
     ax() {
-      const v = vp.vpAx; v.resize(); renderMPR(v, 'ax', { recon: true }); drawCross(v); orientLabels(v, 'ax');
-      $('#axLbl').textContent = `z ${S.cp[2].toFixed(1)} mm${S.read.slab ? ' · MIP ' + S.read.slab + ' mm' : ''}`;
-      $('#axWl').textContent = `W ${S.read.wl[0]} L ${S.read.wl[1]}`;
+      const v = vp.vpAx; v.resize(); const pl = renderMPR(v, 'ax', { recon: true }); drawCross(v); orientLabels(v, 'ax'); drawRuler(v); planeLabels(v);
+      const D = dcScan(), inc = 0.45, nIm = Math.round((S.range[1] - S.range[0]) / inc) + 1, im = clamp(Math.round((S.range[1] - S.cp[2]) / inc) + 1, 1, nIm);
+      $('#axLbl').textContent = `z ${S.cp[2].toFixed(1)} mm · Im ${im}/${nIm}`;
+      $('#axTr').innerHTML = `${D.pt}<br>${D.study}<br>${D.date}`;
+      $('#axWl').innerHTML = `${D.wl}<br>DFOV ${(pl.w / 10).toFixed(1)} cm · ${S.read.zoom.toFixed(1)}×`;
+      $('#axBl').innerHTML = `${D.kv}<br>${D.recon}<br>${D.ecg}`;
     },
     mpr() {
-      const v = vp.vpMpr; v.resize(); renderMPR(v, S.read.mpr, { recon: true }); drawCross(v); orientLabels(v, S.read.mpr);
+      const v = vp.vpMpr; v.resize(); const pl = renderMPR(v, S.read.mpr, { recon: true }); drawCross(v); orientLabels(v, S.read.mpr); drawRuler(v); planeLabels(v);
+      const D = dcScan();
+      $('#mprBr').innerHTML = `${D.wl}<br>DFOV ${(pl.w / 10).toFixed(1)} cm`;
+      $('#mprBl').textContent = D.recon;
       $('#mprName').textContent = S.read.mpr === 'cor' ? 'CORONAL' : 'SAGITTAL';
       $('#mprLbl').textContent = S.read.mpr === 'cor' ? `y ${S.cp[1].toFixed(1)} mm` : `x ${S.cp[0].toFixed(1)} mm`;
     },
-    vr() { const v = vp.vpVr; v.resize(); renderVR(v, vrFast); $('#vrLbl').textContent = { heart: 'volume rendering', tree: 'coronary tree', mip: 'MIP' }[S.read.vr] + ' · drag to rotate'; },
+    vr() {
+      const v = vp.vpVr; v.resize(); renderVR(v, vrFast);
+      $('#vrLbl').textContent = { heart: 'volume rendering', tree: 'coronary tree', mip: 'MIP' }[S.read.vr];
+      $('#vrBl').textContent = { heart: 'VRT · cardiac preset', tree: 'VRT · coronary lumen', mip: 'MIP · W 800 L 330' }[S.read.vr];
+      $('#vrBr').textContent = vrAngle();
+    },
     vrOverlay() { const v = vp.vpVr; if (!vrCache) return mark('vr'); renderVR(v, true); },
-    cpr() { const v = vp.vpCpr; v.resize(); renderCPR(v); $('#cprLbl').textContent = `${TRACKS[S.read.track].name} · straightened · ${S.read.alpha}° · click to move the cursor`; },
-    xs() { const v = vp.vpXs; v.resize(); renderXS(v); },
+    cpr() { const v = vp.vpCpr; v.resize(); renderCPR(v); $('#cprTr').textContent = `${dcScan().wl} · ${KER_NAME[S.read.kernel]}`; $('#cprLbl').textContent = `${TRACKS[S.read.track].name} · straightened · ${S.read.alpha}° · click to move the cursor`; },
+    xs() { const v = vp.vpXs; v.resize(); renderXS(v); $('#xsBr').textContent = dcScan().wl; },
     readKv() { updateReadKv(); },
   };
 
@@ -2324,6 +2588,7 @@
       ['Recon', `${{ smooth: 'smooth', std: 'standard', sharp: 'sharp' }[S.read.kernel]} kernel · ${['FBP', 'iterative medium', 'iterative strong'][S.read.ir]}`],
       ['Motion RCA', motionGrade(b.R)], ['Motion LCx', motionGrade(b.C)], ['Motion LAD', motionGrade(b.A)],
       ['Dose', `${sc.dose.dlp.toFixed(0)} mGy·cm · ${sc.dose.msv.toFixed(1)} mSv`],
+      ['CPR cursor', TRACK ? segText(TRACK.tv[S.read.cur], TRACK.ti[S.read.cur]) : '–'],
       ['Crosshair', `${S.cp.map((x) => x.toFixed(0)).join(', ')}`],
     ];
     $('#readKv').innerHTML = rows.map(([a, c]) => `<dt>${a}</dt><dd>${c}</dd>`).join('');
@@ -2575,6 +2840,7 @@
   seg('kvSeg', (v) => { S.kv = +v; invalidateScan(); updatePlan(); });
   seg('gateSeg', (v) => { S.gating = v; invalidateScan(); updatePlan(); });
   seg('vrSeg', (v) => { S.read.vr = v; mark('vr'); });
+  seg('lblSeg', (v) => { S.read.labels = v === '1'; mark('ax', 'mpr', 'vr'); });
   seg('kerSeg', (v) => { S.read.kernel = v; mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); });
   seg('irSeg', (v) => { S.read.ir = +v; mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); });
   const range = (id, out, fn, f = (x) => x) => { const el = $('#' + id); const h = () => { const v = +el.value; $('#' + out).textContent = f(v); fn(v); }; el.addEventListener('input', h); };
@@ -2661,7 +2927,7 @@
   function completeScan(e) {
     const sigma = noiseSigma(S.kv, S.mas);
     const dose = doseEst();
-    S.scan = { e, sigma, dose, cut: coverageProblem() };
+    S.scan = { e, sigma, dose, cut: coverageProblem(), when: new Date() };
     S.scanDone = true;
     // reconstruction phase limits
     const r = $('#reconR');
