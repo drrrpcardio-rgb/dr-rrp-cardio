@@ -67,13 +67,7 @@ export default async function CourseCategoryPage({
           {practice.map((t) => (
             <Link key={t.id} href={t.href} className="group block overflow-hidden rounded-3xl border border-mist-200 bg-white transition-shadow hover:shadow-xl">
               <div className="relative aspect-[16/10] overflow-hidden bg-royal-950">
-                {"image" in t ? (
-                  <Image src={t.image} alt={`${t.title} screenshot`} fill sizes="340px" className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]" />
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-gradient-to-br from-royal-800 via-royal-900 to-royal-950 text-lg font-semibold tracking-wide text-gold-400">
-                    {t.title}
-                  </div>
-                )}
+                <Image src={t.image} alt={`${t.title} screenshot`} fill sizes="340px" className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]" />
               </div>
               <div className="p-5">
                 <h3 className="font-heading text-lg font-semibold text-ink">{t.title}</h3>
