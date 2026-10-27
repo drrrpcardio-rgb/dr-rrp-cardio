@@ -110,7 +110,7 @@ export function SimulationLab() {
         </Reveal>
 
         {/* The other tools */}
-        <StaggerGroup className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <StaggerGroup className="mt-6 grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-4">
           {rest.map((t) => {
             const Icon = ICONS[t.id];
             return (

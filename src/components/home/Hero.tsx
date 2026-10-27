@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
-import { Activity, ArrowRight, PlayCircle, Waves } from "lucide-react";
+import { Activity, ArrowRight, MonitorPlay, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Aurora } from "@/components/ui/Motion";
 import { RotatingWord } from "@/components/ui/RotatingWord";
@@ -168,15 +168,15 @@ export function Hero() {
 
           {/* Floating highlights */}
           <Link
-            href="/echo-simulator"
+            href="/simulators"
             className="float-slow absolute top-10 -left-4 hidden items-center gap-3 rounded-2xl border border-white/15 bg-royal-900/70 px-4 py-3 shadow-xl backdrop-blur-md transition-colors hover:border-gold-400/60 sm:flex lg:-left-12"
           >
             <span className="flex size-9 items-center justify-center rounded-xl bg-gold-400 text-royal-950">
-              <Waves size={18} aria-hidden="true" />
+              <MonitorPlay size={18} aria-hidden="true" />
             </span>
             <span className="text-left leading-tight">
-              <span className="block text-sm font-semibold text-white">3D echo simulator</span>
-              <span className="block text-xs text-royal-200">16 views · 22 cases · free</span>
+              <span className="block text-sm font-semibold text-white">Free simulators</span>
+              <span className="block text-xs text-royal-200">Echo · CT · ECG · Cath lab</span>
             </span>
           </Link>
           <Link
