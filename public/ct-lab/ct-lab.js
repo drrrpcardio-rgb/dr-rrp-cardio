@@ -1066,6 +1066,60 @@
       lesions: [{ v: 'RCA', at: 0.5, len: 10, sten: 0.45, type: 'soft', ecc: 0.6, ang: 200 }],
       teach: ['At high heart rates diastasis disappears: give a beta-blocker, use end-systole (35–45%) or a faster scanner.', 'Ectopic beats in step-and-shoot mode cause misregistration (stair-step) artefacts; a single-beat wide-detector scan avoids them.', 'If motion makes a segment unreadable, say so: CAD-RADS N or the segment is non-diagnostic.'],
     },
+    {
+      id: 'minimal', title: 'Minimal plaque', pt: '52 F', hr: 62, bmi: 25, circ: 14, rhythm: 'sinus',
+      hx: 'Atypical chest pain, treated hypertension, mother had an MI at 64. CCTA to look for coronary disease.',
+      lesions: [
+        { v: 'LAD', at: 0.12, len: 6, sten: 0.2, type: 'soft', ecc: 0.7, ang: 150 },
+        { v: 'RCA', at: 0.45, len: 3, sten: 0.12, type: 'mixed', ecc: 0.95, ang: -40 },
+      ],
+      teach: ['A thin non-calcified plaque in the proximal LAD and a small partly calcified plaque in the mid RCA, both under 25%: CAD-RADS 1, minimal non-obstructive disease.', 'Any plaque means atherosclerosis is present. The calcium score sets the plaque burden (CAC 1–100 = P1), and even minimal plaque is a reason to start preventive therapy.', 'Small calcified plaques bloom: grade the lumen on the cross-section, not the size of the bright spot.'],
+    },
+    {
+      id: 'rca-hrp', title: 'Non-obstructive high-risk plaque, RCA', pt: '45 M', hr: 63, bmi: 27, circ: 14, rhythm: 'sinus',
+      hx: 'Two episodes of chest pain at rest last week, troponin negative, smoker, LDL 4.6 mmol/l.',
+      lesions: [{ v: 'RCA', at: 0.22, len: 14, sten: 0.42, type: 'hrp', ecc: 0.7, ang: 200, rem: 0.45 }],
+      teach: ['The proximal RCA plaque narrows the lumen only 25–49%, but it is low attenuation with positive remodelling and spotty calcium: CAD-RADS 2/HRP.', 'The HRP modifier applies at any stenosis grade. Many acute events start in plaques like this that do not limit flow.', 'High-risk plaque calls for intensive preventive therapy. On its own, a non-obstructive plaque is not a reason for invasive angiography.'],
+    },
+    {
+      id: 'obese', title: 'High BMI, noisy images', pt: '50 F', hr: 68, bmi: 38, circ: 16, rhythm: 'sinus',
+      hx: 'BMI 38, type 2 diabetes, exertional breathlessness. Plan kV and tube current for a large patient.',
+      lesions: [
+        { v: 'LAD', at: 0.36, len: 10, sten: 0.4, type: 'soft', ecc: 0.65, ang: 60 },
+        { v: 'RCA', at: 0.3, len: 8, sten: 0.3, type: 'soft', ecc: 0.6, ang: 150 },
+      ],
+      teach: ['Noise rises steeply with body size. For a large patient use 120 kV and a higher tube current, or stronger iterative reconstruction, so non-calcified plaque stays visible.', 'Low kV boosts iodine contrast, but in a large patient too few photons reach the detector and the noise hides soft plaque.', 'Contrast enhancement is lower in large patients: a faster injection or more concentrated contrast helps.', 'The mid-LAD and RCA plaques are both 25–49%: CAD-RADS 2.'],
+    },
+    {
+      id: 'lcx-mod', title: 'Moderate LCx stenosis', pt: '61 M', hr: 62, bmi: 28, circ: 15, rhythm: 'sinus',
+      hx: 'Diabetes and hypertension, chest discomfort on exertion, equivocal exercise ECG.',
+      lesions: [
+        { v: 'LCX', at: 0.3, len: 10, sten: 0.6, type: 'mixed', ecc: 0.7, ang: 250 },
+        { v: 'LAD', at: 0.42, len: 8, sten: 0.3, type: 'calc', ecc: 0.85, ang: 110 },
+      ],
+      teach: ['A 50–69% stenosis is CAD-RADS 3. Functional testing (stress imaging or CT-FFR) is suggested to see whether it limits flow.', 'The LCx runs in the left atrioventricular groove beside the great cardiac vein and the left atrial appendage. Follow the artery on the CPR so you do not grade the vein.', 'In partly calcified plaque, measure the lumen on the cross-section, inside the calcium, not at its outer edge.'],
+    },
+    {
+      id: 'bifurcation', title: 'LAD–diagonal bifurcation lesion', pt: '57 M', hr: 60, bmi: 26, circ: 14, rhythm: 'sinus',
+      hx: 'Exertional angina for 3 months despite medical therapy, positive exercise ECG.',
+      lesions: [
+        { v: 'LAD', at: 0.17, len: 8, sten: 0.74, type: 'mixed', ecc: 0.6, ang: 30 },
+        { v: 'LAD', at: 0.235, len: 8, sten: 0.62, type: 'soft', ecc: 0.55, ang: 60 },
+        { v: 'D1', at: 0.04, len: 6, sten: 0.55, type: 'soft', ecc: 0.5, ang: 0 },
+      ],
+      teach: ['Disease on both sides of the first diagonal and at its ostium is a bifurcation lesion. The Medina code scores the proximal main vessel, distal main vessel and side branch (1 = 50% or more): here 1,1,1.', 'Switch the CPR to Diagonal 1 to grade the side-branch ostium; it is easy to miss on the LAD view.', 'The worst stenosis is 70–99% in one vessel: CAD-RADS 4A. Side-branch involvement changes the PCI plan (provisional or two-stent).'],
+    },
+    {
+      id: '3vd', title: 'Three-vessel disease', pt: '69 M', hr: 64, bmi: 29, circ: 16, rhythm: 'sinus',
+      hx: 'Type 2 diabetes, ex-smoker, CCS class III angina with falling exercise tolerance.',
+      lesions: [
+        { v: 'LAD', at: 0.3, len: 12, sten: 0.78, type: 'mixed', ecc: 0.6, ang: 80 },
+        { v: 'LCX', at: 0.42, len: 10, sten: 0.76, type: 'calc', ecc: 0.8, ang: 200 },
+        { v: 'RCA', at: 0.4, len: 14, sten: 0.82, type: 'soft', ecc: 0.55, ang: 100 },
+        { v: 'RCA', at: 0.72, len: 8, sten: 0.35, type: 'calc', ecc: 0.85, ang: -30 },
+      ],
+      teach: ['70% or more in all three vessels is CAD-RADS 4B (as is left main 50% or more). Invasive angiography is recommended.', 'With diabetes and three-vessel disease the heart team usually favours bypass surgery (FREEDOM trial); the SYNTAX score from the angiogram helps decide.', 'Grade each vessel on its own CPR and cross-section. The calcified LCx lesion blooms, so use the wide window.'],
+    },
   ];
   const GROUPS = ['LM', 'LAD', 'LCX', 'RCA'];
   const GROUP_NAME = { LM: 'Left main', LAD: 'LAD', LCX: 'LCx', RCA: 'RCA' };
@@ -1132,22 +1186,33 @@
   const MOT = nrm([0.75, -0.45, 0.48]);
   let MIS = null;
   function buildMotionGrid() {
-    const pts = { R: [], C: [], A: [] };
-    for (const v of VLIST) for (let i = 0; i < v.n; i += 4) pts[v.mg].push(v.pts[i]);
+    const G = ['R', 'C', 'A'], P = {}, lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
+    for (const g of G) {
+      const list = [];
+      for (const v of VLIST) if (v.mg === g) for (let i = 0; i < v.n; i += 4) list.push(v.pts[i]);
+      const a = new Float64Array(list.length * 3);
+      list.forEach((p, n) => { a[3 * n] = p[0]; a[3 * n + 1] = p[1]; a[3 * n + 2] = p[2]; for (let q = 0; q < 3; q++) { lo[q] = Math.min(lo[q], p[q]); hi[q] = Math.max(hi[q], p[q]); } });
+      P[g] = a;
+    }
     for (let k = 0; k < GZ; k++) for (let j = 0; j < GY; j++) for (let i = 0; i < GX; i++) {
       const x = X0 + (i + 0.5) * 4, y = Y0 + (j + 0.5) * 4, z = Z0 + (k + 0.5) * 4;
       const o = (k * GY + j) * GX + i;
+      // far from every artery: no motion here, and the exact distances do not matter
+      const bx = Math.max(lo[0] - x, 0, x - hi[0]), by = Math.max(lo[1] - y, 0, y - hi[1]), bz = Math.max(lo[2] - z, 0, z - hi[2]);
+      if (bx * bx + by * by + bz * bz > 1600) { GD.R[o] = GD.C[o] = GD.A[o] = 1e3; HW[o] = 0; continue; }
       let dmin = 1e9;
-      for (const g of ['R', 'C', 'A']) {
+      for (const g of G) {
+        const a = P[g];
         let m = 1e18;
-        for (const p of pts[g]) { const d = (p[0] - x) ** 2 + (p[1] - y) ** 2 + (p[2] - z) ** 2; if (d < m) m = d; }
+        for (let n = 0; n < a.length; n += 3) { const dx = a[n] - x, dy = a[n + 1] - y, dz = a[n + 2] - z, d = dx * dx + dy * dy + dz * dz; if (d < m) m = d; }
         GD[g][o] = Math.sqrt(m);
-        dmin = Math.min(dmin, GD[g][o]);
+        if (GD[g][o] < dmin) dmin = GD[g][o];
       }
       HW[o] = 1 - sstep(22, 40, dmin);
     }
   }
   function updateBlur(phasePct) {
+    IMGV++;
     const b = blurFor(phasePct);
     for (let o = 0; o < GN; o++) {
       const w = HW[o];
@@ -1177,6 +1242,7 @@
 
   // ───────────────────────── sampling ─────────────────────────
   const NODATA = -5000;
+  let IMGV = 0; // bumped when the images change (case, arteries, scan, recon phase); views cache on it
   // voxel value with contrast, including the partial-volume share of a second compartment
   function hv(o) {
     const g = GA[TAG[o] & 7], f = FR[o];
@@ -1459,9 +1525,9 @@
   }
 
   // sample spacing so the image is about one sample per screen pixel
-  function gridFor(vp, wmm, hmm, maxPx = 560, minMM = 0.28) {
+  function gridFor(vp, wmm, hmm, maxPx = 560, minMM = 0.28, f = 1) {
     const s = Math.min(vp.W / wmm, vp.H / hmm);
-    const sp = Math.max(minMM, 1 / s, Math.max(wmm, hmm) / maxPx);
+    const sp = Math.max(minMM, 1 / s, Math.max(wmm, hmm) / maxPx) * f;
     return { sp, c: Math.max(8, Math.round(wmm / sp)), r: Math.max(8, Math.round(hmm / sp)) };
   }
 
@@ -1486,22 +1552,27 @@
   function renderMPR(vp, orient, opts = {}) {
     const zoom = opts.zoom ?? S.read.zoom;
     const pl = planeOf(orient, zoom);
-    const g = gridFor(vp, pl.w, pl.h, opts.maxPx || 560);
-    const id = vp.img(g.c, g.r), d = id.data;
+    const gF = gridFor(vp, pl.w, pl.h, opts.maxPx || 560);
     const [W, L] = opts.wl || S.read.wl;
     const slab = opts.slab ?? S.read.slab, nn = NORMAL[orient];
+    const key = [orient, vp.W, vp.H, gF.c, gF.r, pl.u0, pl.v0, pl.w, pl.h, S.cp[orient === 'ax' ? 2 : orient === 'cor' ? 1 : 0], W, L, slab, opts.recon ? S.read.kernel + S.read.ir : '-',
+      IMGV, NAMP, +USE_MOTION, +USE_ART, +USE_RANGE, S.range[0], S.range[1], GA.join(',')].join('|');
+    if ((key === vp.mprKey || (LOD && key + '|lod' === vp.mprKey)) && vp.mprG && vp.off.width === vp.mprG.c && vp.off.height === vp.mprG.r) { vp.blit(pl.w, pl.h); vp.plane = { orient, ...pl }; return pl; }
+    const g = LOD && opts.recon ? gridFor(vp, pl.w, pl.h, opts.maxPx || 560, 0.28, LOD_F) : gF;
+    const id = vp.img(g.c, g.r), d = id.data;
+    vp.mprKey = g === gF ? key : key + '|lod'; vp.mprG = g;
     const ns = slab > 0 ? Math.max(2, Math.round(slab / 0.8)) : 1;
     let buf = new Float32Array(g.c * g.r);
     for (let r = 0; r < g.r; r++) {
       const v = pl.v0 + (r + 0.5) * (pl.h / g.r);
       for (let c = 0; c < g.c; c++) {
         const u = pl.u0 + (c + 0.5) * (pl.w / g.c);
-        const p = planePt(orient, u, v);
+        const px = orient === 'sag' ? S.cp[0] : X0 + u, py = orient === 'ax' ? Y0 + v : orient === 'cor' ? S.cp[1] : Y0 + u, pz = orient === 'ax' ? S.cp[2] : ZTOP - v;
         let h;
-        if (ns === 1) h = sampleScan(p[0], p[1], p[2]);
+        if (ns === 1) h = sampleScan(px, py, pz);
         else {
           h = -1e9;
-          for (let s = 0; s < ns; s++) { const o = (s / (ns - 1) - 0.5) * slab; const q = sampleScan(p[0] + nn[0] * o, p[1] + nn[1] * o, p[2] + nn[2] * o); if (q > h) h = q; }
+          for (let s = 0; s < ns; s++) { const o = (s / (ns - 1) - 0.5) * slab; const q = sampleScan(px + nn[0] * o, py + nn[1] * o, pz + nn[2] * o); if (q > h) h = q; }
         }
         buf[r * g.c + c] = h;
       }
@@ -1683,6 +1754,8 @@
   function planeLabels(vp) {
     const pl = vp.plane;
     if (!pl || !S.read.labels) return;
+    const lk = vp.mprKey.replace(/\|lod$/, '') + '|' + S.read.slab;
+    if (vp.lblKey === lk) return drawLabels(vp, vp.lblItems);
     const o = pl.orient, sp = Math.max(pl.w, pl.h) / 64;
     const nc = Math.max(4, Math.round(pl.w / sp)), nr = Math.max(4, Math.round(pl.h / sp));
     const ids = new Int8Array(nc * nr).fill(-1);
@@ -1713,6 +1786,7 @@
       const q = vp.fromMM(((a.c + 0.5) * pl.w) / nc, ((a.r + 0.5) * pl.h) / nr);
       items.push({ x: q[0], y: q[1], text: ANAT[a.id] });
     }
+    vp.lblKey = lk; vp.lblItems = items;
     drawLabels(vp, items);
   }
   // labels for the 3D view, from what each pixel's ray hit: an artery is named where its own surface is visible,
@@ -1846,9 +1920,29 @@
   let heartField = null;
   function heartKey() { return `${S.cs && S.cs.id}|${Array.from(GA, (g) => g | 0).join(',')}|${S.range[0] | 0}|${S.range[1] | 0}`; }
   function buildHeartField() {
-    const i0 = clamp(Math.floor((VRBOX[0] - X0) / DX), 0, NX - 1), i1 = clamp(Math.ceil((VRBOX[1] - X0) / DX), 0, NX - 1);
-    const j0 = clamp(Math.floor((VRBOX[2] - Y0) / DX), 0, NY - 1), j1 = clamp(Math.ceil((VRBOX[3] - Y0) / DX), 0, NY - 1);
-    const k0 = clamp(Math.floor((VRBOX[4] - Z0) / DZ), 0, NZ - 1), k1 = clamp(Math.ceil((VRBOX[5] - Z0) / DZ), 0, NZ - 1);
+    let i0 = clamp(Math.floor((VRBOX[0] - X0) / DX), 0, NX - 1), i1 = clamp(Math.ceil((VRBOX[1] - X0) / DX), 0, NX - 1);
+    let j0 = clamp(Math.floor((VRBOX[2] - Y0) / DX), 0, NY - 1), j1 = clamp(Math.ceil((VRBOX[3] - Y0) / DX), 0, NY - 1);
+    let k0 = clamp(Math.floor((VRBOX[4] - Z0) / DZ), 0, NZ - 1), k1 = clamp(Math.ceil((VRBOX[5] - Z0) / DZ), 0, NZ - 1);
+    // shrink to the heart and aorta inside the scan range (plus room for the blur)
+    {
+      let a0 = 1e9, a1 = -1, b0 = 1e9, b1 = -1, c0 = 1e9, c1 = -1;
+      for (let k = k0; k <= k1; k++) {
+        const z = Z0 + (k + 0.5) * DZ;
+        if (z < S.range[0] || z > S.range[1]) continue;
+        for (let j = j0; j <= j1; j++) {
+          let o = (k * NY + j) * NX + i0;
+          for (let i = i0; i <= i1; i++, o++) {
+            const lab = TAG[o] >> 3;
+            if (lab !== L_HEART && lab !== L_AORTA) continue;
+            if (i < a0) a0 = i; if (i > a1) a1 = i; if (j < b0) b0 = j; if (j > b1) b1 = j; if (k < c0) c0 = k; if (k > c1) c1 = k;
+          }
+        }
+      }
+      if (a1 >= 0) {
+        const p = 6;
+        i0 = Math.max(i0, a0 - p); i1 = Math.min(i1, a1 + p); j0 = Math.max(j0, b0 - p); j1 = Math.min(j1, b1 + p); k0 = Math.max(k0, c0 - p); k1 = Math.min(k1, c1 + p);
+      }
+    }
     const nx = i1 - i0 + 1, ny = j1 - j0 + 1, nz = k1 - k0 + 1, n = nx * ny * nz;
     let a = new Float32Array(n), b = new Float32Array(n);
     for (let k = 0; k < nz; k++) {
@@ -1862,15 +1956,64 @@
       }
     }
     // separable [1 4 6 4 1] / 16 along x, y and z, twice (about 1.4 voxels)
-    for (const [st, len] of [[1, nx], [nx, ny], [nx * ny, nz], [1, nx], [nx, ny], [nx * ny, nz]]) {
-      for (let q = 0; q < n; q++) {
-        const p = ((q / st) | 0) % len;
-        const m2 = p > 1 ? a[q - 2 * st] : a[q], m1 = p > 0 ? a[q - st] : a[q], p1 = p < len - 1 ? a[q + st] : a[q], p2 = p < len - 2 ? a[q + 2 * st] : a[q];
-        b[q] = (m2 + 4 * m1 + 6 * a[q] + 4 * p1 + p2) / 16;
+    // rows (fixed j, k) that hold anything other than HF_OUT
+    let busy = new Uint8Array(ny * nz), busy2 = new Uint8Array(ny * nz);
+    for (let r = 0; r < ny * nz; r++) { for (let q = r * nx, e = q + nx; q < e; q++) if (a[q] !== HF_OUT) { busy[r] = 1; break; } }
+    for (let pass = 0; pass < 6; pass++) {
+      const ax = pass % 3, st = ax === 0 ? 1 : ax === 1 ? nx : nx * ny, len = ax === 0 ? nx : ax === 1 ? ny : nz, s2 = 2 * st;
+      for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++) {
+        const base = (k * ny + j) * nx, pr = ax === 1 ? j : k, row = k * ny + j;
+        let any = busy[row];
+        if (!any && ax !== 0) {
+          const rs = ax === 1 ? 1 : ny;
+          for (let d = -2; d <= 2 && !any; d++) { const p2 = pr + d; if (p2 >= 0 && p2 < len) any = busy[row + d * rs]; }
+        }
+        busy2[row] = any;
+        if (!any) { b.fill(HF_OUT, base, base + nx); continue; }
+        if (ax !== 0 && pr > 1 && pr < len - 2) {
+          for (let q = base, e = base + nx; q < e; q++) b[q] = (a[q - s2] + 4 * a[q - st] + 6 * a[q] + 4 * a[q + st] + a[q + s2]) / 16;
+          continue;
+        }
+        for (let i = 0; i < nx; i++) {
+          const q = base + i, p = ax === 0 ? i : pr;
+          const m2 = p > 1 ? a[q - s2] : a[q], m1 = p > 0 ? a[q - st] : a[q], p1 = p < len - 1 ? a[q + st] : a[q], p2 = p < len - 2 ? a[q + s2] : a[q];
+          b[q] = (m2 + 4 * m1 + 6 * a[q] + 4 * p1 + p2) / 16;
+        }
       }
       const t = a; a = b; b = t;
+      const u = busy; busy = busy2; busy2 = u;
     }
-    heartField = { key: heartKey(), data: a, i0, j0, k0, nx, ny, nz };
+    // coarse occupancy in 4-voxel cells, grown by one cell: a ray can jump straight through cells the surface is not in
+    const OC = 4, ocx = Math.ceil(nx / OC), ocy = Math.ceil(ny / OC), ocz = Math.ceil(nz / OC), occ = new Uint8Array(ocx * ocy * ocz), occ2 = new Uint8Array(occ.length);
+    for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++) {
+      let q = (k * ny + j) * nx;
+      const row = (((k / OC) | 0) * ocy + ((j / OC) | 0)) * ocx;
+      for (let i = 0; i < nx; i++, q++) if (a[q] > HF_THR - 30) occ[row + ((i / OC) | 0)] = 1;
+    }
+    for (let k = 0; k < ocz; k++) for (let j = 0; j < ocy; j++) for (let i = 0; i < ocx; i++) {
+      if (!occ[(k * ocy + j) * ocx + i]) continue;
+      for (let dk = -1; dk <= 1; dk++) for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+        const kk = k + dk, jj = j + dj, ii = i + di;
+        if (kk >= 0 && jj >= 0 && ii >= 0 && kk < ocz && jj < ocy && ii < ocx) occ2[(kk * ocy + jj) * ocx + ii] = 1;
+      }
+    }
+    const bb = [X0 + (i0 + 0.5) * DX, X0 + (i1 + 0.5) * DX, Y0 + (j0 + 0.5) * DX, Y0 + (j1 + 0.5) * DX, Z0 + (k0 + 0.5) * DZ, Z0 + (k1 + 0.5) * DZ];
+    heartField = { key: heartKey(), data: a, i0, j0, k0, nx, ny, nz, OC, ocx, ocy, occ: occ2, bb };
+  }
+  // if (x, y, z) is in a cell the heart surface cannot be in, the distance (mm) along dir to leave that cell; else 0
+  function hfSkip(x, y, z, dir) {
+    const F = heartField, fx = (x - X0) / DX - 0.5 - F.i0, fy = (y - Y0) / DX - 0.5 - F.j0, fz = (z - Z0) / DZ - 0.5 - F.k0;
+    if (fx < 0 || fy < 0 || fz < 0 || fx >= F.nx - 1 || fy >= F.ny - 1 || fz >= F.nz - 1) return 0;
+    const OC = F.OC, ci = (fx / OC) | 0, cj = (fy / OC) | 0, ck = (fz / OC) | 0;
+    if (F.occ[(ck * F.ocy + cj) * F.ocx + ci]) return 0;
+    let te = 1e9;
+    const f = [fx, fy, fz], c = [ci, cj, ck], s = [DX, DX, DZ];
+    for (let q = 0; q < 3; q++) {
+      const dv = dir[q] / s[q];
+      if (dv > 1e-9) te = Math.min(te, ((c[q] + 1) * OC - f[q]) / dv);
+      else if (dv < -1e-9) te = Math.min(te, (c[q] * OC - f[q]) / dv);
+    }
+    return te + 0.02;
   }
   // trilinear sample of the heart field
   function hfAt(x, y, z) {
@@ -1945,11 +2088,12 @@
     }
     return -1;
   }
+  const VR_FR0 = { heart: 150, tree: 200, mip: 150 }, VR_FR = { ...VR_FR0 };
   function renderVR(vp, fast) {
     const cam = camera(), mode = S.read.vr;
     const asp = vp.W / vp.H;
     // the analytic tree is cheap enough to draw finer, which keeps thin branches from stair-stepping
-    const res = mode === 'tree' ? (fast ? 200 : 440) : fast ? 150 : 300;
+    const res = fast ? VR_FR[mode] : mode === 'tree' ? 440 : 300;
     const cols = asp >= 1 ? Math.round(res * asp) : res, rows = asp >= 1 ? res : Math.round(res / asp);
     const id = vp.img(cols, rows), d = id.data;
     const ex = cam.ext * (asp >= 1 ? asp : 1), ey = cam.ext * (asp >= 1 ? 1 : 1 / asp);
@@ -2025,7 +2169,22 @@
             // heart surface: march the smoothed field, then bisect to the threshold
             let hb = -1;
             if (mode === 'heart') {
-              for (let t = t0; t < t1; t += step) if (hfAt(o0[0] + dir[0] * t, o0[1] + dir[1] * t, o0[2] + dir[2] * t) > HF_THR) { hit = t; break; }
+              // only inside the field's box, jumping over empty cells
+              let ha = t0, hz = t1;
+              for (let q = 0; q < 3; q++) {
+                const lo = heartField.bb[2 * q], hi = heartField.bb[2 * q + 1];
+                if (Math.abs(dir[q]) < 1e-6) { if (o0[q] < lo || o0[q] > hi) hz = -1; continue; }
+                let ta = (lo - o0[q]) / dir[q], tb = (hi - o0[q]) / dir[q];
+                if (ta > tb) { const tt = ta; ta = tb; tb = tt; }
+                if (ta > ha) ha = ta; if (tb < hz) hz = tb;
+              }
+              for (let t = ha; t < hz;) {
+                const x = o0[0] + dir[0] * t, y = o0[1] + dir[1] * t, z = o0[2] + dir[2] * t;
+                const sk = hfSkip(x, y, z, dir);
+                if (sk > 0) { t += sk; continue; }
+                if (hfAt(x, y, z) > HF_THR) { hit = t; break; }
+                t += step;
+              }
               if (hit >= 0) {
                 let a = Math.max(t0, hit - step), b = hit;
                 for (let it = 0; it < 6; it++) { const m = (a + b) / 2; if (hfAt(o0[0] + dir[0] * m, o0[1] + dir[1] * m, o0[2] + dir[2] * m) > HF_THR) b = m; else a = m; }
@@ -2069,7 +2228,7 @@
     const ctx = vp.ctx;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, vp.W, vp.H);
     ctx.imageSmoothingEnabled = true; ctx.drawImage(vp.off, 0, 0, vp.W, vp.H);
-    vrCache = { cam, ex, ey, labels: S.read.labels ? vrLabels(cam, ex, ey, cols, rows, hitT, hitV, mode) : [] };
+    vrCache = { W: vp.W, H: vp.H, cam, ex, ey, labels: S.read.labels ? vrLabels(cam, ex, ey, cols, rows, hitT, hitV, mode) : [] };
     drawVROverlay(vp);
   }
   function drawVROverlay(vp) {
@@ -2146,11 +2305,16 @@
     const imgH = vp.H - prof;
     const lenmm = tr.len + 4;
     const half = clamp((imgH / vp.W) * lenmm * 0.5, 7, 22);
-    const cols = clamp(Math.round(Math.min(vp.W, lenmm / 0.12)), 64, 900);
-    const sp = lenmm / cols;
-    const rows = clamp(Math.round((2 * half) / sp), 16, 400);
-    const id = vp.img(cols, rows), d = id.data;
+    const colsF = clamp(Math.round(Math.min(vp.W, lenmm / 0.12)), 64, 900);
+    const rowsF = clamp(Math.round((2 * half) / (lenmm / colsF)), 16, 400);
     const [W, L] = S.read.wl;
+    const key = [tr.key, colsF, rowsF, half, S.read.alpha, W, L, S.read.kernel, S.read.ir, IMGV, NAMP, +USE_MOTION, +USE_ART, GA.join(',')].join('|');
+    const hit = (key === vp.cprKey || (LOD && key + '|lod' === vp.cprKey)) && vp.cprG && vp.off.width === vp.cprG[0] && vp.off.height === vp.cprG[1];
+    const cols = hit || !LOD ? colsF : Math.max(48, Math.round(colsF / LOD_F)), sp = lenmm / cols;
+    const rows = hit || !LOD ? rowsF : clamp(Math.round((2 * half) / sp), 12, 400);
+    if (!hit) {
+    vp.cprKey = cols === colsF ? key : key + '|lod'; vp.cprG = [cols, rows];
+    const id = vp.img(cols, rows), d = id.data;
     const alpha = S.read.alpha * DEG;
     const col = new Float32Array(rows);
     let buf = new Float32Array(cols * rows);
@@ -2177,6 +2341,7 @@
     buf = reconPost(buf, cols, rows, sp, (2 * half) / rows);
     paint(d, buf, W, L);
     vp.octx.putImageData(id, 0, 0);
+    }
     const ctx = vp.ctx;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, vp.W, vp.H);
     const sc = Math.min(vp.W / lenmm, imgH / (2 * half));
@@ -2239,7 +2404,7 @@
     const tr = TRACK; if (!tr) return;
     const k = S.read.cur, v = tr.tv[k], i = tr.ti[k];
     const size = clamp(v.rad[i] * 7, 9, 16);
-    const g = gridFor(vp, size, size, 240, 0.05);
+    const g = gridFor(vp, size, size, 240, 0.05, LOD ? LOD_F : 1);
     const id = vp.img(g.c, g.r), d = id.data;
     const [W, L] = S.read.wl;
     const alpha = S.read.alpha * DEG;
@@ -2275,13 +2440,17 @@
   const ART_COL = { LM: [245, 179, 1], LAD: [255, 107, 107], LCX: [79, 209, 161], RCA: [90, 169, 255] };
   function buildCAC() {
     const nS = Math.floor((S.range[1] - S.range[0]) / CAC_T);
-    const img = new Int16Array(CAC_G * CAC_G * nS), map = new Int16Array(CAC_G * CAC_G * nS);
-    GA.fill(0); NAMP = noiseSigma(120, 80) / 30 * 0.6 / 1.25;
+    const img = new Int16Array(CAC_G * CAC_G * nS).fill(-1000), map = new Int16Array(CAC_G * CAC_G * nS);
+    const g0 = GA.slice(), n0 = NAMP;
+    // automatic exposure control: above BMI 28 the tube current rises to hold the noise
+    GA.fill(0); NAMP = noiseSigma(120, 80 * Math.max(1, (S.cs.bmi / 28) ** 2.8)) / 30 * 0.6 / 1.25;
+    const c0 = Math.floor(CAC_CROP[0] / CAC_SP) - 2, c1 = Math.ceil((CAC_CROP[0] + CAC_CROP[2]) / CAC_SP) + 2;
+    const r0 = Math.floor(CAC_CROP[1] / CAC_SP) - 2, r1 = Math.ceil((CAC_CROP[1] + CAC_CROP[2]) / CAC_SP) + 2;
     for (let s = 0; s < nS; s++) {
       const zc = S.range[1] - (s + 0.5) * CAC_T;
-      for (let r = 0; r < CAC_G; r++) {
+      for (let r = Math.max(0, r0); r < Math.min(CAC_G, r1); r++) {
         const y = Y0 + (r + 0.5) * CAC_SP;
-        for (let c = 0; c < CAC_G; c++) {
+        for (let c = Math.max(0, c0); c < Math.min(CAC_G, c1); c++) {
           const x = X0 + (c + 0.5) * CAC_SP;
           const h = (tri(x, y, zc - 1) + tri(x, y, zc) + tri(x, y, zc + 1)) / 3;
           img[(s * CAC_G + r) * CAC_G + c] = Math.round(h);
@@ -2323,6 +2492,7 @@
     const tot = { LM: 0, LAD: 0, LCX: 0, RCA: 0 };
     for (const c of comps) if (c.ok && c.ref) tot[c.ref] += c.score;
     S.cac = { nS, img, map, comps, ref: tot, refTotal: tot.LM + tot.LAD + tot.LCX + tot.RCA };
+    GA.set(g0); NAMP = n0;
     S.cacUser = {};
   }
   function cacUserTotals() {
@@ -2338,7 +2508,21 @@
   const dirty = new Set();
   let raf = 0;
   const mark = (...k) => { k.forEach((x) => dirty.add(x)); if (!raf) raf = requestAnimationFrame(flush); };
-  let vrFast = false;
+  let vrFast = false, vrT = 0;
+  function vrQuick(delay = 160) {
+    vrFast = true; mark('vr');
+    clearTimeout(vrT); vrT = setTimeout(() => { vrFast = false; mark('vr'); }, delay);
+  }
+  // While the user drags or scrolls, the slice views are drawn on a coarser grid (the volume voxels are 0.9 mm,
+  // so little is lost) and redrawn sharp once they pause.
+  const LOD_F = 1.6;
+  let LOD = false, lodT = 0;
+  const lodKeys = new Set();
+  function interact(...k) {
+    LOD = true; k.forEach((x) => lodKeys.add(x)); mark(...k);
+    clearTimeout(lodT);
+    lodT = setTimeout(() => { LOD = false; const ks = [...lodKeys]; lodKeys.clear(); mark(...ks); }, 160);
+  }
   function flush() {
     raf = 0;
     const list = [...dirty]; dirty.clear();
@@ -2408,12 +2592,22 @@
       $('#mprLbl').textContent = S.read.mpr === 'cor' ? `y ${S.cp[1].toFixed(1)} mm` : `x ${S.cp[0].toFixed(1)} mm`;
     },
     vr() {
-      const v = vp.vpVr; v.resize(); renderVR(v, vrFast);
+      const v = vp.vpVr; v.resize();
+      if (S.read.vr === 'heart' && (!heartField || heartField.key !== heartKey())) buildHeartField();
+      const t = performance.now(), m = S.read.vr;
+      renderVR(v, vrFast);
+      if (vrFast) VR_FR[m] = clamp(Math.round(VR_FR[m] * (0.5 + 0.5 * Math.sqrt(45 / Math.max(5, performance.now() - t)))), 90, VR_FR0[m]);
       $('#vrLbl').textContent = { heart: 'volume rendering', tree: 'coronary tree', mip: 'MIP' }[S.read.vr];
       $('#vrBl').textContent = { heart: 'VRT · cardiac preset', tree: 'VRT · coronary lumen', mip: 'MIP · W 800 L 330' }[S.read.vr];
       $('#vrBr').textContent = vrAngle();
     },
-    vrOverlay() { const v = vp.vpVr; if (!vrCache) return mark('vr'); renderVR(v, true); },
+    vrOverlay() {
+      const v = vp.vpVr;
+      if (!vrCache || vrCache.W !== v.W || vrCache.H !== v.H) return mark('vr');
+      const c = v.ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, v.W, v.H);
+      c.imageSmoothingEnabled = true; c.drawImage(v.off, 0, 0, v.W, v.H);
+      drawVROverlay(v);
+    },
     cpr() { const v = vp.vpCpr; v.resize(); renderCPR(v); $('#cprTr').textContent = `${dcScan().wl} · ${KER_NAME[S.read.kernel]}`; $('#cprLbl').textContent = `${TRACKS[S.read.track].name} · straightened · ${S.read.alpha}° · click to move the cursor`; },
     xs() { const v = vp.vpXs; v.resize(); renderXS(v); $('#xsBr').textContent = dcScan().wl; },
     readKv() { updateReadKv(); },
@@ -2620,22 +2814,22 @@
     if (!TRACK) return;
     let bi = -1, bd = 25;
     for (let k = 0; k < TRACK.n; k++) { const d = (TRACK.p[k][0] - S.cp[0]) ** 2 + (TRACK.p[k][1] - S.cp[1]) ** 2 + (TRACK.p[k][2] - S.cp[2]) ** 2; if (d < bd) { bd = d; bi = k; } }
-    if (bi >= 0) { S.read.cur = bi; mark('cpr', 'xs'); }
+    if (bi >= 0) { S.read.cur = bi; interact('cpr', 'xs'); }
   }
   function mprHandlers(key, getOrient) {
     const v = vp[key];
     onDrag(v.cv, {
-      down(e, b) { if (b === 0) { S.cp = viewToWorld(v, e); syncCursorToCP(); mark('ax', 'mpr', 'vrOverlay', 'readKv'); } },
+      down(e, b) { if (b === 0) { S.cp = viewToWorld(v, e); syncCursorToCP(); interact('ax', 'mpr', 'vrOverlay', 'readKv'); } },
       move(e, b, dx, dy) {
-        if (b === 2) { S.read.wl = [clamp(S.read.wl[0] + dx * 4, 50, 4000), clamp(S.read.wl[1] - dy * 2, -1000, 1500)]; mark('ax', 'mpr', 'cpr', 'xs'); }
-        else { S.cp = viewToWorld(v, e); syncCursorToCP(); mark('ax', 'mpr', 'vrOverlay', 'readKv'); }
+        if (b === 2) { S.read.wl = [clamp(S.read.wl[0] + dx * 4, 50, 4000), clamp(S.read.wl[1] - dy * 2, -1000, 1500)]; interact('ax', 'mpr', 'cpr', 'xs'); }
+        else { S.cp = viewToWorld(v, e); syncCursorToCP(); interact('ax', 'mpr', 'vrOverlay', 'readKv'); }
       },
       up() { mark('vrOverlay'); },
       wheel(e) {
         const o = getOrient(), n = NORMAL[o], st = (e.deltaY > 0 ? -1 : 1) * (o === 'ax' ? DZ : DX) * (e.shiftKey ? 4 : 1);
         if (e.ctrlKey) { S.read.zoom = clamp(S.read.zoom * (e.deltaY > 0 ? 0.85 : 1.18), 1, 4); }
         else { S.cp = [clamp(S.cp[0] + n[0] * st, X0 + 1, X0 + FOV - 1), clamp(S.cp[1] + n[1] * st, Y0 + 1, Y0 + FOV - 1), clamp(S.cp[2] + n[2] * st, Z0 + 1, ZTOP - 1)]; }
-        mark('ax', 'mpr', 'vrOverlay', 'readKv');
+        interact('ax', 'mpr', 'vrOverlay', 'readKv');
       },
       hover(e) {
         if (key !== 'vpAx' || !v.plane) return;
@@ -2648,30 +2842,30 @@
   mprHandlers('vpMpr', () => S.read.mpr);
   onDrag(vp.vpVr.cv, {
     down() { },
-    move(e, b, dx, dy) { S.read.yaw -= dx * 0.5; S.read.pitch = clamp(S.read.pitch + dy * 0.4, -85, 85); vrFast = true; mark('vr'); },
-    up() { vrFast = false; mark('vr'); },
-    wheel(e) { S.read.zoomVr = clamp(S.read.zoomVr * (e.deltaY > 0 ? 0.9 : 1.1), 0.7, 3); mark('vr'); },
+    move(e, b, dx, dy) { S.read.yaw -= dx * 0.5; S.read.pitch = clamp(S.read.pitch + dy * 0.4, -85, 85); vrQuick(300); },
+    up() { clearTimeout(vrT); vrFast = false; mark('vr'); },
+    wheel(e) { S.read.zoomVr = clamp(S.read.zoomVr * (e.deltaY > 0 ? 0.9 : 1.1), 0.7, 3); vrQuick(); },
   });
   $$('#vpVr .tools button').forEach((b) => b.addEventListener('click', () => {
     const p = { ant: [0, 0], lao: [-45, 20], rao: [35, 15], inf: [-10, -65] }[b.dataset.p];
-    S.read.yaw = p[0]; S.read.pitch = p[1]; mark('vr');
+    S.read.yaw = p[0]; S.read.pitch = p[1]; vrQuick(30);
   }));
   $$('#vpMpr .tools button').forEach((b) => b.addEventListener('click', () => {
     S.read.mpr = b.dataset.o; $$('#vpMpr .tools button').forEach((x) => x.classList.toggle('on', x === b)); mark('mpr');
   }));
   onDrag(vp.vpCpr.cv, {
-    down(e, b) { if (b === 0) cprPick(e); },
-    move(e, b, dx) { if (b === 2) { S.read.alpha = ((S.read.alpha + Math.round(dx)) % 360 + 360) % 360; $('#rotR').value = S.read.alpha; $('#rotO').textContent = S.read.alpha + '°'; mark('cpr', 'xs'); } else cprPick(e); },
-    wheel(e) { S.read.cur = clamp(S.read.cur + (e.deltaY > 0 ? 2 : -2), 0, TRACK.n - 1); cursorToCP(); },
+    down(e, b) { if (b === 0) cprPick(e, true); },
+    move(e, b, dx) { if (b === 2) { S.read.alpha = ((S.read.alpha + Math.round(dx)) % 360 + 360) % 360; $('#rotR').value = S.read.alpha; $('#rotO').textContent = S.read.alpha + '°'; interact('cpr', 'xs'); } else cprPick(e, true); },
+    wheel(e) { S.read.cur = clamp(S.read.cur + (e.deltaY > 0 ? 2 : -2), 0, TRACK.n - 1); cursorToCP(true); },
   });
-  function cprPick(e) {
+  function cprPick(e, live) {
     const g = cprGeo; if (!g) return;
     const r = vp.vpCpr.cv.getBoundingClientRect(), x = (e.clientX - r.left) * vp.vpCpr.dpr;
     const s = (x - g.ox) / g.sc - 2;
     S.read.cur = clamp(Math.round(s / 0.5), 0, TRACK.n - 1);
-    cursorToCP();
+    cursorToCP(live);
   }
-  function cursorToCP() { S.cp = TRACK.p[S.read.cur].slice(); mark('cpr', 'xs', 'ax', 'mpr', 'vrOverlay', 'readKv'); }
+  function cursorToCP(live) { S.cp = TRACK.p[S.read.cur].slice(); (live ? interact : mark)('cpr', 'xs', 'ax', 'mpr', 'vrOverlay', 'readKv'); }
 
   // topogram: drag the range lines, hover to preview axial level
   onDrag(vp.vpTopo.cv, {
@@ -2739,7 +2933,7 @@
     if (st === 'plan') mark('topo', 'planAx', 'ecg');
     if (st === 'cac') { if (!S.cac) { buildCAC(); cacSlice = Math.round(S.cac.nS * 0.3); } $('#cacSlice').max = S.cac.nS - 1; $('#cacSlice').value = cacSlice; renderCacTable(false); markDone('cac'); mark('cac'); }
     if (st === 'bolus') mark('mon', 'tac');
-    if (st === 'read' || st === 'report') { applyReadGains(); updateBlur(S.read.recon); mark('ax', 'mpr', 'vr', 'cpr', 'xs', 'readKv'); }
+    if (st === 'read' || st === 'report') { applyReadGains(); updateBlur(S.read.recon); mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); vrQuick(30); }
     if (st === 'report') buildReportForm();
   }
   function markDone(st) { const b = $(`#steps button[data-step="${st}"]`); b && b.classList.add('done'); }
@@ -2806,7 +3000,7 @@
 
   let ready = false;
   function loadCase(idx) {
-    S.caseIdx = idx; S.cs = CASES[idx]; S.meto = 0;
+    S.caseIdx = idx; S.cs = CASES[idx]; S.meto = 0; IMGV++;
     HU.set(baseHU); TAG.set(baseTag); FR.set(baseFR);
     if (S.cs.infarct) applyInfarct();
     buildCoronaries(S.cs);
@@ -2824,6 +3018,7 @@
   }
   function rebuildCoronaries() {
     // GTN changes vessel calibre
+    IMGV++;
     HU.set(baseHU); TAG.set(baseTag); FR.set(baseFR);
     if (S.cs.infarct) applyInfarct();
     buildCoronaries(S.cs); stampCoronaries(); buildMotionGrid(); buildTrack(S.read.track);
@@ -2839,7 +3034,7 @@
   function seg(id, fn) { $$(`#${id} button`).forEach((b) => b.addEventListener('click', () => { $$(`#${id} button`).forEach((x) => x.classList.toggle('on', x === b)); fn(b.dataset.v); })); }
   seg('kvSeg', (v) => { S.kv = +v; invalidateScan(); updatePlan(); });
   seg('gateSeg', (v) => { S.gating = v; invalidateScan(); updatePlan(); });
-  seg('vrSeg', (v) => { S.read.vr = v; mark('vr'); });
+  seg('vrSeg', (v) => { S.read.vr = v; vrQuick(30); });
   seg('lblSeg', (v) => { S.read.labels = v === '1'; mark('ax', 'mpr', 'vr'); });
   seg('kerSeg', (v) => { S.read.kernel = v; mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); });
   seg('irSeg', (v) => { S.read.ir = +v; mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); });
@@ -2928,6 +3123,7 @@
     const sigma = noiseSigma(S.kv, S.mas);
     const dose = doseEst();
     S.scan = { e, sigma, dose, cut: coverageProblem(), when: new Date() };
+    IMGV++;
     S.scanDone = true;
     // reconstruction phase limits
     const r = $('#reconR');
@@ -2936,7 +3132,6 @@
     else { r.min = 0; r.max = 95; S.read.recon = bestPhase(); r.value = S.read.recon; }
     $('#reconO').textContent = S.read.recon + '%';
     $('#reconRow').querySelector('label').textContent = S.gating === 'retro' ? 'Recon phase (any)' : S.gating === 'pro' ? 'Recon phase (window)' : 'Recon phase (fixed)';
-    if (!S.cac) buildCAC();
     $('#btnToRead').disabled = false;
     $('#steps button[data-step="read"]').disabled = false;
     $('#steps button[data-step="report"]').disabled = false;
@@ -2971,8 +3166,8 @@
   // controls: read
   const trackSel = $('#trackSel');
   Object.entries(TRACKS).forEach(([k, t]) => trackSel.add(new Option(t.name, k)));
-  trackSel.addEventListener('change', () => { S.read.track = trackSel.value; buildTrack(S.read.track); S.read.cur = Math.round(TRACK.n * 0.15); cursorToCP(); mark('vr'); });
-  range('rotR', 'rotO', (v) => { S.read.alpha = v; mark('cpr', 'xs'); }, (v) => v + '°');
+  trackSel.addEventListener('change', () => { S.read.track = trackSel.value; buildTrack(S.read.track); S.read.cur = Math.round(TRACK.n * 0.15); cursorToCP(); vrQuick(30); });
+  range('rotR', 'rotO', (v) => { S.read.alpha = v; interact('cpr', 'xs'); }, (v) => v + '°');
   $('#wlSel').addEventListener('change', (e) => { S.read.wl = e.target.value.split(',').map(Number); mark('ax', 'mpr', 'cpr', 'xs'); });
   $('#slabSel').addEventListener('change', (e) => { S.read.slab = +e.target.value; mark('ax', 'mpr'); });
   range('reconR', 'reconO', (v) => { S.read.recon = v; updateBlur(v); mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); }, (v) => v + '%');
@@ -2988,6 +3183,7 @@
     $('#repFb').innerHTML = '';
   }
   function checkReport(reveal) {
+    if (!S.cac && S.scan) buildCAC();
     const key = answerKey(S.cs, S.cac ? S.cac.refTotal : 0);
     let ok = 0, n = 0;
     const li = [];
@@ -3021,35 +3217,85 @@
     S.read.track = tk; trackSel.value = tk; buildTrack(tk);
     const k = TRACK.tv.findIndex((v, i) => v.id === vid && TRACK.ti[i] * 0.5 >= s);
     S.read.cur = k >= 0 ? k : 0;
-    cursorToCP(); mark('vr');
+    cursorToCP(); vrQuick(30);
   }
   $('#btnCheck').addEventListener('click', () => checkReport(false));
   $('#btnAnswer').addEventListener('click', () => checkReport(true));
   $('#btnNewCase').addEventListener('click', () => { const n = (S.caseIdx + 1) % CASES.length; caseSel.value = n; loadCase(n); });
 
   // resize
+  const VP_OF = { topo: 'vpTopo', planAx: 'vpPlanAx', ecg: 'vpEcg', cac: 'vpCac', mon: 'vpMon', tac: 'vpTac', ax: 'vpAx', mpr: 'vpMpr', vr: 'vpVr', cpr: 'vpCpr', xs: 'vpXs' };
   const ro = new ResizeObserver(() => {
     if (!ready) return;
     const st = S.step;
-    if (st === 'plan') mark('topo', 'planAx', 'ecg');
-    else if (st === 'cac') mark('cac');
-    else if (st === 'bolus') mark('mon', 'tac');
-    else mark('ax', 'mpr', 'vr', 'cpr', 'xs');
+    const keys = st === 'plan' ? ['topo', 'planAx', 'ecg'] : st === 'cac' ? ['cac'] : st === 'bolus' ? ['mon', 'tac'] : ['ax', 'mpr', 'vr', 'cpr', 'xs'];
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const stale = keys.filter((k) => {
+      const v = vp[VP_OF[k]], r = v.el.getBoundingClientRect();
+      return Math.max(2, Math.round(r.width * dpr)) !== v.cv.width || Math.max(2, Math.round(r.height * dpr)) !== v.cv.height;
+    });
+    if (stale.length) mark(...stale);
+    if (stale.includes('vr')) vrQuick(250);
   });
   ro.observe($('#stage'));
+
+  // ───────────────────────── saved volume ─────────────────────────
+  // The finished base volume is kept in this browser (IndexedDB), so later visits skip the build.
+  // It is keyed by a hash of this script: any change to the code builds and saves it again.
+  const VDB = 'ct-lab-volume', VSTORE = 'base';
+  const vdb = () => new Promise((res, rej) => {
+    const rq = indexedDB.open(VDB, 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore(VSTORE);
+    rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); rq.onblocked = () => rej(new Error('blocked'));
+  });
+  async function volumeKey() {
+    if (!SELF_SRC || typeof indexedDB === 'undefined') return null;
+    const src = await (await fetch(SELF_SRC, { cache: 'force-cache' })).text();
+    let h = 2166136261;
+    for (let i = 0; i < src.length; i++) { h ^= src.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return `${(h >>> 0).toString(36)}.${src.length}.${NX}x${NY}x${NZ}`;
+  }
+  async function loadSavedVolume(key) {
+    const db = await vdb();
+    try {
+      const get = (k) => new Promise((res, rej) => { const rq = db.transaction(VSTORE).objectStore(VSTORE).get(k); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); });
+      if ((await get('key')) !== key) return false;
+      const rec = await get('v');
+      if (!rec || rec.hu.length !== NV || rec.tag.length !== NV || rec.fr.length !== NV || rec.noise.length !== NV) return false;
+      baseHU.set(rec.hu); baseTag.set(rec.tag); baseFR.set(rec.fr); NOISE.set(rec.noise);
+      return true;
+    } finally { db.close(); }
+  }
+  async function saveVolume(key) {
+    const db = await vdb();
+    try {
+      await new Promise((res, rej) => {
+        const tx = db.transaction(VSTORE, 'readwrite');
+        tx.objectStore(VSTORE).put({ hu: baseHU, tag: baseTag, fr: baseFR, noise: NOISE }, 'v');
+        tx.objectStore(VSTORE).put(key, 'key');
+        tx.oncomplete = res; tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+      });
+    } finally { db.close(); }
+  }
 
   // ───────────────────────── boot ─────────────────────────
   async function boot() {
     const bar = $('#loadBar'), txt = $('#loadTxt');
     txt.textContent = 'Chest, heart and great vessels';
-    const vol = buildVolume((f) => { bar.style.width = `${f * 80}%`; });
-    await frame();
-    // detector noise is made here while the workers build the anatomy
-    genNoise();
-    await vol;
-    txt.textContent = 'Cardiac veins, lung vessels and bronchi'; bar.style.width = '84%'; await frame();
-    stampVeins();
-    stampLungVessels();
+    const key = await volumeKey().catch(() => null);
+    const saved = key ? await loadSavedVolume(key).catch(() => false) : false;
+    if (!saved) {
+      const vol = buildVolume((f) => { bar.style.width = `${f * 80}%`; });
+      await frame();
+      // detector noise is made here while the workers build the anatomy
+      genNoise();
+      await vol;
+      txt.textContent = 'Cardiac veins, lung vessels and bronchi'; bar.style.width = '84%'; await frame();
+      stampVeins();
+      stampLungVessels();
+      // save once the first case is on screen
+      if (key) setTimeout(() => saveVolume(key).catch((e) => console.warn('CT lab: volume not saved', e)), 2500);
+    }
     txt.textContent = 'Coronary arteries'; bar.style.width = '97%'; await frame();
     ready = true;
     const q = new URLSearchParams(location.search).get('case');

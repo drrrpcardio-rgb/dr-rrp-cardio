@@ -31,6 +31,12 @@ const cases = [
   "Patent LAD stent",
   "Left main disease",
   "Fast heart rate with ectopics",
+  "Minimal plaque",
+  "Non-obstructive high-risk plaque in the RCA",
+  "High BMI and image noise",
+  "Moderate LCx stenosis",
+  "LAD–diagonal bifurcation lesion",
+  "Three-vessel disease",
 ];
 
 const jsonLd = {
@@ -101,7 +107,7 @@ export default function CtSimulatorPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-royal-100 bg-white p-6 shadow-sm">
-            <h2 className="font-heading text-lg font-semibold text-royal-900">10 teaching cases</h2>
+            <h2 className="font-heading text-lg font-semibold text-royal-900">{cases.length} teaching cases</h2>
             <ul className="mt-3 space-y-1.5 text-sm text-ink-soft">
               {cases.map((c) => (
                 <li key={c} className="flex gap-2">
