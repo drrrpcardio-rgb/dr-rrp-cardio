@@ -1009,20 +1009,74 @@ function myoAt(a, b, c) {
 }
 // OUT.kind: 0 soft tissue, 1 blood / fluid, 2 valve, 3 bone, 4 lung, 5 air
 // OUT.myo: 1 LV wall, 2 RV wall, 3 atrial wall (for tissue Doppler); OUT.heart: sample lies in heart tissue (speckle moves with it)
-const OUT = { raw: 0, att: 1, kind: 0, myo: 0, heart: 0 };
+// OUT.raw: diffuse backscatter (the speckle brightness of the tissue itself)
+// OUT.imp: acoustic impedance relative to blood. Bright specular lines come from impedance steps the beam meets
+// head-on (fascia, pericardium against lung, valve leaflets), not from every change in brightness.
+const OUT = { raw: 0, att: 1, kind: 0, myo: 0, heart: 0, imp: 1, mass: 0, liver: 0 };
 let INSP = 0, RZ = 0, IVC_K = 1; // inspiration 0..1, caudal heart shift (cm), IVC radius factor
-function tissue(x, y, z) {
-  OUT.att = 1; OUT.kind = 0; OUT.myo = 0; OUT.heart = 0; OUT.mass = 0;
-  if (z <= ZMIN || z >= ZMAX) { OUT.raw = 0; OUT.att = 0; OUT.kind = 5; return; }
+// Ribs, as drawn in the 3D scene: bone from the back round to the costal cartilage near the sternum.
+// Bone reflects and absorbs almost everything (bright line, black shadow); cartilage lets most of the sound through.
+const RIB_N = 10, RIB_F0 = -80 * DEG, RIB_F1 = 72 * DEG, RIB_F2 = 84 * DEG, RIB_IN = 1.3, RIB_R = 0.38;
+const ribZ = (i, f) => { const zp = 12.5 - 2.3 * i, za = zp - 3.0 - 0.3 * i; return f <= RIB_F1 ? lerp(zp, za, (f - RIB_F0) / (RIB_F1 - RIB_F0)) : za + 0.8 * (f - RIB_F1) / (RIB_F2 - RIB_F1); };
+// 0 none, 1 rib bone, 2 costal cartilage
+function ribAt(x, y, z, s) {
+  if (s < RIB_IN - 0.5 || s > RIB_IN + 0.5 || z > 13 || z < -21) return 0;
+  const f = Math.atan2((y - bodyC(z)) / bodyD(z), Math.abs(x) / bodyW(z));
+  if (f < RIB_F0 || f > RIB_F2) return 0;
+  const ds = s - RIB_IN;
+  for (let i = 0; i < RIB_N; i++) {
+    const dz = z - ribZ(i, f); if (dz < -RIB_R || dz > RIB_R) continue;
+    // same size as the ribs drawn in the 3D view
+    const k = (dz * dz + ds * ds) / (RIB_R * RIB_R);
+    if (k < 1) return f > RIB_F1 ? 2 : 1;
+  }
+  return 0;
+}
+function ribHit(x, y, z) {
+  if (z > 13.5 || z < -21.5) return 0;
   const W = bodyW(z), D = bodyD(z), u = x / W, v = (y - bodyC(z)) / D, q = u * u + v * v;
-  if (q >= 1) { OUT.raw = 0; OUT.att = 0; OUT.kind = 5; return; }
+  if (q >= 1) return 0;
+  return ribAt(x, y, z, (1 - Math.sqrt(q)) * (W < D ? W : D));
+}
+// Rib shadow for one scan line. The probe face is ~1.5 cm long and ~1.2 cm thick and the ribs lie just under it, so
+// each steered beam leaves the whole face and crosses the rib layer shifted toward its steering angle. The part of
+// that footprint lying over bone is blocked: centred in an intercostal space the image is clear, on a rib it is dark,
+// and steering toward a neighbouring rib casts a shadow wedge at the edge of the sector.
+const RIB_LINE = { fb: 0, r: 99 };
+function ribLine(pos, d, marker, normal) {
+  let hit = 0, n = 0, rMin = 99;
+  for (let u = -0.7; u <= 0.71; u += 0.35) for (let e = -0.5; e <= 0.51; e += 0.5) {
+    n++;
+    const ox = pos.x + marker.x * u + normal.x * e, oy = pos.y + marker.y * u + normal.y * e, oz = pos.z + marker.z * u + normal.z * e;
+    for (let t = 0.6; t < 2.6; t += 0.1) if (ribHit(ox + d.x * t, oy + d.y * t, oz + d.z * t) === 1) { hit++; if (t < rMin) rMin = t; break; }
+  }
+  RIB_LINE.fb = hit / n; RIB_LINE.r = rMin;
+  return RIB_LINE;
+}
+function tissue(x, y, z) {
+  OUT.att = 1; OUT.kind = 0; OUT.myo = 0; OUT.heart = 0; OUT.mass = 0; OUT.imp = 1; OUT.liver = 0;
+  if (z <= ZMIN || z >= ZMAX) { OUT.raw = 0; OUT.att = 0; OUT.kind = 5; OUT.imp = 0.2; return; }
+  const W = bodyW(z), D = bodyD(z), u = x / W, v = (y - bodyC(z)) / D, q = u * u + v * v;
+  if (q >= 1) { OUT.raw = 0; OUT.att = 0; OUT.kind = 5; OUT.imp = 0.2; return; }
   const s = (1 - Math.sqrt(q)) * (W < D ? W : D);
-  // chest wall: skin, subcutaneous fat, muscle (thin adult, ~1 cm)
-  if (s < 0.12) { OUT.raw = 0.8; return; }
-  if (s < 0.45) { OUT.raw = 0.08; return; }
-  if (s < 1.0) { OUT.raw = 0.22 + 0.1 * Math.sin(s * 30); return; }
+  // chest wall: skin, subcutaneous fat, muscle with perimysial striations and a bright deep fascia (thin adult, ~1 cm)
+  if (s < 1.08) {
+    // layers undulate a little and the striations are wavy and broken, not perfect rings around the probe
+    const sw = s + 0.09 * (vnoise(x * 0.9 + 3.1, z * 0.9, y * 0.3) - 0.5);
+    if (sw < 0.12) { OUT.raw = 0.32; OUT.imp = 1.08; return; }
+    if (sw < 0.45) { // fat with a few thin fibrous septa
+      const sp = vnoise(x * 2.2, z * 2.2, sw * 9);
+      OUT.raw = 0.05 + (sp > 0.62 ? 0.16 * (sp - 0.62) / 0.38 : 0); OUT.imp = 0.97; return;
+    }
+    if (sw < 1.0) {
+      const st = Math.sin(sw * 30 + 5 * vnoise(x * 0.5, z * 0.5, 1.7)), br = vnoise(x * 1.4 + 7, z * 1.4, sw * 5);
+      OUT.raw = 0.12 + 0.06 * st * (0.3 + br); OUT.imp = sw > 0.92 ? 1.07 : 1.02; return;
+    }
+  }
+  // costal cartilage lets the sound through and looks dark; rib bone is handled per scan line (ribLine)
+  if (s < RIB_IN + 0.5 && ribAt(x, y, z, s) === 2) { OUT.raw = 0.03; OUT.att = 0.99; OUT.imp = 1.08; return; }
   const sy = y + 7.8;
-  if (z < 14 && x * x + sy * sy < 4.2) { OUT.raw = 0.95; OUT.kind = 3; OUT.att = 0.55; return; }
+  if (z < 14 && x * x + sy * sy < 4.2) { OUT.raw = 0.6; OUT.kind = 3; OUT.att = 0.55; OUT.imp = 2.6; return; }
   vesselSD(x, y, z);
   const vd = VSD, eff = MODEL.effusion_cm;
   const hx = x - SWB * e2x, hy = y - SWB * e2y, hz = z - SWB * e2z + RZ;
@@ -1034,18 +1088,22 @@ function tissue(x, y, z) {
     VEG = 0; PVHIT = 0;
     if (valveAt(a, b, c, hx, hy, hz)) {
       // Thin leaflets: moderately bright (they also get a specular flash when the beam meets them head-on)
-      OUT.raw = VEG ? 0.45 : PVHIT ? 0.4 : MODEL.av === 'stenosis' && Math.abs(a + 0.4) < 2.5 && c > 0.8 ? 0.95 : MODEL.av === 'bicuspid' && Math.abs(a + 0.4) < 2.5 && c > 0.8 ? 0.7 : MODEL.mv === 'ms' && a > -1.3 && a < 0.6 ? 0.6 : 0.27;
+      const calc = MODEL.av === 'stenosis' && Math.abs(a + 0.4) < 2.5 && c > 0.8;
+      OUT.raw = VEG ? 0.45 : PVHIT ? 0.4 : calc ? 0.95 : MODEL.av === 'bicuspid' && Math.abs(a + 0.4) < 2.5 && c > 0.8 ? 0.7 : MODEL.mv === 'ms' && a > -1.3 && a < 0.6 ? 0.6 : 0.27;
+      OUT.imp = calc ? 1.7 : OUT.raw > 0.5 ? 1.3 : 1.13;
+      // heavy calcium casts a partial acoustic shadow
+      if (calc) OUT.att = 0.93;
       OUT.kind = 2; OUT.heart = 1; return;
     }
-    if (MODEL.thrombus && (a - (LVd.a + LVd.ra * 0.8)) ** 2 + (b - LVd.b - 0.5) ** 2 + (c + 0.2) ** 2 < 0.85) { OUT.raw = 0.22; OUT.heart = 1; OUT.mass = 1; return; }
-    if (MODEL.myxoma && a < 0.6 && myxomaAt(a, b, c)) { OUT.raw = 0.27 + 0.12 * Math.sin(a * 7 + c * 5) * Math.sin(b * 6); OUT.heart = 1; OUT.mass = 1; return; }
+    if (MODEL.thrombus && (a - (LVd.a + LVd.ra * 0.8)) ** 2 + (b - LVd.b - 0.5) ** 2 + (c + 0.2) ** 2 < 0.85) { OUT.raw = 0.22; OUT.imp = 1.05; OUT.heart = 1; OUT.mass = 1; return; }
+    if (MODEL.myxoma && a < 0.6 && myxomaAt(a, b, c)) { OUT.raw = 0.27 + 0.12 * Math.sin(a * 7 + c * 5) * Math.sin(b * 6); OUT.imp = 1.04; OUT.heart = 1; OUT.mass = 1; return; }
     // Endocardium is not a smooth shell: trabeculations make the blood-tissue border slightly irregular (~1 mm),
     // fixed to the heart so it moves with it
     const wa = a + 0.05 * fsin(2.9 * b + 2.1 * c + 0.7), wb = b + 0.07 * fsin(3.3 * a - 1.9 * c) + 0.04 * fsin(7.1 * c + 2.3 * a);
     const wc = c + 0.07 * fsin(3.7 * a + 2.5 * b) + 0.04 * fsin(6.3 * b - 3.1 * a);
     // The aortic root wall separates the root from the RVOT and RA that press on it; only the LVOT side stays open
     if (vd >= 0 && vd < 0.25 && SEG[VSEGI].id === 1 && !capsule(a, b, c, LVOT0, LVOT1, 1.05) && !(a > -0.2 && lvCavity(a, b, c))) {
-      OUT.raw = 0.32; OUT.heart = 1; return;
+      OUT.raw = 0.32; OUT.imp = 1.12; OUT.heart = 1; return;
     }
     if (vd < 0 || bloodAt(wa, wb, wc)) { OUT.raw = 0.005; OUT.kind = 1; return; }
     HDIST = 99; HDIST2 = 99;
@@ -1053,37 +1111,41 @@ function tissue(x, y, z) {
     if (m) {
       // Myocardium is mid-grey: well below the pericardium and valves, a little below the liver
       let r = m === 1 ? 0.125 : m === 2 ? 0.135 : 0.155;
-      if (m === 1 && MODEL.wma === 'apex' && a > LVd.a + 0.25 * LVd.ra) r = 0.3; // scarred, thinned apex is brighter
+      OUT.imp = 1.06;
+      if (m === 1 && MODEL.wma === 'apex' && a > LVd.a + 0.25 * LVd.ra) { r = 0.3; OUT.imp = 1.12; } // scarred, thinned apex is brighter
       // Amyloid: bright, coarse "sparkling" ventricular walls
-      if (MODEL.sparkle && m < 3) r = 0.3 * (0.5 + 3.0 * ((hash3(Math.floor(a * 5), Math.floor(b * 5), Math.floor(c * 5)) & 1023) / 1023) ** 4);
+      if (MODEL.sparkle && m < 3) { r = 0.3 * (0.5 + 3.0 * ((hash3(Math.floor(a * 5), Math.floor(b * 5), Math.floor(c * 5)) & 1023) / 1023) ** 4); OUT.imp = 1.1; }
       OUT.raw = r; OUT.myo = m; OUT.heart = 1; return;
     }
     hd = HDIST;
     // Between two chambers (AV groove, crux, interatrial region): fat and connective tissue inside the sac, not pericardium
-    if (HDIST2 < 0.9 && hd < 0.9 && vd > 0.3) { OUT.raw = 0.2; OUT.heart = 1; return; }
+    if (HDIST2 < 0.9 && hd < 0.9 && vd > 0.3) { OUT.raw = 0.16; OUT.imp = 0.96; OUT.heart = 1; return; }
   } else if (vd < 0) { OUT.raw = 0.007; OUT.kind = 1; return; }
-  if (vd < 0.16) { OUT.raw = 0.4; return; }
+  if (vd < 0.16) { OUT.raw = 0.3; OUT.imp = 1.12; return; }
   if (hd >= 0 && hd < eff) { OUT.raw = 0.004; OUT.kind = 1; return; }
-  // Pericardium: fibrous and bright, brightest where the beam meets it head-on (specular term in computePolar)
+  // Pericardium: fibrous; it looks brightest where the beam meets it head-on, and brightest of all where lung lies
+  // behind it (the pericardium-lung interface is the white line under the posterior wall in PLAX)
   const pc = MODEL.pericard;
-  if (hd >= eff && hd < eff + 0.22 + pc) { OUT.raw = pc ? 0.75 : 0.42; return; }
+  if (hd >= eff && hd < eff + 0.22 + pc) { OUT.raw = pc ? 0.55 : 0.26; OUT.imp = pc ? 1.45 : 1.2; return; }
   // Diaphragm (right dome higher); below it the liver fills the right and central upper abdomen
   // Dome-shaped: highest posteriorly and on the right, sloping down to the costal margin at the front,
   // so it never lies between an apical probe and the heart
   const zd = -4.7 + 1.3 * Math.exp(-(((x + 3) / 6) ** 2)) - 2.8 * sm(1.5, 8.5, y);
-  if (z < zd + 0.22 && z > zd - 0.22) { OUT.raw = 0.9; return; }
+  if (z < zd + 0.22 && z > zd - 0.22) { OUT.raw = 0.42; OUT.imp = 1.2; return; }
   const lx = (x + 4) / 11, ly = (y - 0.5) / 8, lz = (z + 12.5) / 7.5, lq = lx * lx + ly * ly + lz * lz;
-  if (lq < 1 || (z < zd && x < 4.5 && y > -5 && z > zd - 9)) { OUT.raw = lq > 0.955 && lq < 1 ? 0.8 : 0.33; return; }
+  // Liver: fine, even, mid-grey texture with a bright capsule
+  if (lq < 1 || (z < zd && x < 4.5 && y > -5 && z > zd - 9)) { const cap = lq > 0.955 && lq < 1; OUT.raw = cap ? 0.32 : 0.19; OUT.imp = cap ? 1.15 : 1.05; OUT.liver = 1; return; }
   // Lung fills the chest around the heart, except the cardiac notch between the heart and the chest wall
   // (where s + hd stays small), the mediastinum and the tissue around the great vessels.
   const mediastinum = (z > 6 && Math.abs(x - 0.5) < 4.5 && y > -6) || vd < 0.9 || vd + hd < 3.2;
   // The lung edge does not follow the heart as it contracts, so allow for the systolic shrink (~1.2 cm)
   const hs = 1.2 * SYS;
   if (!mediastinum && z > zd && z < 14 && s > 1.0 && hd > eff + pc + 0.55 + hs && s + hd > 4 + hs + G.notch) {
-    OUT.raw = 0.5; OUT.kind = 4; OUT.att = 0.78; return;
+    OUT.raw = 0.3; OUT.kind = 4; OUT.att = 0.72; OUT.imp = 0.25; return;
   }
-  if (hd < eff + pc + 0.55) { OUT.raw = 0.1; return; } // epicardial fat
-  OUT.raw = z > -5 ? 0.16 : 0.23;
+  if (hd < eff + pc + 0.55) { OUT.raw = 0.055; OUT.imp = 0.94; return; } // epicardial fat
+  // Mediastinal fat and connective tissue: darker than the myocardium; upper abdomen a little brighter
+  OUT.raw = z > -5 ? 0.06 : 0.15; OUT.imp = z > -5 ? 0.97 : 1.02;
 }
 let TA = 0, TB = 0, TC = 0;
 
@@ -1146,7 +1208,15 @@ function flowAt() {
     }
     if (t > j.L) continue;
     const qx = rx - t * j.d[0], qy = ry - t * j.d[1], qz = rz - t * j.d[2], radial = Math.sqrt(qx * qx + qy * qy + qz * qz), w = j.w0 + t * j.tan;
-    if (radial > w) continue;
+    if (radial > w) {
+      // Turbulent mixing zone round a high-velocity jet: slower, disordered flow entrained from the chamber.
+      // On colour it is the mosaic; on spectral Doppler it fills in under the envelope.
+      const wh = w * 1.2 + 0.3;
+      if (j.turb < 0.5 || t < 0.4 || radial > w + wh) continue;
+      const s = j.v * j.g * 0.3 * (1 - (radial - w) / wh) * (1 - 0.5 * t / j.L);
+      if (s > sp) { sp = s; FLOW.a = j.d[0] * s; FLOW.b = j.d[1] * s; FLOW.c = j.d[2] * s; FLOW.turb = j.turb; }
+      continue;
+    }
     // Jet core: full speed for the first ~1 cm (vena contracta), then slows; flat-topped across its width
     const s = j.v * j.g * (1 - 0.55 * Math.max(0, t - 1) / (j.L - 1)) * Math.exp(-2 * (radial / w) ** 4);
     if (s > sp) { sp = s; FLOW.a = j.d[0] * s; FLOW.b = j.d[1] * s; FLOW.c = j.d[2] * s; FLOW.turb = j.turb * (1 - 0.3 * t / j.L); }
@@ -1216,8 +1286,9 @@ function colorRGB(v, turb, out) {
   // v: aliased velocity normalised to [-1, 1]; positive = toward the probe (red / yellow), negative = away (blue / cyan)
   const m = Math.abs(v);
   let r = 0, g = 0, b = 0;
-  if (v >= 0) { r = 0.18 + 0.82 * Math.min(1, m * 1.5); g = Math.max(0, m - 0.65) * 1.9; }
-  else { b = 0.25 + 0.75 * Math.min(1, m * 1.5); g = Math.max(0, m - 0.65) * 1.6; r = 0; }
+  // brightness rises with speed; near the Nyquist limit red turns orange-yellow and blue turns light blue
+  if (v >= 0) { r = 0.28 + 0.72 * Math.min(1, m * 1.15); g = Math.max(0, m - 0.6) * 1.65; }
+  else { b = 0.32 + 0.68 * Math.min(1, m * 1.15); g = Math.max(0, m - 0.6) * 1.5; r = Math.max(0, m - 0.8) * 1.4; }
   g = Math.min(1, g + 0.6 * turb);
   out[0] = r * 255; out[1] = g * 255; out[2] = b * 255;
 }
@@ -1285,100 +1356,156 @@ function buildTint() {
 }
 buildTint();
 const toGray = (v, gain) => { const x = v * gain; return x >= LUT_MAX ? 255 : GRAY_LUT[(Math.sqrt(x / LUT_MAX) * 4095) | 0]; };
-// Beam point-spread function: axial 5-tap kernel; lateral kernel widens away from the focus (~8 cm)
+// Beam point-spread function: axial 5-tap kernel; lateral width set per depth (wide near the probe, narrowest at the
+// transmit focus, widening again deep down), plus a low, wide side-lobe pedestal
 const sI = new Float32Array(NL * NS), sQ = new Float32Array(NL * NS), tI = new Float32Array(NL * NS), tQ = new Float32Array(NL * NS);
 const rawA = new Float32Array(NL * NS), texA = new Float32Array(NL * NS), grA = new Float32Array(NL * NS); // tissue map, textured reflectivity, gain
-const AXW = (() => { const w = [0.04, 0.24, 0.44, 0.24, 0.04], e = Math.sqrt(w.reduce((s, x) => s + x * x, 0)); return w.map(x => x / e); })();
-const LT = 7, LH = 3; // lateral kernel taps (±3 lines)
-const latW = new Float32Array(NS * LT); let latDepth = -1, latThi = null;
+const impA = new Float32Array(NL * NS), hazeA = new Float32Array(NL * NS); // acoustic impedance, lung reverberation amplitude
+// Axial pulse: ~1 mm long (a little longer without harmonics), set in cm so speckle keeps its real grain when the
+// depth is reduced (zoomed in), instead of turning into thin streaks
+const AXW = new Float32Array(17); let AXH = 2;
+function buildAxial(depth) {
+  const sig = Math.max(0.85, (DISP.thi ? 0.042 : 0.05) / (depth / NS));
+  AXH = Math.min(8, Math.ceil(2.6 * sig)); let e = 0;
+  for (let o = -AXH; o <= AXH; o++) { const x = Math.exp(-0.5 * (o / sig) ** 2); AXW[o + AXH] = x; e += x * x; }
+  e = Math.sqrt(e); for (let o = 0; o <= 2 * AXH; o++) AXW[o] /= e;
+}
+const LT = 7, LH = 3; // narrow lateral kernel taps (±3 lines); wider beams use box passes
+const latW = new Float32Array(NS * LT), latBox = new Int16Array(NS), latBoxK = new Float32Array(NS), sideK = new Float32Array(NS);
+let latDepth = -1, latThi = null;
+const SIDE_W = 13; // side-lobe pedestal: two box passes of 13 lines (about ±12 lines, ±7°)
 function buildLat(depth) {
   DISP.focus = clamp(Math.round(depth * 0.45 * 2) / 2, 5, 10);
   const fz = DISP.focus, k = DISP.thi ? 1 : 1.35;
   for (let j = 0; j < NS; j++) {
-    const r = (j + 0.5) / NS * depth, spacing = Math.max(0.02, r * 2 * SECT / (NL - 1));
+    const r = (j + 0.5) / NS * depth, spacing = Math.max(0.004, r * 2 * SECT / (NL - 1));
     // 2.5 MHz phased array: ~2.5-3 mm lateral resolution at the focus, widening to ~7 mm deep in the image
-    // (wider again without harmonics); this is what stretches speckle sideways on a real scanner
-    const fwhm = (0.26 + 0.035 * Math.abs(r - fz) + (r > 12 ? 0.025 * (r - 12) : 0)) * k, sig = clamp(fwhm / 2.355 / spacing, 0.45, 3.2);
-    let se = 0; const w = [];
-    for (let o = -LH; o <= LH; o++) { const x = Math.exp(-0.5 * (o / sig) ** 2); w.push(x); se += x * x; }
-    for (let o = 0; o < LT; o++) latW[j * LT + o] = w[o] / Math.sqrt(se);
+    // (wider again without harmonics); this is what stretches speckle sideways on a real scanner.
+    // The first 2-3 cm sit in the unfocused near field, where the beam is several mm wide: near-field speckle
+    // is smeared into short horizontal arcs, not fine grain.
+    const fwhm = (0.26 + 0.035 * Math.abs(r - fz) + (r > 12 ? 0.025 * (r - 12) : 0) + 0.14 * Math.exp(-r / 1.2)) * k;
+    const sig = Math.max(0.45, fwhm / 2.355 / spacing);
+    if (sig <= 2.4) {
+      latBox[j] = 0; let se = 0; const w = [];
+      for (let o = -LH; o <= LH; o++) { const x = Math.exp(-0.5 * (o / sig) ** 2); w.push(x); se += x * x; }
+      for (let o = 0; o < LT; o++) latW[j * LT + o] = w[o] / Math.sqrt(se);
+    } else {
+      // two box passes ≈ Gaussian; scaled so diffuse speckle keeps its brightness
+      const w = Math.min(61, 2 * Math.floor(Math.sqrt(6 * sig * sig + 1) / 2) + 1);
+      latBox[j] = w; latBoxK[j] = Math.sqrt(3 * w * w * w / (2 * w * w + 1)) / (w * w);
+    }
+    // Side lobes: about -30 dB with harmonics, -24 dB without; they smear bright echoes (pericardium, valves,
+    // septum) into faint arcs across dark cavities at the same depth
+    sideK[j] = (DISP.thi ? 0.032 : 0.065) * Math.sqrt(3 * SIDE_W ** 3 / (2 * SIDE_W ** 2 + 1)) / (SIDE_W * SIDE_W);
   }
+  buildAxial(depth);
   latDepth = depth; latThi = DISP.thi;
 }
+// Lateral blur helpers: two passes of a box of width w over one depth row (line index), edges clamped
+const rowI = new Float32Array(NL), rowQ = new Float32Array(NL), rowA = new Float32Array(NL), rowB = new Float32Array(NL), csum = new Float64Array(NL + 1);
+function boxRow(src, dst, w) {
+  const h = (w - 1) >> 1;
+  csum[0] = 0; for (let i = 0; i < NL; i++) csum[i + 1] = csum[i] + src[i];
+  for (let i = 0; i < NL; i++) {
+    const lo = i - h, hi = i + h + 1;
+    // clamp to the edge sample outside the sector
+    let s = csum[hi > NL ? NL : hi] - csum[lo < 0 ? 0 : lo];
+    if (lo < 0) s += -lo * src[0];
+    if (hi > NL) s += (hi - NL) * src[NL - 1];
+    dst[i] = s;
+  }
+}
 
-function computePolar(fr, depth) {
-  const { pos, beam, marker } = fr;
-  const doColor = COLOR.on, nyq = COLOR.nyq, r0 = COLOR.rc - COLOR.hd, r1 = COLOR.rc + COLOR.hd;
-  if (doColor) { colA.fill(0); jetGains(); }
+function computePolar(fr, depth, persist = false) {
+  const { pos, beam, marker, normal } = fr;
+  const doColor = COLOR.on, r0 = COLOR.rc - COLOR.hd, r1 = COLOR.rc + COLOR.hd;
+  if (doColor) { cP.fill(0); jetGains(); }
   if (depth !== latDepth || DISP.thi !== latThi) buildLat(depth);
-  const dr = depth / NS;
+  const dr = depth / NS, thi = DISP.thi, lz = RZ * 40;
   for (let i = 0; i < NL; i++) {
     const th = -SECT + 2 * SECT * i / (NL - 1), ct = Math.cos(th), st = Math.sin(th);
     const dx = ct * beam.x + st * marker.x, dy = ct * beam.y + st * marker.y, dz = ct * beam.z + st * marker.z;
     const lineIn = doColor && Math.abs(th - COLOR.th) <= COLOR.hw;
     const apod = 1 - 0.4 * Math.pow(Math.abs(th) / SECT, 6); // weaker echoes at the sector edges
-    let T = 1, texJ = -9, texH = -1, texV = 1;
+    let T = 1, texJ = -9, texH = -1, texV = 1, lungR = -1, lungG = 0, ribDone = false;
+    ribLine(pos, DIRV.set(dx, dy, dz), marker, normal); const ribFb = RIB_LINE.fb, ribR = RIB_LINE.r;
     for (let j = 0; j < NS; j++) {
       const r = (j + 0.5) / NS * depth, px = pos.x + dx * r, py = pos.y + dy * r, pz = pos.z + dz * r;
       tissue(px, py, pz);
-      if (lineIn && OUT.kind === 1 && r >= r0 && r <= r1 && T > 0.07) { // only true shadow (rib, lung) hides colour; deep flow behind thick muscle still shows
-        flowAt();
-        let v = towardProbe(dx, dy, dz);
-        const nz = speck(px * 1.7 + TIME * 3, py * 1.7, pz * 1.7) - 0.9;
-        v = FLOW.turb > 0 ? v + nz * 1.3 * nyq * FLOW.turb : v * (1 + 0.25 * nz);
-        if (Math.abs(v) > 0.07) {
-          const k = i * NS + j, wrapped = ((v + nyq) % (2 * nyq) + 2 * nyq) % (2 * nyq) - nyq;
-          colV[k] = wrapped / nyq; colT[k] = FLOW.turb; colA[k] = 1;
-        }
+      // Ribs: a bright curved surface, then an acoustic shadow as deep as the part of the beam the bone blocks
+      // Ribs: a bright curved surface where the beam meets bone, then a shadow as deep as the part of the beam it blocks
+      let tb = 1;
+      if (ribFb > 0 && r < 3) {
+        if (!ribDone && r >= ribR) { tb = 1 - 0.95 * ribFb; ribDone = true; }
+        if (ribFb > 0.25 && ribHit(px, py, pz) === 1) { OUT.raw = 0.5; OUT.imp = 2.6; OUT.kind = 3; }
       }
-      // Random scatterer phase: fixed to the tissue (heart frame for cardiac tissue), decorrelating over time in blood
       const raw = OUT.raw, kind = OUT.kind, k = i * NS + j;
-      const h = kind === 1 ? hash3((px * 30 + TIME * 23) | 0, (py * 30) | 0, (pz * 30 - TIME * 17) | 0)
+      // Colour Doppler samples: blood velocity toward the probe; the estimate is formed later over small cells
+      if (lineIn && kind === 1 && r >= r0 && r <= r1 && T > 0.07) { // only true shadow (rib, lung) hides colour; deep flow behind thick muscle still shows
+        flowAt(); cV[k] = towardProbe(dx, dy, dz); cTu[k] = FLOW.turb; cP[k] = 1;
+      }
+      const g = T * Math.exp(0.17 * r) * apod * (thi ? 1 - 0.45 * Math.exp(-r / 1.3) : 1);
+      if (kind === 4 && lungR < 0) { lungR = r; lungG = g; }
+      // Random scatterer phase: fixed to the tissue (heart frame for cardiac tissue), decorrelating over time in blood;
+      // behind the pleura the echoes are reverberation, which slides with breathing
+      const h = lungR >= 0 ? hash3((px * 30) | 0, (py * 30) | 0, (pz * 30 + lz) | 0)
+        : kind === 1 ? hash3((px * 30 + TIME * 23) | 0, (py * 30) | 0, (pz * 30 - TIME * 17) | 0)
         : OUT.heart ? hash3((TA * 30) | 0, (TB * 30) | 0, (TC * 30) | 0)
         : hash3((px * 30) | 0, (py * 30) | 0, (pz * 30) | 0);
       const h2 = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0;
       sI[k] = ((h & 4095) + ((h >>> 12) & 4095) - 4095) * 0.000598; sQ[k] = ((h2 & 4095) + ((h2 >>> 12) & 4095) - 4095) * 0.000598;
       // Tissue texture: scatterer density varies on a 3-8 mm scale (myocardial fibres, fat, connective tissue)
-      // (smooth on the scale of several samples, so it is evaluated every third sample along the line)
+      // (smooth on the scale of several samples, so it is evaluated every third sample along the line).
+      // Myocardium and liver are fairly even; fat and connective tissue are patchier.
       let tex = 1;
       if (kind !== 1 && raw > 0.02 && kind !== 5) {
-        const hf = OUT.heart;
+        const hf = OUT.heart ? 1 : OUT.liver ? 2 : 0;
         if (j - texJ >= 3 || hf !== texH) {
           texJ = j; texH = hf;
-          texV = hf ? 0.4 + 0.75 * vnoise(TA * 3.2, TB * 3.2, TC * 3.2) + 0.5 * vnoise(TA * 7.5 + 11, TB * 7.5, TC * 7.5) ** 2
-            : 0.35 + 1.1 * vnoise(px * 1.4, py * 1.4, pz * 1.4) * (0.6 + 0.6 * vnoise(px * 4.5 + 7, py * 4.5, pz * 4.5));
+          texV = hf === 1 ? 0.68 + 0.45 * vnoise(TA * 3.2, TB * 3.2, TC * 3.2) + 0.3 * vnoise(TA * 7.5 + 11, TB * 7.5, TC * 7.5) ** 2
+            : hf === 2 ? 0.8 + 0.4 * vnoise(px * 2.2, py * 2.2, pz * 2.2)
+            : 0.45 + 0.9 * vnoise(px * 1.4, py * 1.4, pz * 1.4) * (0.6 + 0.6 * vnoise(px * 4.5 + 7, py * 4.5, pz * 4.5));
         }
         tex = texV;
       }
-      rawA[k] = raw; texA[k] = raw * tex;
-      // depth attenuation T, time-gain compensation, sector-edge apodisation
-      grA[k] = T * Math.exp(0.17 * r) * apod;
-      T *= OUT.att * Math.exp(-(kind === 1 ? 0.08 : 0.2) * dr);
+      rawA[k] = raw; texA[k] = raw * tex; impA[k] = OUT.imp;
+      // depth attenuation T, time-gain compensation, sector-edge apodisation; with harmonics the signal builds up
+      // over the first centimetres, so the near field is quieter
+      grA[k] = g;
+      // Lung: the pleura reflects almost all the sound. What lies beyond is reverberation, not anatomy: a grey haze
+      // with horizontal streaks and A-lines at multiples of the pleural depth
+      if (lungR >= 0) {
+        const dd = r - lungR;
+        let hz = 0.032 * Math.exp(-0.22 * dd) * (0.3 + 1.4 * vnoise(r * 5.5, i * 0.09 + 3.1, lz * 0.05 + 0.5));
+        for (let n = 2; n <= 4; n++) { const dn = (r - n * lungR) / 0.13; if (dn > -3 && dn < 3) hz += 0.07 / n * Math.exp(-dn * dn); }
+        hazeA[k] = hz * lungG * Math.exp(0.17 * dd);
+      } else hazeA[k] = 0;
+      T *= OUT.att * tb * Math.exp(-(kind === 1 ? 0.08 : 0.2) * dr);
     }
   }
-  // Echo formation. Specular echoes come only from interfaces the beam meets nearly head-on (cos^2 of the
-  // incidence angle, from the local gradient of the tissue map), so walls running along the beam fade, as on a scanner.
+  // Echo formation. Specular echoes come from impedance steps the beam meets nearly head-on (cos^4 of the
+  // incidence angle, from the local gradient of the impedance map), so walls running along the beam fade, as on a scanner.
   const dl0 = 2 * SECT / (NL - 1);
   // Harmonic imaging suppresses near-field haze and reverberation, so cavities look cleaner
-  const thi = DISP.thi, revA = thi ? 0.06 : 0.13, cluA = thi ? 0.028 : 0.07;
-  for (let j = 0; j < NS; j++) { const r = (j + 0.5) / NS * depth; REVk[j] = r < 7 ? revA * Math.exp(-r / 3.5) : 0; CLUk[j] = cluA * Math.exp(-r / 2.6); LATk[j] = 1 / (8 * Math.max(0.02, r * dl0)); }
-  const iax = 1 / (8 * dr);
+  const revA = thi ? 0.05 : 0.12, cluA = thi ? 0.022 : 0.06;
+  for (let j = 0; j < NS; j++) { const r = (j + 0.5) / NS * depth; REVk[j] = r < 7 ? revA * Math.exp(-r / 3.5) : 0; CLUk[j] = cluA * Math.exp(-r / 2.2); LATk[j] = 1 / (8 * Math.max(0.02, r * dl0)); }
+  const iax = 1 / (8 * dr), KS = 3.4;
   for (let i = 0; i < NL; i++) {
     const il = i > 0 ? i - 1 : i, ir = i < NL - 1 ? i + 1 : i;
     for (let j = 0; j < NS; j++) {
       const k = i * NS + j, jd = j > 0 ? j - 1 : j, ju = j < NS - 1 ? j + 1 : j;
-      const jump = Math.abs(rawA[k] - rawA[k - j + jd]);
+      const zc = impA[k], zp = impA[k - j + jd], R = (zc - zp) / (zc + zp), jump = R < 0 ? -R : R;
       let spec = 0;
-      if (jump > 0.01) {
+      if (jump > 0.006) {
         // Sobel-style gradient: axial (per cm) and lateral (per cm)
-        const ga = (rawA[il * NS + ju] + 2 * rawA[k - j + ju] + rawA[ir * NS + ju] - rawA[il * NS + jd] - 2 * rawA[k - j + jd] - rawA[ir * NS + jd]) * iax;
-        const gl = (rawA[ir * NS + jd] + 2 * rawA[ir * NS + j] + rawA[ir * NS + ju] - rawA[il * NS + jd] - 2 * rawA[il * NS + j] - rawA[il * NS + ju]) * LATk[j];
+        const ga = (impA[il * NS + ju] + 2 * impA[k - j + ju] + impA[ir * NS + ju] - impA[il * NS + jd] - 2 * impA[k - j + jd] - impA[ir * NS + jd]) * iax;
+        const gl = (impA[ir * NS + jd] + 2 * impA[ir * NS + j] + impA[ir * NS + ju] - impA[il * NS + jd] - 2 * impA[il * NS + j] - impA[il * NS + ju]) * LATk[j];
         const g2 = ga * ga + gl * gl, cos2 = g2 > 1e-6 ? ga * ga / g2 : 0;
-        spec = jump * cos2 * cos2 * 2.0;
+        spec = jump * cos2 * cos2 * KS;
       }
       // near-field clutter (haze) and chest-wall reverberation: shallow echoes repeated at twice their depth
       const jr = j >> 1, rev = REVk[j] ? REVk[j] * texA[i * NS + jr] * grA[i * NS + jr] : 0;
-      const gr = grA[k], amp = (texA[k] + CLUk[j]) * gr + rev;
+      const gr = grA[k], amp = (texA[k] + CLUk[j]) * gr + rev + hazeA[k];
       // specular part: mostly coherent, partly broken up by the rough interface
       const sp = spec * gr, gI = sI[k], gQ = sQ[k];
       sI[k] = amp * gI + sp * (0.75 + 0.35 * gQ); sQ[k] = amp * gQ + sp * 0.35 * gI;
@@ -1387,20 +1514,32 @@ function computePolar(fr, depth) {
   // receiver noise level per depth sample (amplified with depth by the TGC)
   const nf0 = thi ? 0.0021 : 0.003;
   for (let j = 0; j < NS; j++) NFk[j] = nf0 * Math.exp(0.17 * (j + 0.5) / NS * depth);
-  // Lateral beam blur (complex), then axial blur and envelope detection → Rayleigh speckle
-  for (let i = 0; i < NL; i++) for (let j = 0; j < NS; j++) {
-    let a = 0, b = 0; const wb = j * LT;
-    for (let o = -LH; o <= LH; o++) {
-      const ii = i + o < 0 ? 0 : i + o >= NL ? NL - 1 : i + o, kk = ii * NS + j;
-      a += latW[wb + o + LH] * sI[kk]; b += latW[wb + o + LH] * sQ[kk];
+  // Lateral beam blur (complex) with the side-lobe pedestal, then axial blur and envelope detection → Rayleigh speckle
+  for (let j = 0; j < NS; j++) {
+    for (let i = 0; i < NL; i++) { rowI[i] = sI[i * NS + j]; rowQ[i] = sQ[i * NS + j]; }
+    const sk = sideK[j];
+    boxRow(rowI, rowA, SIDE_W); boxRow(rowA, sideI, SIDE_W); boxRow(rowQ, rowA, SIDE_W); boxRow(rowA, sideQ, SIDE_W);
+    const w = latBox[j];
+    if (w) {
+      const kk = latBoxK[j];
+      boxRow(rowI, rowA, w); boxRow(rowA, rowB, w);
+      for (let i = 0; i < NL; i++) tI[i * NS + j] = rowB[i] * kk + sideI[i] * sk;
+      boxRow(rowQ, rowA, w); boxRow(rowA, rowB, w);
+      for (let i = 0; i < NL; i++) tQ[i * NS + j] = rowB[i] * kk + sideQ[i] * sk;
+    } else {
+      const wb = j * LT;
+      for (let i = 0; i < NL; i++) {
+        let a = 0, b = 0;
+        for (let o = -LH; o <= LH; o++) { const ii = i + o < 0 ? 0 : i + o >= NL ? NL - 1 : i + o; a += latW[wb + o + LH] * rowI[ii]; b += latW[wb + o + LH] * rowQ[ii]; }
+        tI[i * NS + j] = a + sideI[i] * sk; tQ[i * NS + j] = b + sideQ[i] * sk;
+      }
     }
-    const k = i * NS + j; tI[k] = a; tQ[k] = b;
   }
   for (let i = 0; i < NL; i++) {
     const base = i * NS;
     for (let j = 0; j < NS; j++) {
       let a = 0, b = 0;
-      for (let o = -2; o <= 2; o++) { const jj = j + o < 0 ? 0 : j + o >= NS ? NS - 1 : j + o; a += AXW[o + 2] * tI[base + jj]; b += AXW[o + 2] * tQ[base + jj]; }
+      for (let o = -AXH; o <= AXH; o++) { const jj = j + o < 0 ? 0 : j + o >= NS ? NS - 1 : j + o; a += AXW[o + AXH] * tI[base + jj]; b += AXW[o + AXH] * tQ[base + jj]; }
       // receiver noise, amplified with depth by the TGC: gives dark cavities their faint grain
       // (xorshift: much cheaper than Math.random in this inner loop; two 16-bit uniforms per draw)
       rs ^= rs << 13; rs ^= rs >>> 17; rs ^= rs << 5; const u1 = rs >>> 16, u2 = rs & 65535;
@@ -1411,6 +1550,60 @@ function computePolar(fr, depth) {
     }
   }
   if (DISP.sri > 0) speckleReduce(DISP.sri);
+  if (doColor) colorEstimate(depth, persist);
+}
+const sideI = new Float32Array(NL), sideQ = new Float32Array(NL), DIRV = new THREE.Vector3();
+// ---------- Colour flow estimate ----------
+// A scanner measures colour from a short packet of pulses per colour line: the mean Doppler phase shift over a small
+// cell (autocorrelation). So the map is smooth in laminar flow, aliases where the speed passes the Nyquist limit, drops
+// out where flow is slow (wall filter), has ragged edges, and breaks into a mosaic in turbulent jets (high variance,
+// shown as green on a velocity-variance map).
+const cV = new Float32Array(NL * NS), cTu = new Float32Array(NL * NS), cP = new Float32Array(NL * NS); // raw velocity, turbulence, blood
+const fR = new Float32Array(NL * NS), fI = new Float32Array(NL * NS), fP = new Float32Array(NL * NS); // per-sample phasor
+const csR = new Float32Array(NL * NS), csI = new Float32Array(NL * NS), csP = new Float32Array(NL * NS); // cell estimate
+const cpR = new Float32Array(NL * NS), cpI = new Float32Array(NL * NS), cpP = new Float32Array(NL * NS); // previous frame (persistence)
+function colorEstimate(depth, persist) {
+  const dr = depth / NS, nyq = COLOR.nyq;
+  const i0 = Math.max(0, Math.floor((COLOR.th - COLOR.hw + SECT) / (2 * SECT) * (NL - 1))), i1 = Math.min(NL - 1, Math.ceil((COLOR.th + COLOR.hw + SECT) / (2 * SECT) * (NL - 1)));
+  const j0 = Math.max(0, Math.floor((COLOR.rc - COLOR.hd) / dr)), j1 = Math.min(NS - 1, Math.ceil((COLOR.rc + COLOR.hd) / dr));
+  const fq = (TIME * 24) | 0; // a new packet each frame; a frozen frame keeps its estimate
+  // Phase shift per sample, with estimator noise that is correlated over a colour cell (2 lines × ~1.5 mm):
+  // small in laminar flow, so large in turbulence that the mean phase becomes random
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
+    const k = i * NS + j;
+    if (!cP[k]) { fR[k] = fI[k] = fP[k] = 0; continue; }
+    const hc = hash3(i >> 1, (j / 3) | 0, fq), hf = hash3(i, j, fq + 7), tu = cTu[k];
+    const n = ((hc & 1023) / 1023 - 0.5) * (0.8 + 5.2 * tu) + ((hf & 1023) / 1023 - 0.5) * (0.3 + 1.5 * tu);
+    // slow eddies: laminar flow is never one flat colour on a real map
+    const ed = 0.82 + 0.36 * vnoise(i * 0.07, j * 0.045, TIME * 2.5);
+    const ph = Math.PI * cV[k] * ed / nyq + n;
+    fR[k] = Math.cos(ph); fI[k] = Math.sin(ph); fP[k] = 1;
+  }
+  // Average over the cell: 3 lines × 5 samples
+  const keep = persist ? 0.4 : 0;
+  for (let i = i0; i <= i1; i++) {
+    const ia = i > i0 ? i - 1 : i, ib = i < i1 ? i + 1 : i;
+    for (let j = j0; j <= j1; j++) {
+      const ja = j - 2 < j0 ? j0 : j - 2, jb = j + 2 > j1 ? j1 : j + 2;
+      let sr = 0, si = 0, sp = 0;
+      for (let ii = ia; ii <= ib; ii++) for (let jj = ja; jj <= jb; jj++) { const q = ii * NS + jj; sr += fR[q]; si += fI[q]; sp += fP[q]; }
+      const n = 1 / ((ib - ia + 1) * (jb - ja + 1)), k = i * NS + j;
+      // colour persistence: blend with the last frame, as scanners do to steady the map
+      sr *= n; si *= n; sp *= n;
+      if (keep) { sr += (cpR[k] - sr) * keep; si += (cpI[k] - si) * keep; sp += (cpP[k] - sp) * keep; }
+      csR[k] = sr; csI[k] = si; csP[k] = sp; cpR[k] = sr; cpI[k] = si; cpP[k] = sp;
+    }
+  }
+  colA.fill(0);
+  const wf = Math.PI * 0.055 / nyq; // wall filter: ~5 cm/s
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
+    const k = i * NS + j, P = csP[k];
+    // power threshold with a little noise: ragged edges where the cell is only partly blood
+    if (P < 0.42 + 0.22 * ((hash3(i >> 1, (j / 3) | 0, fq + 3) & 255) / 255)) continue;
+    const R = Math.sqrt(csR[k] * csR[k] + csI[k] * csI[k]) / P, ph = Math.atan2(csI[k], csR[k]);
+    if (ph > -wf && ph < wf && R > 0.5) continue;
+    colV[k] = ph / Math.PI; colT[k] = clamp((0.9 - R) * 1.5, 0, 1); colA[k] = 1;
+  }
 }
 // Speckle reduction (like SRI / XRES on a scanner): blend each sample toward a local 3x5 mean, less so where the
 // sample differs strongly from its neighbourhood (a true border), so walls and valves stay sharp
@@ -1448,12 +1641,13 @@ function scanConvert(img, gain, src) {
     const fi = MI[k], fj = MJ[k], i = fi | 0, j = fj | 0, ti = fi - i, tj = fj - j;
     const i2 = i < NL - 1 ? i + 1 : i, j2 = j < NS - 1 ? j + 1 : j;
     const v = (src[i * NS + j] * (1 - tj) + src[i * NS + j2] * tj) * (1 - ti) + (src[i2 * NS + j] * (1 - tj) + src[i2 * NS + j2] * tj) * ti;
-    const p = MP[k];
+    const p = MP[k], g = toGray(v, gain);
     if (COLOR.on) {
+      // write priority: colour is painted only where the grey-scale echo is dark (blood), not over walls and valves
       const ci = Math.round(fi) * NS + Math.round(fj);
-      if (colA[ci]) { colorRGB(colV[ci], colT[ci], RGB); d[p] = RGB[0]; d[p + 1] = RGB[1]; d[p + 2] = RGB[2]; d[p + 3] = 255; continue; }
+      if (colA[ci] && g < 150) { colorRGB(colV[ci], colT[ci], RGB); d[p] = RGB[0]; d[p + 1] = RGB[1]; d[p + 2] = RGB[2]; d[p + 3] = 255; continue; }
     }
-    const g = toGray(v, gain); d[p] = TR[g]; d[p + 1] = TG[g]; d[p + 2] = TB_[g]; d[p + 3] = 255;
+    d[p] = TR[g]; d[p + 1] = TG[g]; d[p + 2] = TB_[g]; d[p + 3] = 255;
   }
 }
 const RGB = [0, 0, 0];
@@ -1496,12 +1690,38 @@ const RVc = Lw(2.0, 4.7, 0.5), RAc = Lw(-2.3, 4.4, -0.6), TVw = Lw(0.3, TVB, TVC
 function makeView(o) {
   const N = o.N.clone().normalize();
   const app = o.seed.clone().addScaledVector(N, -o.seed.dot(N)).normalize();
+  let best = viewFrame(o, N, app), bb = ribShadowOf(best.frame);
+  // Find the intercostal space, as a sonographer does: if a rib shadows this window, slide the probe a little up or
+  // down the chest (keeping the plane through the same target) to where the shadow is least
+  if (bb > 0.02) {
+    const S0 = best.frame.pos, n0 = skinNormal(S0), zt = V3(0, 0, 1).addScaledVector(n0, -n0.z).normalize();
+    for (let t = -1.2; t <= 1.21; t += 0.2) {
+      if (Math.abs(t) < 0.01) continue;
+      const ax = projectToSkin(S0.clone().addScaledVector(zt, t)).sub(o.target).normalize();
+      const N2 = N.clone().addScaledVector(ax, -N.dot(ax)).normalize();
+      const c = viewFrame(o, N2, ax), b = ribShadowOf(c.frame) + 0.03 * Math.abs(t);
+      if (b < bb) { bb = b; best = c; }
+    }
+  }
+  return best;
+}
+function viewFrame(o, N, app) {
   const beam = app.clone().negate();
   const marker = new THREE.Vector3().crossVectors(N, beam).normalize();
   if (marker.dot(o.hint) < 0) marker.negate();
   const S = exitPoint(o.target, app);
   const pose = poseFromFrame(S, marker, beam);
   return { ...o, pose, frame: frameFromPose(pose) };
+}
+// Mean fraction of the beam that ribs block across the sector
+function ribShadowOf(fr) {
+  let s = 0; const d = V3(0, 0, 0);
+  for (let k = 0; k <= 16; k++) {
+    const th = -SECT + 2 * SECT * k / 16, c = Math.cos(th), sn = Math.sin(th);
+    d.set(c * fr.beam.x + sn * fr.marker.x, c * fr.beam.y + sn * fr.marker.y, c * fr.beam.z + sn * fr.marker.z);
+    s += ribLine(fr.pos, d, fr.marker, fr.normal).fb;
+  }
+  return s / 17;
 }
 const IVC_T = IVC[1].clone().lerp(IVC[2], 0.15);
 // Plane through the ascending aorta, the arch top and the descending aorta: the whole 'candy cane' lies in it
@@ -1719,7 +1939,7 @@ function drawOverlay(ctx, fr, depth, showLabels, mTheta) {
   ctx.restore();
 }
 function renderUSInto(ctx, img, fr, depth, gain, labels, usePersist, mTheta = null) {
-  computePolar(fr, depth);
+  computePolar(fr, depth, usePersist);
   let src = polarS;
   if (usePersist) { for (let k = 0; k < persist.length; k++) persist[k] = persist[k] * 0.3 + polarS[k] * 0.7; src = persist; }
   scanConvert(img, gain, src);
