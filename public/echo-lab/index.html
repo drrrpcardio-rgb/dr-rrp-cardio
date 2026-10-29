@@ -1028,7 +1028,18 @@ let INSP = 0, RZ = 0, IVC_K = 1; // inspiration 0..1, caudal heart shift (cm), I
 // Ribs, as drawn in the 3D scene: bone from the back round to the costal cartilage near the sternum.
 // Bone reflects and absorbs almost everything (bright line, black shadow); cartilage lets most of the sound through.
 const RIB_N = 10, RIB_F0 = -80 * DEG, RIB_F1 = 72 * DEG, RIB_F2 = 84 * DEG, RIB_IN = 1.3, RIB_R = 0.38;
-const ribZ = (i, f) => { const zp = 12.5 - 2.3 * i, za = zp - 3.0 - 0.3 * i; return f <= RIB_F1 ? lerp(zp, za, (f - RIB_F0) / (RIB_F1 - RIB_F0)) : za + 0.8 * (f - RIB_F1) / (RIB_F2 - RIB_F1); };
+// Ribs 2–11 (rib 1 sits under the clavicle, above every window). f is the angle round the chest wall (0 at the side,
+// 90° at the front). Each rib runs from the back (f = RIB_F0, z = zp), falling as it comes forward, to its
+// costochondral junction (f1, z1); costal cartilage then carries on to (f2, z2). Ribs 2–7 reach the sternum; the
+// cartilages of ribs 8–10 turn up to join the one above and make the costal margin; rib 11 floats, ending in the flank.
+const RIBS = [...Array(RIB_N)].map((_, i) => {
+  const zp = 12.5 - 2.3 * i, za = zp - 3.0 - 0.3 * i, f1 = [72, 72, 72, 72, 72, 72, 72, 58, 44, 26][i] * DEG;
+  const z1 = lerp(zp, za, (f1 - RIB_F0) / (RIB_F1 - RIB_F0));
+  const [f2, z2] = i < 5 ? [RIB_F2, za + 0.8] : i === 5 ? [RIB_F2, -1.6] : i === 6 ? [78 * DEG, -2.55]
+    : i === 7 ? [71.5 * DEG, -6.2] : i === 8 ? [62 * DEG, -7.7] : [f1, z1];
+  return { zp, z1, f1, f2, z2 };
+});
+const ribZ = (i, f) => { const R = RIBS[i]; return f <= R.f1 ? lerp(R.zp, R.z1, (f - RIB_F0) / (R.f1 - RIB_F0)) : lerp(R.z1, R.z2, (f - R.f1) / (R.f2 - R.f1)); };
 // 0 none, 1 rib bone, 2 costal cartilage
 function ribAt(x, y, z, s) {
   if (s < RIB_IN - 0.5 || s > RIB_IN + 0.5 || z > 13 || z < -21) return 0;
@@ -1036,10 +1047,11 @@ function ribAt(x, y, z, s) {
   if (f < RIB_F0 || f > RIB_F2) return 0;
   const ds = s - RIB_IN;
   for (let i = 0; i < RIB_N; i++) {
+    const R = RIBS[i]; if (f > R.f2) continue;
     const dz = z - ribZ(i, f); if (dz < -RIB_R || dz > RIB_R) continue;
     // same size as the ribs drawn in the 3D view
     const k = (dz * dz + ds * ds) / (RIB_R * RIB_R);
-    if (k < 1) return f > RIB_F1 ? 2 : 1;
+    if (k < 1) return f > R.f1 ? 2 : 1;
   }
   return 0;
 }
@@ -2288,51 +2300,396 @@ function startApp() {
   const camera = new THREE.PerspectiveCamera(38, 1, 1, 600);
   const camHome = { pos: V3(-44, 50, -34), target: V3(-1, 1, -1) };
   camera.position.copy(camHome.pos);
-  scene.add(new THREE.HemisphereLight(0xdfe9f0, 0x2a2018, 1.1));
-  const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(20, 60, 10); scene.add(sun);
-  const rim = new THREE.DirectionalLight(0x88aacc, 0.6); rim.position.set(-30, 10, -20); scene.add(rim);
+  // ---- Look: neutral tone mapping, soft shadows, and a studio environment so glossy tissue picks up highlights ----
+  function studioEnv(r) {
+    const env = new THREE.Scene();
+    const room = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x353c48, side: THREE.BackSide }));
+    room.scale.set(44, 26, 44); room.position.y = 9; env.add(room);
+    const lamp = (w, h, x, y, z, k, col = 0xffffff) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(k), side: THREE.DoubleSide }));
+      m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m);
+    };
+    lamp(16, 16, 0, 21, 0, 5);              // overhead examination light
+    lamp(12, 9, -21, 8, 6, 2.4, 0xdfe9ff);  // cool window light
+    lamp(9, 9, 21, 6, -9, 1.5, 0xffe2c8);   // warm fill
+    lamp(34, 3, 0, -2, 21, 0.7);            // bounce from the floor
+    const pm = new THREE.PMREMGenerator(r), tex = pm.fromScene(env, 0.035).texture;
+    pm.dispose(); return tex;
+  }
+  if (renderer) {
+    renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1.05;
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    scene.environment = studioEnv(renderer); scene.environmentIntensity = 0.85;
+  }
+  scene.add(new THREE.HemisphereLight(0xe6eef6, 0x2b221c, 0.5));
+  const sun = new THREE.DirectionalLight(0xfff3e6, 1.8); sun.position.set(16, 64, 20);
+  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.06;
+  Object.assign(sun.shadow.camera, { left: -44, right: 44, top: 50, bottom: -50, near: 10, far: 150 });
+  sun.target.position.set(0, -6, -2); scene.add(sun, sun.target);
+  const rim = new THREE.DirectionalLight(0x9db8d6, 0.8); rim.position.set(-34, 14, -30); scene.add(rim);
 
-  const table = new THREE.Mesh(new THREE.BoxGeometry(46, 1.2, 66), new THREE.MeshStandardMaterial({ color: 0x26333c, roughness: 0.9 }));
-  table.position.set(0, -11, -2); scene.add(table);
+  // ---- Examination couch: padded vinyl mattress with a paper sheet, on a steel frame ----
+  const COUCH_TOP = -10.05;
+  const roundRect = (w, l, r) => {
+    const s = new THREE.Shape(), x = -w / 2, y = -l / 2;
+    s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + l - r);
+    s.quadraticCurveTo(x + w, y + l, x + w - r, y + l); s.lineTo(x + r, y + l); s.quadraticCurveTo(x, y + l, x, y + l - r);
+    s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); return s;
+  };
+  // a flat slab with rounded corners and soft edges, lying in x–z with its bottom at y = 0
+  const slab = (w, l, th, r, bev) => {
+    const g = new THREE.ExtrudeGeometry(roundRect(w - 2 * bev, l - 2 * bev, r), { depth: th - 2 * bev, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 5, curveSegments: 12 });
+    g.rotateX(-Math.PI / 2); g.translate(0, bev, 0); return g;
+  };
+  const pad = new THREE.Mesh(slab(46, 76, 7, 4, 1.8), new THREE.MeshPhysicalMaterial({ color: 0x223039, roughness: 0.6, clearcoat: 0.3, clearcoatRoughness: 0.45 }));
+  pad.position.set(0, COUCH_TOP - 7, -5); pad.receiveShadow = true;
+  const couchBase = new THREE.Mesh(slab(42, 72, 2.4, 3, 0.6), new THREE.MeshStandardMaterial({ color: 0x9aa3ab, metalness: 0.85, roughness: 0.3 }));
+  couchBase.position.set(0, COUCH_TOP - 9.4, -5);
+  const sheet = new THREE.Mesh(new THREE.PlaneGeometry(36, 72), new THREE.MeshStandardMaterial({ color: 0xf2f4f5, roughness: 0.95 }));
+  sheet.rotation.x = -Math.PI / 2; sheet.position.set(0, COUCH_TOP + 0.02, -5); sheet.receiveShadow = true;
+  // soft contact shadow where the back rests on the sheet
+  const contactTex = (() => {
+    const c = document.createElement('canvas'); c.width = 128; c.height = 192; const g = c.getContext('2d');
+    for (let k = 0; k < 26; k++) { const m = 4 + k * 2.1; g.fillStyle = 'rgba(0,0,0,0.04)'; g.beginPath(); g.roundRect(m, m, 128 - 2 * m, 192 - 2 * m, Math.max(4, 30 - k)); g.fill(); }
+    return new THREE.CanvasTexture(c);
+  })();
+  const contact = new THREE.Mesh(new THREE.PlaneGeometry(44, 66), new THREE.MeshBasicMaterial({ map: contactTex, transparent: true, depthWrite: false, toneMapped: false }));
+  contact.rotation.x = -Math.PI / 2; contact.position.set(0, COUCH_TOP + 0.05, -2); contact.renderOrder = 1;
+  scene.add(pad, couchBase, sheet, contact);
 
-  const skinGeo = (() => {
+  // ---- Skin ----
+  // Scan surface: the elliptic cylinder the probe slides on and the ultrasound uses. It is never drawn.
+  const physGeo = (() => {
     const NZ = 96, NP = 84, pos = [], idx = [];
     for (let iz = 0; iz <= NZ; iz++) { const z = ZMIN + 0.6 + (ZMAX - ZMIN - 1.2) * iz / NZ, W = bodyW(z), D = bodyD(z), c = bodyC(z);
       for (let ip = 0; ip <= NP; ip++) { const f = 2 * Math.PI * ip / NP; pos.push(W * Math.cos(f), c + D * Math.sin(f), z); } }
     for (let iz = 0; iz < NZ; iz++) for (let ip = 0; ip < NP; ip++) { const a = iz * (NP + 1) + ip, b = a + NP + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
   })();
-  const skinMat = new THREE.MeshStandardMaterial({ color: 0xc89b80, roughness: 0.75, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide });
-  const skin = new THREE.Mesh(skinGeo, skinMat); skin.renderOrder = 5; scene.add(skin);
-  const hitMesh = new THREE.Mesh(skinGeo, new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })); scene.add(hitMesh);
-
-  const ribs = new THREE.Group(); scene.add(ribs);
-  const boneMat = new THREE.MeshStandardMaterial({ color: 0xece4d3, roughness: 0.6, transparent: true, opacity: 0.45, depthWrite: false });
-  const cartMat = new THREE.MeshStandardMaterial({ color: 0xb9c7cc, roughness: 0.5, transparent: true, opacity: 0.35, depthWrite: false });
-  for (let i = 0; i < 10; i++) for (const side of [1, -1]) {
-    const zp = 12.5 - 2.3 * i, za = zp - 3.0 - 0.3 * i, bone = [], cart = [];
-    for (let k = 0; k <= 24; k++) { const f = lerp(-80, 72, k / 24) * DEG, z = lerp(zp, za, k / 24), W = bodyW(z) - 1.3, D = bodyD(z) - 1.3; bone.push(V3(side * W * Math.cos(f), bodyC(z) + D * Math.sin(f), z)); }
-    for (let k = 0; k <= 6; k++) { const f = lerp(72, 84, k / 6) * DEG, z = lerp(za, za + 0.8, k / 6), W = bodyW(z) - 1.3, D = bodyD(z) - 1.3; cart.push(V3(side * W * Math.cos(f), bodyC(z) + D * Math.sin(f), z)); }
-    ribs.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(bone), 48, 0.38, 8), boneMat));
-    ribs.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(cart), 10, 0.42, 8), cartMat));
+  const hitMesh = new THREE.Mesh(physGeo, new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })); scene.add(hitMesh);
+  // Drawn skin: the scan surface given the shape of a real torso where no probe goes: a broader, flatter back resting on
+  // the couch, shoulders sloping up to the neck, chest muscles, collar bones, waist, hips and navel. Over the scanning
+  // windows (front and left side of the chest, epigastrium, suprasternal notch) it stays on the scan surface, so the
+  // probe still sits on the skin. Cut at the neck and hips like a training manikin.
+  const SH_Z = [4, 7, 9.5, 11.8, 13.6, 15, 16.3, 17.5, 18.8, 20.2, 21.6], SH_W = [16, 16.2, 17.4, 18.9, 19.3, 18.5, 15.6, 11.8, 8.4, 6.7, 6.2];
+  const shoulderW = z => { // half-width at the shoulders (Catmull-Rom through SH_W)
+    if (z <= SH_Z[0] || z >= SH_Z[SH_Z.length - 1]) return 0;
+    let i = 0; while (z > SH_Z[i + 1]) i++;
+    const t = (z - SH_Z[i]) / (SH_Z[i + 1] - SH_Z[i]), p0 = SH_W[Math.max(0, i - 1)], p1 = SH_W[i], p2 = SH_W[i + 1], p3 = SH_W[Math.min(SH_W.length - 1, i + 2)];
+    return 0.5 * (2 * p1 + (p2 - p0) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (3 * p1 - p0 - 3 * p2 + p3) * t * t * t);
+  };
+  function torsoXY(z, f, o) { // f: angle round the body, 90° at the front
+    const W = bodyW(z), D = bodyD(z), c = bodyC(z), cf = Math.cos(f), sf = Math.sin(f), lat = Math.abs(cf);
+    const e = 1 / (1 + 0.75 * sm(0, -0.4, sf)); // superellipse below the mid-line: flatter, broader back
+    let x = W * Math.sign(cf) * lat ** e, y = c + D * Math.sign(sf) * Math.abs(sf) ** e;
+    if (sf < 0) y -= Math.max(0, c - D - COUCH_TOP - 0.03) * (1 - sm(13.5, 17.5, z)) * (-sf) ** 3; // settle onto the couch
+    let nx = cf / W, ny = sf / D; const nl = Math.hypot(nx, ny); nx /= nl; ny /= nl;
+    x += Math.sign(cf) * Math.max(0, shoulderW(z) - W) * lat ** 2.5 * (1 - 0.25 * sf);
+    let d = lat * lat * (1.8 * sm(-21, -27.4, z) - 0.9 * Math.exp(-(((z + 16.5) / 5) ** 2))); // hips, waist
+    if (sf > 0) {
+      const ax = Math.abs(x);
+      d += 0.5 * sf * Math.exp(-(((ax - 7.5) / 4.8) ** 2) - (((z - 6.5) / 4.2) ** 2)); // chest muscles
+      d += 0.28 * sf * sm(1.5, 3.5, ax) * (1 - sm(14, 17, ax)) * Math.exp(-(((z - 13.6 - 0.06 * ax) / 0.7) ** 2)); // collar bones
+      d -= 0.55 * sf ** 8 * Math.exp(-((Math.hypot(x, z + 19) / 0.55) ** 2)); // navel
+    }
+    o[0] = x + nx * d; o[1] = y + ny * d;
   }
-  const sternum = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.7, 19), boneMat); sternum.position.set(0, bodyD(4) - 1.3, 4); ribs.add(sternum);
-  for (let z = -24; z < 13; z += 2.7) { const v = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 2.0, 18), boneMat); v.rotation.x = Math.PI / 2; v.position.set(0, -7.8, z); ribs.add(v); }
+  function torsoGeo() {
+    const NZ = 150, NF = 128, z0 = ZMIN + 0.6, z1 = ZMAX - 0.6, P = [], I = [], o = [0, 0];
+    let rings = 0;
+    const ring = (z, s, dz) => { const c = bodyC(z); for (let k = 0; k < NF; k++) { torsoXY(z, 2 * Math.PI * k / NF, o); P.push(o[0] * s, c + (o[1] - c) * s, z + dz); } return rings++; };
+    const quads = (r0, r1) => { for (let k = 0; k < NF; k++) { const a = r0 * NF + k, b = r0 * NF + (k + 1) % NF, c = r1 * NF + k, d = r1 * NF + (k + 1) % NF; I.push(a, b, c, b, d, c); } };
+    for (let iz = 0; iz <= NZ; iz++) ring(lerp(z0, z1, iz / NZ), 1, 0);
+    for (let r = 0; r < NZ; r++) quads(r, r + 1);
+    const cap = (z, h, up, from) => { // domed cap over a cut end
+      let prev = from;
+      for (let k = 1; k <= 5; k++) { const a = k / 6 * Math.PI / 2, cur = ring(z, Math.cos(a), (up ? h : -h) * Math.sin(a)); up ? quads(prev, cur) : quads(cur, prev); prev = cur; }
+      const ci = P.length / 3; P.push(0, bodyC(z), z + (up ? h : -h));
+      for (let k = 0; k < NF; k++) { const a = prev * NF + k, b = prev * NF + (k + 1) % NF; up ? I.push(a, b, ci) : I.push(b, a, ci); }
+    };
+    cap(z1, 0.9, true, NZ); cap(z0, 1.6, false, 0);
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); g.computeVertexNormals(); return g;
+  }
+  const skinMat = new THREE.MeshPhysicalMaterial({ color: 0xd8a284, roughness: 0.5, sheen: 0.7, sheenRoughness: 0.45, sheenColor: new THREE.Color(0xffc6aa),
+    transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide });
+  // Glass-manikin look: see-through face-on, solid toward the outline, so the body keeps its shape
+  const ghostly = (mat, rim, pw) => {
+    mat.onBeforeCompile = sh => {
+      sh.fragmentShader = sh.fragmentShader.replace('#include <opaque_fragment>',
+        'float rimF = 1.0 - abs( dot( normalize( normal ), normalize( vViewPosition ) ) );\n' +
+        `diffuseColor.a = clamp( diffuseColor.a + ( 1.0 - diffuseColor.a ) * ${rim.toFixed(2)} * pow( rimF, ${pw.toFixed(2)} ), 0.0, 1.0 );\n#include <opaque_fragment>`);
+    };
+    return mat;
+  };
+  ghostly(skinMat, 0.8, 2.4);
+  const skin = new THREE.Mesh(torsoGeo(), skinMat); skin.renderOrder = 5; skin.castShadow = true; skin.receiveShadow = true; scene.add(skin);
 
+  // ---- Skeleton: ribs and costal cartilages, sternum, collar bones and spine ----
+  const ribs = new THREE.Group(); scene.add(ribs);
+  // bone and cartilage are solid at their edges but let the heart show through face-on
+  const boneMat = ghostly(new THREE.MeshPhysicalMaterial({ color: 0xe9e0cb, roughness: 0.58, clearcoat: 0.15, side: THREE.DoubleSide, transparent: true, opacity: 0.5 }), 1, 1.6);
+  const cartMat = ghostly(new THREE.MeshPhysicalMaterial({ color: 0xbfd0d6, roughness: 0.32, clearcoat: 0.5, side: THREE.DoubleSide, transparent: true, opacity: 0.45 }), 1, 1.6);
+  // a band swept along a curve: broad face toward the skin (nrm), height h along the body, thickness t
+  function bandGeo(pts, nrm, h, t, seg = 12) {
+    const P = [], I = [], N = pts.length, T = new THREE.Vector3(), n = new THREE.Vector3(), b = new THREE.Vector3();
+    for (let i = 0; i < N; i++) {
+      T.subVectors(pts[Math.min(N - 1, i + 1)], pts[Math.max(0, i - 1)]).normalize();
+      n.copy(nrm[i]).addScaledVector(T, -nrm[i].dot(T)).normalize(); b.crossVectors(T, n);
+      const u = i / (N - 1), hh = typeof h === 'function' ? h(u) : h, tt = typeof t === 'function' ? t(u) : t;
+      for (let k = 0; k < seg; k++) {
+        const a = 2 * Math.PI * k / seg, ca = Math.cos(a) * tt, sa = Math.sin(a) * hh;
+        P.push(pts[i].x + n.x * ca + b.x * sa, pts[i].y + n.y * ca + b.y * sa, pts[i].z + n.z * ca + b.z * sa);
+      }
+    }
+    for (let i = 0; i < N - 1; i++) for (let k = 0; k < seg; k++) { const a = i * seg + k, c = a + seg, a1 = i * seg + (k + 1) % seg, c1 = a1 + seg; I.push(a, c, a1, a1, c, c1); }
+    const e0 = P.length / 3; P.push(pts[0].x, pts[0].y, pts[0].z, pts[N - 1].x, pts[N - 1].y, pts[N - 1].z);
+    for (let k = 0; k < seg; k++) { const k1 = (k + 1) % seg; I.push(e0, k, k1, e0 + 1, (N - 1) * seg + k1, (N - 1) * seg + k); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); g.computeVertexNormals(); return g;
+  }
+  const wallN = p => { const W = bodyW(p.z), D = bodyD(p.z); return V3(p.x / (W * W), (p.y - bodyC(p.z)) / (D * D), 0).normalize(); };
+  const ribPt = (side, f, z) => { const W = bodyW(z), D = bodyD(z), r = 1 - RIB_IN / Math.min(W, D); return V3(side * r * W * Math.cos(f), bodyC(z) + r * D * Math.sin(f), z); };
+  const smoothPts = (pts, n) => new THREE.CatmullRomCurve3(pts, false, 'centripetal').getPoints(n);
+  // bands are gathered per material and merged into one mesh each, so the skeleton costs a few draw calls, not fifty
+  const bands = new Map();
+  const addBand = (pts, h, t, mat) => { if (!bands.has(mat)) bands.set(mat, []); bands.get(mat).push(bandGeo(pts, pts.map(wallN), h, t)); };
+  const mergeGeos = list => {
+    let nv = 0, ni = 0; for (const g of list) { nv += g.attributes.position.count; ni += g.index.count; }
+    const P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), I = new Uint32Array(ni); let ov = 0, oi = 0;
+    for (const g of list) {
+      P.set(g.attributes.position.array, ov * 3); N.set(g.attributes.normal.array, ov * 3);
+      const ix = g.index.array; for (let k = 0; k < ix.length; k++) I[oi + k] = ix[k] + ov;
+      ov += g.attributes.position.count; oi += ix.length; g.dispose();
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setIndex(new THREE.BufferAttribute(I, 1)); return g;
+  };
+  const oA = [0, 0], oB = [0, 0];
+  for (const side of [1, -1]) {
+    // Ribs 2–11 follow the same path the ultrasound uses: bone from the spine round to the costochondral junction,
+    // then cartilage to the sternum (ribs 2–7) or up into the costal margin (ribs 8–10); rib 11 floats
+    RIBS.forEach((R, i) => {
+      const bone = [V3(side * 1.85, -7.25, R.zp + 0.45)];
+      for (let k = 0; k <= 30; k++) { const f = lerp(RIB_F0, R.f1, k / 30); bone.push(ribPt(side, f, ribZ(i, f))); }
+      const free = R.f2 <= R.f1;
+      addBand(smoothPts(bone, 72), u => 0.3 + 0.2 * sm(0, 0.5, u) - (free ? 0.3 * sm(0.75, 1, u) : 0), 0.24, boneMat);
+      if (!free) { const cart = []; for (let k = 0; k <= 10; k++) { const f = lerp(R.f1, R.f2, k / 10); cart.push(ribPt(side, f, ribZ(i, f))); } addBand(cart, 0.4, 0.28, cartMat); }
+    });
+    // Rib 1: short and tightly curved, under the collar bone
+    addBand(smoothPts([V3(1.7, -6.9, 15.6), V3(4.4, -7.2, 15.4), V3(7.3, -4.6, 15.0), V3(8.5, -0.2, 14.5), V3(7.6, 4.3, 13.7), V3(5.2, 7.2, 13.0), V3(3.3, 8.1, 12.75)]
+      .map(p => V3(side * p.x, p.y, p.z)), 40), u => 0.4 + 0.16 * u, 0.24, boneMat);
+    addBand([V3(side * 3.3, 8.1, 12.75), V3(side * 2.6, 8.35, 12.7), V3(side * 1.9, 8.5, 12.65)], 0.5, 0.3, cartMat);
+    // Rib 12: short floating rib at the back
+    const r12 = [V3(side * 1.9, -7.3, -10.05)];
+    for (let k = 0; k <= 16; k++) { const f = lerp(RIB_F0, -14 * DEG, k / 16); r12.push(ribPt(side, f, -10.5 - 6 * (f - RIB_F0) / (152 * DEG))); }
+    addBand(smoothPts(r12, 36), u => 0.32 + 0.12 * sm(0, 0.4, u) - 0.3 * sm(0.75, 1, u), 0.22, boneMat);
+    // Collar bone: from the top of the sternum out to the tip of the shoulder, just under the skin
+    const cl = [];
+    for (let k = 0; k <= 22; k++) {
+      const ax = lerp(1.9, 17.4, k / 22), z = 13.55 + 0.06 * ax - 0.5 * sm(13, 17.4, ax);
+      let f = Math.PI / 2; for (; f > 0.02; f -= 0.004) { torsoXY(z, f, oA); if (oA[0] >= ax) break; }
+      torsoXY(z, f + 0.01, oB); let nx = oB[1] - oA[1], ny = oA[0] - oB[0]; const nl = Math.hypot(nx, ny) || 1, dep = lerp(0.85, 1.3, k / 22);
+      cl.push(V3(side * (oA[0] - nx / nl * dep), oA[1] - ny / nl * dep, z));
+    }
+    addBand(smoothPts(cl, 44), u => 0.5 - 0.08 * Math.sin(Math.PI * u), u => 0.45 - 0.06 * Math.sin(Math.PI * u), boneMat);
+  }
+  for (const [mat, list] of bands) ribs.add(new THREE.Mesh(mergeGeos(list), mat));
+  // Sternum: manubrium, body and xiphoid, a few millimetres under the skin of the front of the chest
+  {
+    const R = [[0.9, 13.55], [1.7, 13.6], [2.45, 13.3], [2.55, 12.6], [2.0, 11.0], [1.45, 9.9], [1.35, 9.0], [1.4, 7.0], [1.55, 4.5], [1.6, 2.5], [1.45, 0.5], [1.15, -1.25], [0.72, -1.5], [0.55, -2.15], [0.3, -2.8], [0, -3.0]];
+    const s = new THREE.Shape(); s.moveTo(0, 13.25);
+    s.splineThru(R.map(([x, z]) => new THREE.Vector2(x, z)));
+    s.splineThru(R.slice(0, -1).reverse().map(([x, z]) => new THREE.Vector2(-x, z)).concat([new THREE.Vector2(0, 13.25)]));
+    const g = new THREE.ExtrudeGeometry(s, { depth: 0.75, bevelEnabled: true, bevelThickness: 0.25, bevelSize: 0.2, bevelSegments: 3, curveSegments: 48 });
+    g.rotateX(Math.PI / 2); g.translate(0, 9.25, 0); // outline y → body z; thickness runs back from the front face
+    ribs.add(new THREE.Mesh(g, boneMat));
+  }
+  // Spine: vertebral bodies and discs where the ultrasound puts the spine, with small transverse processes at the ribs
+  {
+    const vbGeo = new THREE.LatheGeometry([[0, -0.5], [0.9, -0.5], [1, -0.43], [0.9, 0], [1, 0.43], [0.9, 0.5], [0, 0.5]].map(([r, y]) => new THREE.Vector2(r, y)), 28).rotateX(Math.PI / 2);
+    const discGeo = new THREE.CylinderGeometry(1, 1, 1, 28).rotateX(Math.PI / 2), tpGeo = new THREE.CapsuleGeometry(0.24, 1.3, 4, 10);
+    const vb = [], ds = [], tp = [], spineY = z => -7.8 + 3.4 * sm(12, 20, z);
+    for (let z = -27.6; z < 22.6;) {
+      const lum = z < -12, cerv = z > 14.5, r = lum ? 2.15 : cerv ? 1.15 : 1.9, h = lum ? 2.4 : cerv ? 1.25 : 1.95, dh = lum ? 0.9 : cerv ? 0.4 : 0.55;
+      vb.push([z + h / 2, spineY(z + h / 2), r, h]); if (!lum && !cerv) tp.push([z + h / 2, spineY(z + h / 2), 1], [z + h / 2, spineY(z + h / 2), -1]);
+      z += h; ds.push([z + dh / 2, spineY(z + dh / 2), r * 0.97, dh]); z += dh;
+    }
+    const M = new THREE.Matrix4(), q = new THREE.Quaternion(), zAx = V3(0, 0, 1);
+    const inst = (geo, list, mat, fn) => { const m = new THREE.InstancedMesh(geo, mat, list.length); list.forEach((e, i) => m.setMatrixAt(i, fn(e))); m.instanceMatrix.needsUpdate = true; ribs.add(m); };
+    inst(vbGeo, vb, boneMat, ([z, y, r, h]) => M.compose(V3(0, y, z), q.identity(), V3(r, r, h)));
+    inst(discGeo, ds, cartMat, ([z, y, r, h]) => M.compose(V3(0, y, z), q.identity(), V3(r, r, h)));
+    inst(tpGeo, tp, boneMat, ([z, y, s]) => M.compose(V3(s * 2.15, y - 0.75, z), q.setFromAxisAngle(zAx, s * (Math.PI / 2 - 0.35)), V3(1, 1, 1)));
+  }
+
+  // Merged-vertex icosphere (smooth normals, no seams), used for the heart and liver
+  function icoSphere(detail) {
+    const src = new THREE.IcosahedronGeometry(1, detail), p = src.attributes.position.array, map = new Map(), pos = [], idx = [];
+    for (let i = 0; i < p.length; i += 3) {
+      const key = `${Math.round(p[i] * 1e4)},${Math.round(p[i + 1] * 1e4)},${Math.round(p[i + 2] * 1e4)}`;
+      let j = map.get(key); if (j === undefined) { j = pos.length / 3; map.set(key, j); pos.push(p[i], p[i + 1], p[i + 2]); }
+      idx.push(j);
+    }
+    src.dispose(); const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); return g;
+  }
+
+  // ---- Heart: one smooth surface wrapped round the beating chambers ----
+  // Rebuilt every frame from the chamber shapes the ultrasound uses. Each vertex looks out along a fixed direction from
+  // a point between the chambers and sits on the outermost chamber wall it meets; the walls are blended so the grooves
+  // between chambers fill in a little, as epicardial fat does. Fat and the coronary arteries are painted along the
+  // atrioventricular and interventricular grooves, and the atrial appendages are added to their atria.
   const heart = new THREE.Group(), vessels = new THREE.Group(), liverG = new THREE.Group(); scene.add(heart, vessels, liverG);
   const sphere = new THREE.SphereGeometry(1, 40, 28);
   const ell = (color, op = 0.9) => { const m = new THREE.Mesh(sphere, new THREE.MeshStandardMaterial({ color, roughness: 0.55, transparent: true, opacity: op })); m.matrixAutoUpdate = false; heart.add(m); return m; };
-  const mLV = ell(0xb8403a), mRV = ell(0x9a4a6a), mLA = ell(0xc4675c), mRA = ell(0x6f5a9e);
   const mPE = ell(0xe6d27a, 0.16); mPE.material.depthWrite = false;
-  const swingOff = V3(0, 0, 0);
-  const placeEll = (m, C, R) => { m.matrix.makeBasis(E1, E2, E3).scale(V3(R[0], R[1], R[2])).setPosition(Lw(C[0], C[1], C[2]).add(swingOff)); };
-  const tubeMesh = (pts, r, color, grp) => grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 80, r, 14), new THREE.MeshStandardMaterial({ color, roughness: 0.5, transparent: true, opacity: 0.92 })));
-  tubeMesh(AORTA, 1.15, 0xcf4a3f, vessels); tubeMesh(PA, 1.15, 0x6a64b8, vessels); tubeMesh(LPA, 0.8, 0x6a64b8, vessels); tubeMesh(RPA, 0.8, 0x6a64b8, vessels);
-  tubeMesh(IVC, 1.0, 0x4f6fb5, vessels); tubeMesh(HEPV, 0.45, 0x4f6fb5, vessels); tubeMesh(SVC, 0.9, 0x4f6fb5, vessels);
-  for (const pv of PVEINS) tubeMesh(pv, 0.55, 0xc4675c, vessels);
-  const liver = new THREE.Mesh(sphere, new THREE.MeshStandardMaterial({ color: 0x8a4a35, roughness: 0.7, transparent: true, opacity: 0.4, depthWrite: false }));
-  liver.scale.set(11, 8, 7.5); liver.position.set(-4, 0.5, -12.5); liverG.add(liver);
+  const hGeo = icoSphere(30), hDir = hGeo.attributes.position.array.slice(), hN = hDir.length / 3;
+  const hCol = new THREE.BufferAttribute(new Float32Array(hN * 3), 3); hGeo.setAttribute('color', hCol);
+  const heartMesh = new THREE.Mesh(hGeo, new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.5, clearcoat: 0.55, clearcoatRoughness: 0.3 }));
+  heartMesh.matrixAutoUpdate = false; heartMesh.frustumCulled = false; heart.add(heartMesh);
+  const hIdx = hGeo.index.array, hNrm = new THREE.BufferAttribute(new Float32Array(hN * 3), 3); hGeo.setAttribute('normal', hNrm);
+  // smooth normals straight from the typed arrays (the generic three.js version is slow enough to matter every frame)
+  function heartNormals(P) {
+    const Nn = hNrm.array; Nn.fill(0);
+    for (let i = 0; i < hIdx.length; i += 3) {
+      const a = hIdx[i] * 3, b = hIdx[i + 1] * 3, c = hIdx[i + 2] * 3;
+      const ux = P[b] - P[a], uy = P[b + 1] - P[a + 1], uz = P[b + 2] - P[a + 2], vx = P[c] - P[a], vy = P[c + 1] - P[a + 1], vz = P[c + 2] - P[a + 2];
+      const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      Nn[a] += nx; Nn[a + 1] += ny; Nn[a + 2] += nz; Nn[b] += nx; Nn[b + 1] += ny; Nn[b + 2] += nz; Nn[c] += nx; Nn[c + 1] += ny; Nn[c + 2] += nz;
+    }
+    for (let j = 0; j < Nn.length; j += 3) { const l = 1 / (Math.sqrt(Nn[j] * Nn[j] + Nn[j + 1] * Nn[j + 1] + Nn[j + 2] * Nn[j + 2]) || 1); Nn[j] *= l; Nn[j + 1] *= l; Nn[j + 2] *= l; }
+    hNrm.needsUpdate = true;
+  }
+  // per-vertex surface unevenness and colour mottling depend only on the vertex direction, so work them out once
+  const hBump = new Float32Array(hN), hMot = new Float32Array(hN);
+  for (let v = 0, j = 0; v < hN; v++, j += 3) {
+    const da = hDir[j], db = hDir[j + 1], dc = hDir[j + 2];
+    hBump[v] = 0.035 * Math.sin(23 * da + 5 * db) * Math.sin(19 * dc - 7 * da);
+    hMot[v] = 1 + 0.08 * Math.sin(19 * da + 7 * dc) * Math.sin(17 * db - 5 * da);
+  }
+  const HC = [0.4, 1.7, 0.1], HE = new Float64Array(6 * 8), HT = new Float64Array(6);
+  const C_LV = new THREE.Color(0x7e2620), C_RV = new THREE.Color(0x8a2e25), C_AT = new THREE.Color(0x6e2530), C_FAT = new THREE.Color(0xdcb465), C_ART = new THREE.Color(0xb3241a);
+  // chamber bits: LV 1, RV 2, LA 4, RA 8, LA appendage 16, RA appendage 32; groove between two chambers → [fat, width, coronary artery]
+  const GROOVE = { 3: [0.7, 0.55, 1], 5: [1, 0.8, 1], 10: [1, 0.8, 1], 12: [0.35, 0.5, 0], 9: [0.8, 0.7, 0.6], 6: [0.5, 0.6, 0], 17: [0.8, 0.4, 0.8], 18: [0.45, 0.4, 0], 34: [0.85, 0.4, 0.9], 33: [0.4, 0.4, 0] };
+  // smooth maximum: the larger of a and b, rounded off where they are within k of each other
+  const smax = (a, b, k) => { const h = k - Math.abs(a - b); return (a > b ? a : b) + (h > 0 ? h * h / (4 * k) : 0); };
+  // each chamber is an ellipsoid; store what the ray test needs: centre offset from HC in unit-sphere space, 1/radii, bit
+  const setE = (k, C, R, bit) => {
+    const o = k * 8, ia = 1 / R[0], ib = 1 / R[1], ic = 1 / R[2], pa = (HC[0] - C[0]) * ia, pb = (HC[1] - C[1]) * ib, pc = (HC[2] - C[2]) * ic;
+    HE[o] = pa; HE[o + 1] = pb; HE[o + 2] = pc; HE[o + 3] = ia; HE[o + 4] = ib; HE[o + 5] = ic; HE[o + 6] = pa * pa + pb * pb + pc * pc - 1; HE[o + 7] = bit;
+  };
+  const swingOff = V3(0, 0, 0), heartOff = V3(0, 0, 0);
+  function updateHeart(lvC, lvR) {
+    setE(0, lvC, lvR, 1); setE(1, RVC, RVOR, 2); setE(2, LAC, LAOR, 4); setE(3, RAC, RAOR, 8);
+    setE(4, [LAC[0] + 1.9, LAC[1] - 1.1, LAC[2] + 3.6], [1.3, 0.8, 1.2], 16);   // left atrial appendage, beside the pulmonary trunk
+    setE(5, [RAC[0] + 0.7, RAC[1] - 0.2, RAC[2] + 3.1], [1.15, 1.0, 1.0], 32); // right atrial appendage, over the aortic root
+    const P = hGeo.attributes.position.array, Cc = hCol.array;
+    // the ventricles taper to the apex on the LV axis
+    const apA = lvC[0] + lvR[0], tb = lvC[1] + 0.4, rvTip = RVC[0] + 0.6 * RVOR[0], rvEnd = RVC[0] + 0.95 * RVOR[0];
+    for (let v = 0, j = 0; v < hN; v++, j += 3) {
+      const da = hDir[j], db = hDir[j + 1], dc = hDir[j + 2];
+      let t1 = -1e9, b1 = 0, t2 = -1e9, b2 = 0;
+      for (let k = 0, o = 0; k < 6; k++, o += 8) {
+        // far root of the ray from HC along the vertex direction through this ellipsoid
+        const qa = da * HE[o + 3], qb = db * HE[o + 4], qc = dc * HE[o + 5];
+        const A = qa * qa + qb * qb + qc * qc, B = qa * HE[o] + qb * HE[o + 1] + qc * HE[o + 2], dsc = B * B - A * HE[o + 6];
+        let t = -1e9; if (dsc > 0) { t = (Math.sqrt(dsc) - B) / A; if (t < 0) t = -1e9; }
+        HT[k] = t;
+        const bit = HE[o + 7];
+        if (t > t1) { if (bit !== b1) { t2 = t1; b2 = b1; } t1 = t; b1 = bit; } else if (bit !== b1 && t > t2) { t2 = t; b2 = bit; }
+      }
+      // ventricles blend into one mass (the interventricular groove is shallow); the atria sit on it, with a deeper
+      // atrioventricular groove
+      const tV = smax(HT[0], HT[1], 1.9), tA = smax(smax(HT[2], HT[4], 0.85), smax(HT[3], HT[5], 0.85), 0.85);
+      let t = smax(tV, tA, 0.72); if (t < 0) t = 1;
+      t += hBump[v]; // slightly uneven surface
+      let pa = HC[0] + da * t, pb = HC[1] + db * t, pc = HC[2] + dc * t;
+      if (pa > 1.2) { const g0 = 1 - 0.3 * sm(1.2, apA, pa) ** 1.3; pb = tb + (pb - tb) * g0; pc *= g0; }
+      P[j] = pa; P[j + 1] = pb; P[j + 2] = pc;
+      const base = b1 === 1 ? C_LV : b1 === 2 ? C_RV : C_AT, g = t2 > -1e8 ? GROOVE[b1 | b2] : undefined;
+      let fat = 0, art = 0;
+      if (g) {
+        const dd = t1 - t2, gk = (b1 | b2) === 3 ? 1 - sm(rvTip, rvEnd, pa) : 1; // the RV ends short of the apex: no groove there
+        fat = gk * g[0] * Math.exp(-((dd / g[1]) ** 2)); if (g[2]) art = gk * g[2] * Math.exp(-((dd / 0.24) ** 2));
+      }
+      const m = hMot[v] * (1 - fat);
+      Cc[j] = (base.r * m + C_FAT.r * fat) * (1 - art) + C_ART.r * art;
+      Cc[j + 1] = (base.g * m + C_FAT.g * fat) * (1 - art) + C_ART.g * art;
+      Cc[j + 2] = (base.b * m + C_FAT.b * fat) * (1 - art) + C_ART.b * art;
+    }
+    hGeo.attributes.position.needsUpdate = true; hCol.needsUpdate = true; heartNormals(P);
+    heartMesh.matrix.makeBasis(E1, E2, E3).setPosition(O.x + heartOff.x, O.y + heartOff.y, O.z + heartOff.z);
+  }
+  const placeEll = (m, C, R) => { m.matrix.makeBasis(E1, E2, E3).scale(V3(R[0], R[1], R[2])).setPosition(Lw(C[0], C[1], C[2]).add(heartOff)); };
 
+  // ---- Great vessels: tubes whose radius follows the case (dilated aortic root, pulmonary artery, IVC) ----
+  const vMat = c => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.4, clearcoat: 0.6, clearcoatRoughness: 0.3, side: THREE.DoubleSide });
+  const VM = { art: vMat(0xb02e28), pa: vMat(0x4f5fb0), vein: vMat(0x3d5aa3), pv: vMat(0xb4463d) };
+  function vesselGeo(pts, rs, seg = 80, rad = 18) {
+    const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal'), F = curve.computeFrenetFrames(seg, false);
+    const L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + pts[i].distanceTo(pts[i - 1]));
+    const rAt = u => { if (!Array.isArray(rs)) return rs; const s = u * L[L.length - 1]; let i = 0; while (i < L.length - 2 && s > L[i + 1]) i++; return lerp(rs[i], rs[i + 1], clamp((s - L[i]) / (L[i + 1] - L[i] || 1), 0, 1)); };
+    const P = [], NN = [], I = [], p = new THREE.Vector3();
+    for (let i = 0; i <= seg; i++) {
+      curve.getPointAt(i / seg, p); const r = rAt(i / seg), N = F.normals[i], B = F.binormals[i];
+      for (let k = 0; k <= rad; k++) {
+        const v = k / rad * Math.PI * 2, s = Math.sin(v), c = -Math.cos(v), nx = c * N.x + s * B.x, ny = c * N.y + s * B.y, nz = c * N.z + s * B.z;
+        P.push(p.x + r * nx, p.y + r * ny, p.z + r * nz); NN.push(nx, ny, nz);
+      }
+    }
+    for (let j = 1; j <= seg; j++) for (let k = 1; k <= rad; k++) { const a = (rad + 1) * (j - 1) + k - 1, b = (rad + 1) * j + k - 1, c = b + 1, d = a + 1; I.push(a, b, d, b, c, d); }
+    for (const [j, sg] of [[0, -1], [seg, 1]]) { // closed ends
+      const T = F.tangents[j], c0 = P.length / 3; curve.getPointAt(j / seg, p); P.push(p.x, p.y, p.z); NN.push(T.x * sg, T.y * sg, T.z * sg);
+      for (let k = 0; k <= rad; k++) { const q = ((rad + 1) * j + k) * 3; P.push(P[q], P[q + 1], P[q + 2]); NN.push(T.x * sg, T.y * sg, T.z * sg); }
+      for (let k = 0; k < rad; k++) I.push(c0, c0 + 1 + k, c0 + 2 + k);
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(NN, 3)); g.setIndex(I); return g;
+  }
+  // Arch branches carried on up the neck (carotids) and out toward the shoulders (subclavians)
+  const AB = ARCH_BRANCHES;
+  const NECK_ART = [
+    [[AB[0][0], AB[0][1], V3(-1.9, 1.7, 17.5), V3(-2.4, 1.0, 23.2)], [0.5, 0.46, 0.36, 0.33]],                      // brachiocephalic → right carotid
+    [[AB[0][1], V3(-4.6, 2.2, 15.2), V3(-9.2, 1.0, 15.0), V3(-14.5, -0.6, 13.8)], [0.42, 0.38, 0.34, 0.3]],         // right subclavian
+    [[AB[1][0], AB[1][1], V3(2.0, 0.9, 18.5), V3(2.4, 1.0, 23.2)], [0.36, 0.34, 0.33, 0.32]],                       // left carotid
+    [[AB[2][0], AB[2][1], V3(4.6, -0.5, 15.5), V3(9.2, 0.4, 15.0), V3(14.5, -0.6, 13.8)], [0.4, 0.38, 0.35, 0.32, 0.3]], // left subclavian
+  ];
+  const vesselKey = () => `${MODEL.paR}|${MODEL.ivcR}|${MODEL.av}|${PVEINS[0][0].x.toFixed(3)}`;
+  let builtVessels = '';
+  function buildVesselMeshes() {
+    for (const m of vessels.children) m.geometry.dispose();
+    vessels.clear();
+    const add = (pts, r, mat) => vessels.add(new THREE.Mesh(vesselGeo(pts, r), mat));
+    const p = MODEL.paR, v = MODEL.ivcR;
+    const aoR = MODEL.av === 'stenosis' ? AORTA_R.map((r, i) => i === 1 ? 1.75 : r) : MODEL.av === 'bicuspid' ? AORTA_R.map((r, i) => i === 1 ? 1.95 : i === 2 ? 1.65 : r) : AORTA_R;
+    add(AORTA, aoR, VM.art); for (const [pts, r] of NECK_ART) add(pts, r, VM.art);
+    add(PA, [p, p, p * 0.92], VM.pa); add(LPA, p * 0.7, VM.pa); add(RPA, p * 0.7, VM.pa);
+    add(IVC, [v, v, v * 0.95, v * 0.9, v * 0.9], VM.vein); add(HEPV, 0.45 * v, VM.vein); add(SVC, 0.9, VM.vein);
+    for (const pv of PVEINS) add(pv, [0.66, 0.6, 0.55, 0.5], VM.pv);
+    builtVessels = vesselKey();
+  }
+  buildVesselMeshes();
+
+  // ---- Liver: inside the region the ultrasound uses (a dome under the right diaphragm), cut to a liver's wedge: the
+  // lower border rises from the right flank to the thin left lobe in front. Found by casting rays from inside it,
+  // with the edges rounded off ----
+  liverG.add((() => {
+    const g = icoSphere(18), p = g.attributes.position.array, n = p.length / 3, C = [-4.5, 1.5, -10];
+    const inLiver = (x, y, z) => {
+      const W = bodyW(z), D = bodyD(z), lim = 1 - 1.5 / Math.min(W, D);
+      if ((x / W) ** 2 + ((y - bodyC(z)) / D) ** 2 > lim * lim || x * x + (y + 7.8) ** 2 < 6.8) return false;
+      const zd = -4.7 + 1.3 * Math.exp(-(((x + 3) / 6) ** 2)) - 2.8 * sm(1.5, 8.5, y);
+      if (z > zd - 0.3 || z < -17.5 + 0.62 * (x + 11) || y < -6.5 + 1.1 * Math.max(0, x + 1)) return false;
+      const lx = (x + 4) / 11, ly = (y - 0.5) / 8, lz = (z + 12.5) / 7.5;
+      return lx * lx + ly * ly + lz * lz < 1 || (x < 4.5 && y > -5 && z > zd - 9);
+    };
+    let r = new Float32Array(n);
+    for (let v = 0; v < n; v++) { let last = 0.5; for (let t = 0.2; t < 24; t += 0.2) if (inLiver(C[0] + p[3 * v] * t, C[1] + p[3 * v + 1] * t, C[2] + p[3 * v + 2] * t)) last = t; r[v] = last; }
+    const nb = Array.from({ length: n }, () => new Set()), ix = g.index.array;
+    for (let i = 0; i < ix.length; i += 3) { const a = ix[i], b = ix[i + 1], c = ix[i + 2]; nb[a].add(b).add(c); nb[b].add(a).add(c); nb[c].add(a).add(b); }
+    const nbA = nb.map(s => [...s]);
+    for (let it = 0; it < 6; it++) { const nr = new Float32Array(n); for (let v = 0; v < n; v++) { let s = 0; for (const w of nbA[v]) s += r[w]; nr[v] = 0.4 * r[v] + 0.6 * s / nbA[v].length; } r = nr; }
+    for (let v = 0; v < n; v++) for (let k = 0; k < 3; k++) p[3 * v + k] = C[k] + p[3 * v + k] * r[v];
+    g.computeVertexNormals();
+    return new THREE.Mesh(g, new THREE.MeshPhysicalMaterial({ color: 0x6a281d, roughness: 0.42, clearcoat: 0.7, clearcoatRoughness: 0.25 }));
+  })());
+
+  // ---- Scan plane: the live image on a fan in the body ----
   const usTex = new THREE.CanvasTexture(usCanvas); usTex.colorSpace = THREE.SRGBColorSpace;
   const fanGeo = (() => {
     const T = 48, R = 20, pos = [], uv = [], idx = [];
@@ -2346,25 +2703,46 @@ function startApp() {
   })();
   const fanOutlinePts = (() => { const p = [V3(0, 0, 0)]; for (let it = 0; it <= 40; it++) { const th = -SECT + 2 * SECT * it / 40; p.push(V3(Math.sin(th), Math.cos(th), 0)); } p.push(V3(0, 0, 0)); return p; })();
   const fan = new THREE.Group(); fan.matrixAutoUpdate = false; scene.add(fan);
-  const fanMesh = new THREE.Mesh(fanGeo, new THREE.MeshBasicMaterial({ map: usTex, side: THREE.DoubleSide, transparent: true, opacity: 0.93 }));
+  const fanMesh = new THREE.Mesh(fanGeo, new THREE.MeshBasicMaterial({ map: usTex, side: THREE.DoubleSide, transparent: true, opacity: 0.93, toneMapped: false }));
   fanMesh.renderOrder = 2; fan.add(fanMesh);
-  fan.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(fanOutlinePts), new THREE.LineBasicMaterial({ color: 0xf0a447 })));
+  // The same image, faint and drawn through everything, so the plane can still be followed inside the heart and liver
+  const fanX = new THREE.Mesh(fanGeo, new THREE.MeshBasicMaterial({ map: usTex, side: THREE.DoubleSide, transparent: true, opacity: 0.5, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  fanX.renderOrder = 9; fan.add(fanX);
+  fan.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(fanOutlinePts), new THREE.LineBasicMaterial({ color: 0xf0a447, toneMapped: false })));
 
-  const makeProbe = (bodyMat, markMat) => {
-    const g = new THREE.Group(); g.matrixAutoUpdate = false;
-    const head = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.3, 1.3), bodyMat); head.position.y = 0.65;
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 1.0, 1.4, 20), bodyMat); neck.position.y = 1.95;
-    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.62, 3.6, 20), bodyMat); handle.position.y = 4.4;
-    const cable = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 2.4, 10), bodyMat); cable.position.y = 7.2;
-    const mark = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 10), markMat); mark.position.set(1.36, 0.9, 0);
-    g.add(head, neck, handle, cable, mark); return g;
+  // ---- Probe: a phased-array cardiac transducer (small rounded footprint, acoustic lens, tapered grip, boot, cable) ----
+  function loftGeo(secs, seg = 36) { // superellipse cross-sections [y, half-width x, half-depth z, exponent] lofted along y
+    const P = [], I = [], S = secs.length;
+    for (const [y, hx, hz, n] of secs) { const e = 2 / n; for (let k = 0; k < seg; k++) { const a = 2 * Math.PI * k / seg, c = Math.cos(a), s = Math.sin(a); P.push(hx * Math.sign(c) * Math.abs(c) ** e, y, hz * Math.sign(s) * Math.abs(s) ** e); } }
+    for (let j = 0; j < S - 1; j++) for (let k = 0; k < seg; k++) { const a = j * seg + k, b = j * seg + (k + 1) % seg; I.push(a, a + seg, b, b, a + seg, b + seg); }
+    const c0 = P.length / 3; P.push(0, secs[0][0], 0, 0, secs[S - 1][0], 0);
+    for (let k = 0; k < seg; k++) { const k1 = (k + 1) % seg; I.push(c0, k1, k, c0 + 1, (S - 1) * seg + k, (S - 1) * seg + k1); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); g.computeVertexNormals(); return g;
+  }
+  const PG = {
+    lens: loftGeo([[0.12, 1.03, 0.67, 4.5], [0.03, 1.0, 0.64, 4.5], [-0.03, 0.9, 0.55, 4], [-0.06, 0.6, 0.36, 3]]),
+    body: loftGeo([[0.08, 1.09, 0.74, 4.5], [0.3, 1.19, 0.83, 4.2], [0.9, 1.27, 0.91, 3.6], [1.6, 1.24, 0.91, 3.2], [2.4, 1.07, 0.86, 2.8], [3.1, 0.95, 0.8, 2.5],
+      [4.2, 0.99, 0.85, 2.4], [5.6, 1.0, 0.86, 2.4], [6.8, 0.88, 0.78, 2.3], [7.4, 0.68, 0.62, 2.2], [7.7, 0.46, 0.45, 2.1], [7.8, 0.3, 0.3, 2]]),
+    boot: new THREE.LatheGeometry([...Array(15)].map((_, i) => new THREE.Vector2(0.44 - 0.17 * i / 14 + (i % 2 ? 0.025 : 0), 7.6 + 2.6 * i / 14)), 20),
+    cable: new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0, 10.1, 0), V3(0, 11.8, 0.2), V3(0.4, 13.8, 1.3), V3(1.6, 15.6, 3.4), V3(3.6, 16.6, 6.4)]), 40, 0.22, 10),
+    mark: new THREE.CapsuleGeometry(0.085, 0.55, 4, 10),
   };
-  const probe = makeProbe(new THREE.MeshStandardMaterial({ color: 0xd7dde0, roughness: 0.35, metalness: 0.1 }), new THREE.MeshStandardMaterial({ color: 0xf0a447, emissive: 0x7a4a10 }));
+  const makeProbe = (bodyMat, markMat, lensMat = bodyMat, cableMat = bodyMat) => {
+    const g = new THREE.Group(); g.matrixAutoUpdate = false;
+    const mark = new THREE.Mesh(PG.mark, markMat); mark.position.set(1.3, 1.0, 0); // orientation marker on the marker side
+    g.add(new THREE.Mesh(PG.body, bodyMat), new THREE.Mesh(PG.lens, lensMat), new THREE.Mesh(PG.boot, cableMat), new THREE.Mesh(PG.cable, cableMat), mark);
+    return g;
+  };
+  const probe = makeProbe(new THREE.MeshPhysicalMaterial({ color: 0xe3e6e9, roughness: 0.3, clearcoat: 0.7, clearcoatRoughness: 0.2, side: THREE.DoubleSide }),
+    new THREE.MeshStandardMaterial({ color: 0xf0a447, emissive: 0x8a4c10, roughness: 0.4 }),
+    new THREE.MeshStandardMaterial({ color: 0x3b424b, roughness: 0.65, side: THREE.DoubleSide }),
+    new THREE.MeshStandardMaterial({ color: 0x2c3036, roughness: 0.5, side: THREE.DoubleSide }));
+  probe.traverse(o => { if (o.isMesh) o.castShadow = true; });
   scene.add(probe);
-  const ghostMat = new THREE.MeshBasicMaterial({ color: 0x5ccf95, transparent: true, opacity: 0.35, depthWrite: false });
+  const ghostMat = new THREE.MeshBasicMaterial({ color: 0x5ccf95, transparent: true, opacity: 0.35, depthWrite: false, toneMapped: false });
   const ghost = makeProbe(ghostMat, ghostMat); scene.add(ghost);
   const ghostFan = new THREE.Group(); ghostFan.matrixAutoUpdate = false;
-  ghostFan.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(fanOutlinePts), new THREE.LineDashedMaterial({ color: 0x5ccf95, dashSize: 0.04, gapSize: 0.03 })));
+  ghostFan.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(fanOutlinePts), new THREE.LineDashedMaterial({ color: 0x5ccf95, dashSize: 0.04, gapSize: 0.03, toneMapped: false })));
   ghostFan.children[0].computeLineDistances(); scene.add(ghostFan);
   const placeProbe = (g, fr) => { const up = fr.beam.clone().negate(); g.matrix.makeBasis(fr.marker, up, new THREE.Vector3().crossVectors(fr.marker, up)).setPosition(fr.pos); };
   const placeFan = (g, fr, depth) => { g.matrix.makeBasis(fr.marker, fr.beam, new THREE.Vector3().crossVectors(fr.marker, fr.beam)).scale(V3(depth, depth, depth)).setPosition(fr.pos); };
@@ -3635,9 +4013,11 @@ registerProcessor('dop-synth', class extends AudioWorkletProcessor {
     }
 
     if (renderer) {
-      swingOff.copy(E2).multiplyScalar(SWB);
+      // the heart swings (tamponade) and drops a little on inspiration, as in the ultrasound
+      swingOff.copy(E2).multiplyScalar(SWB); heartOff.copy(swingOff); heartOff.z -= RZ;
       const lvC = [LVO.a, LVO.b + (LVO.rbp - LVO.rbm) / 2, 0], lvR = [LVO.ra, (LVO.rbp + LVO.rbm) / 2, LVO.rc];
-      placeEll(mLV, lvC, lvR); placeEll(mRV, RVC, RVOR); placeEll(mLA, LAC, LAOR); placeEll(mRA, RAC, RAOR);
+      if (heart.visible) updateHeart(lvC, lvR);
+      if (vesselKey() !== builtVessels) buildVesselMeshes();
       const eff = MODEL.effusion_cm; mPE.visible = eff > 0.2;
       if (mPE.visible) placeEll(mPE, [1.6, 1.6, 0.1], [lvR[0] + 2.4 + eff, 3.9 + eff, 3.4 + eff]);
       placeProbe(probe, fr); placeFan(fan, fr, st.depth);
