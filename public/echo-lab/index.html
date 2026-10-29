@@ -910,9 +910,13 @@ function valveAt(a, b0, c0, x, y, z) {
   const c = b0 * MV_CU + c0 * MV_SU, b = -b0 * MV_SU + c0 * MV_CU;
   if (a > -1.3 && a < 2.4 && b > -1.45 && b < 1.45 && c > -2.2 && c < 2.4) {
     const hc = Math.sqrt(Math.max(0, 2.1 - b * b)), k = hc / 1.45, o = MVO;
+    // Saddle-shaped, D-shaped annulus: between the fibrous trigones the anterior leaflet hangs from the back wall of
+    // the aortic root (aorto-mitral continuity), so its hinge there sits further back and higher toward the atrium
+    // than the rest of the annulus. In PLAX and A3C the posterior aortic wall runs straight on into the leaflet.
+    const wAo = Math.exp(-(((b - 0.35) / 0.75) ** 2)), haA = -0.15 - 0.72 * wAo, hcA = hc - 0.52 * wAo;
     // Open tips stay inside the annulus: anterior leaflet swings further than the shorter posterior one, so in
     // short axis the orifice is an oval, wide between the commissures and narrower front to back (fish-mouth)
-    let th = 0.11, A = [lerp(0.45, 2.0, o), lerp(0.12, 0.78, o) * k], Am = null, P = [lerp(0.40, 1.3, o), lerp(-0.05, -0.62, o) * k], Pm = null;
+    let th = 0.11, A = [lerp(0.45, 2.0 - 0.3 * wAo, o), lerp(0.12, 0.78, o) * k], Am = null, P = [lerp(0.40, 1.3, o), lerp(-0.05, -0.62, o) * k], Pm = null;
     if (M.mv === 'ms') {
       th = 0.2;
       A = [lerp(0.45, 1.55, o), lerp(0.12, 0.55, o) * k]; Am = [lerp(0.15, 0.95, o), lerp(0.85, 1.25, o) * k];
@@ -933,7 +937,7 @@ function valveAt(a, b0, c0, x, y, z) {
       const rr = 0.42 + 0.06 * Math.sin(b * 9 + a * 7);
       if ((a - va) ** 2 + (c - vc) ** 2 + (vb / 1.5) ** 2 < rr * rr) { VEG = 1; return true; }
     }
-    if (leaflet(a, c, -0.15, hc, Am ? Am[0] : null, Am ? Am[1] : 0, A[0], A[1], th)) return true;
+    if (leaflet(a, c, haA, hcA, Am ? Am[0] : null, Am ? Am[1] : 0, A[0], A[1], th)) return true;
     if (leaflet(a, c, -0.15, -hc, Pm ? Pm[0] : null, Pm ? Pm[1] : 0, P[0], P[1], th)) return true;
   }
   // Tricuspid leaflets: septal and anterior.
