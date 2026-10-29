@@ -277,6 +277,11 @@ body.gridmode #grid{display:block}
           <span class="row" style="gap:12px">
             <label class="mini">Baseline <input type="range" id="specBase" min="-0.8" max="0.8" step="0.05" value="0"></label>
             <label class="mini">Scale <input type="range" id="specScale" min="1" max="7" step="0.5" value="5"><output id="specScaleO">±5 m/s</output></label>
+            <label class="mini" title="Doppler gain: brightens signal and background noise together">Gain <input type="range" id="specGain" min="-15" max="15" step="1" value="0"><output id="specGainO">0 dB</output></label>
+          </span>
+          <span class="row" style="gap:6px">
+            <label class="chip" title="Doppler audio: the Doppler shift is audible. Flow toward the probe plays on the left, away on the right"><input type="checkbox" id="specSound"> Sound</label>
+            <label class="mini">Vol <input type="range" id="specVol" min="0" max="1" step="0.05" value="0.5"></label>
           </span>
           <span class="row" style="gap:6px">
             <button class="chip" id="specMeasure" type="button">Measure last beat</button>
@@ -293,6 +298,7 @@ body.gridmode #grid{display:block}
             <label class="chip" title="Tissue Doppler: PW on the myocardium (e′, s′, a′)"><input type="checkbox" id="tdiOn"> TDI</label>
           </span>
           <button class="chip" id="savePng" type="button" title="Download the current image (and any M-mode or Doppler strip) as a PNG">Save PNG</button>
+          <label class="mini" title="Sweep speed of the ECG, M-mode and Doppler strips">Sweep <select id="sweepSel" aria-label="Sweep speed"><option value="6">Slow</option><option value="4" selected>Medium</option><option value="2.5">Fast</option></select></label>
           <label class="mini">Click sets <select id="clickMode" aria-label="What a click on the image sets"><option value="m">M-mode line</option><option value="c">Color box</option><option value="d">Doppler cursor</option></select></label>
           <span id="mmHint" style="flex-basis:100%">Turn on a mode, then click the image to place its cursor.</span>
         </div>
@@ -851,9 +857,10 @@ function seg2(px, py, ax, ay, bx, by) {
   const dx = bx - ax, dy = by - ay; let t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1); t = t < 0 ? 0 : t > 1 ? 1 : t;
   const qx = px - ax - t * dx, qy = py - ay - t * dy; return Math.sqrt(qx * qx + qy * qy);
 }
+let CAP_T = 0; // position along the last capsule tested (0 at P, 1 at Q)
 function capsule(a, b, c, P, Q, r) {
   const dx = Q[0] - P[0], dy = Q[1] - P[1], dz = Q[2] - P[2], px = a - P[0], py = b - P[1], pz = c - P[2];
-  let t = (px * dx + py * dy + pz * dz) / (dx * dx + dy * dy + dz * dz); t = t < 0 ? 0 : t > 1 ? 1 : t;
+  let t = (px * dx + py * dy + pz * dz) / (dx * dx + dy * dy + dz * dz); t = t < 0 ? 0 : t > 1 ? 1 : t; CAP_T = t;
   const qx = px - t * dx, qy = py - t * dy, qz = pz - t * dz; return qx * qx + qy * qy + qz * qz < r * r;
 }
 const LVOT0 = [0.9, 0.6, 0.75], LVOT1 = AV_LOC;
@@ -1161,7 +1168,8 @@ const JET_DEFS = {
   'mr-ant': { o: [0.1, 0, -0.35], d: [-0.75, 0, 0.66], L: 5.0, w0: 0.2, ha: 10, v: 5.0, when: 'late', turb: 1, pisa: 0.3 },
   'mr-post': { o: [0.4, 0, 0.3], d: [-0.8, 0, -0.6], L: 3.5, w0: 0.2, ha: 12, v: 4.5, when: 'late', turb: 1, pisa: 0 },
   'lvot': { o: [lerp(LVOT0[0], LVOT1[0], 0.15), lerp(LVOT0[1], LVOT1[1], 0.15), lerp(LVOT0[2], LVOT1[2], 0.15)], d: [LVOT1[0] - 0.7, LVOT1[1] - 0.9, LVOT1[2] - 1.3], L: 4.2, w0: 0.3, ha: 10, v: 3.6, when: 'dagger', turb: 1, pisa: 0 },
-  'as': { o: [AVL[0] + AXL[0] * 0.3, AVL[1] + AXL[1] * 0.3, AVL[2] + AXL[2] * 0.3], d: AXL, L: 6.0, w0: 0.25, ha: 9, v: 4.6, when: 'sys', turb: 1, pisa: 0.25 },
+  // the stenotic jet leaves the valve along the LVOT / aortic root axis
+  'as': { o: [AVL[0] + AXL[0] * 0.3, AVL[1] + AXL[1] * 0.3, AVL[2] + AXL[2] * 0.3], d: nrm([LVOT1[0] - LVOT0[0], LVOT1[1] - LVOT0[1], LVOT1[2] - LVOT0[2]]).map((x, i) => 0.6 * x + 0.4 * AXL[i]), L: 6.0, w0: 0.25, ha: 9, v: 4.6, when: 'ej', turb: 1, pisa: 0.25 },
   'ar': { o: [AVL[0] + AXL[0] * 0.2, AVL[1] + AXL[1] * 0.2, AVL[2] + AXL[2] * 0.2], d: [LVOT0[0] - LVOT1[0], LVOT0[1] - LVOT1[1], LVOT0[2] - LVOT1[2]], L: 5.5, w0: 0.35, ha: 13, v: 4.0, when: 'dia', turb: 0.9, pisa: 0.2 },
   'ms': { o: [0.7, 0, 0.1], d: [1, 0, 0], L: 5.0, w0: 0.35, ha: 8, v: 2.0, when: 'msd', turb: 0.75, pisa: 0.35 },
   'tr': { o: [0.35 + TVA, TVB, TVC], d: [-1, 0.1, 0], L: 4.5, w0: 0.22, ha: 14, v: 3.8, when: 'sys', turb: 1, pisa: 0.25 },
@@ -1177,6 +1185,8 @@ function jetGains() {
     const j = JET_DEFS[id], v = jetPeak(id);
     let g = 0;
     if (j.when === 'sys') g = SYS > 0.02 ? Math.min(1, SYS * 1.6) : 0;
+    // Aortic stenosis: velocity follows the ejection flow, a rounded curve that peaks in mid-to-late systole
+    else if (j.when === 'ej') g = p > 0.1 && p < 0.44 ? Math.sin(Math.PI * clamp((p - 0.1) / 0.34, 0, 1) ** 1.25) ** 0.85 : 0;
     else if (j.when === 'late') g = SYS > 0.02 ? sm(0.14, 0.3, p) : 0;
     // Dynamic LVOT obstruction: slow start, then a steep rise to a late peak ("dagger" CW profile)
     else if (j.when === 'dagger') g = SYS > 0.02 ? sm(0.1, 0.38, p) ** 2 * Math.min(1, SYS * 3) : 0;
@@ -1243,7 +1253,7 @@ function flowAt() {
   }
   const dia = PHASE >= 0.47;
   if (a > -1.3 && a < 0.4 && b * b + c * c < 2.1) { if (dia) FLOW.a = 0.8 * MVO * MVR * (1 - 0.6 * (b * b + c * c) / 2.1); return; }
-  if (capsule(a, b, c, LVOT0, LVOT1, 1.0)) { const s = 1.0 * SYS; FLOW.a = LVOT_D[0] * s; FLOW.b = LVOT_D[1] * s; FLOW.c = LVOT_D[2] * s; return; }
+  if (capsule(a, b, c, LVOT0, LVOT1, 1.0)) { const s = SYS * (0.4 + 0.6 * sm(0, 0.55, CAP_T)); FLOW.a = LVOT_D[0] * s; FLOW.b = LVOT_D[1] * s; FLOW.c = LVOT_D[2] * s; return; }
   if (a > -1.1 && a < 0.5 + TVA && (b - TVB) ** 2 + (c - TVC) ** 2 < TVR2) { if (dia) FLOW.a = 0.6 * TVO * TVR; return; }
   if (capsule(a, b, c, RVOT0, RVOT1, 1.15)) { const s = 0.8 * rvEject(); FLOW.a = RVOT_D[0] * s; FLOW.b = RVOT_D[1] * s; FLOW.c = RVOT_D[2] * s; return; }
   if (a > -0.2 && lvCavity(a, b, c)) {
@@ -1253,7 +1263,7 @@ function flowAt() {
       if (rr < 1.6) FLOW.a = 0.65 * MVO * MVR * Math.exp(-a / 5) * (1 - (rr / 1.6) ** 2);
     } else {
       const dist = Math.hypot(a - LVOT0[0], b - LVOT0[1], c - LVOT0[2]);
-      towards(a, b, c, LVOT0, 0.6 * SYS * clamp(MODEL.EF / 60, 0.3, 1.2) * clamp(1 - dist / 7, 0, 1) ** 1.5);
+      towards(a, b, c, LVOT0, 0.45 * SYS * clamp(MODEL.EF / 60, 0.3, 1.2) * clamp(1 - dist / 5, 0, 1) ** 1.6);
     }
     return;
   }
@@ -1734,8 +1744,14 @@ const A4C_DEF = { id: 'a4c', name: 'A4C', full: 'Apical four-chamber', group: 'A
 // A5C: the probe sits over the LV apex and tilts forward until the plane takes in the aortic valve,
 // so the beam runs down the LV cavity and the LVOT
 function a5Plane(S) {
-  const v = AVw.clone().sub(S);
-  return { N: cross(E2, v), target: S.clone().addScaledVector(v, 0.55), seed: v.clone().negate() };
+  const v = AVw.clone().sub(S), vn = v.clone().normalize();
+  // turn the plane about the apex-to-valve line toward the outflow tract, so the LVOT and the aortic jet lie in it
+  // (as in a real A5C, where CW Doppler of the aortic valve is lined up with the flow)
+  const n0 = cross(E2, v).normalize(), lv = Lw(...LVOT1).sub(Lw(...LVOT0)), n1 = cross(v, lv).normalize();
+  if (n1.dot(n0) < 0) n1.negate();
+  const N = n0.multiplyScalar(0.4).addScaledVector(n1, 0.6); N.addScaledVector(vn, -N.dot(vn)).normalize();
+  // aimed at the valve itself, so the valve stays in the plane when the probe shifts to an intercostal space
+  return { N, target: AVw.clone(), seed: v.clone().negate() };
 }
 function psaxMvPlane() {
   // plane a = 0.95 + 0.45 (b - 0.2) + 0.15 (c - 0.1) in heart coordinates: across the mitral orifice it stays
@@ -2009,6 +2025,211 @@ function aimColorBox(v) {
   COLOR.th = clamp(Math.atan2(lat, dep), -SECT + COLOR.hw, SECT - COLOR.hw);
   COLOR.rc = clamp(Math.hypot(lat, dep), COLOR.hd * 0.6, v.depth - COLOR.hd * 0.6);
 }
+// ---------- Spectral Doppler (PW / CW / TDI) ----------
+// One sweep column is one short FFT of the echoes from the PW gate, or from the whole CW line. The spectrum is the
+// spread of blood (or, for TDI, wall) velocities in the beam, shown the way a scanner shows it: log-compressed power
+// with grainy spectral speckle, a noise floor, a dark wall-filter band either side of the baseline with some wall
+// thump, valve clicks, and a faint mirror image of strong signals.
+const SPEC = { H: null, P: null, Pp: null, A: null, sk: null, out: null, eP: 0, eN: 0, clk: 0, rs: 0x2545f491 };
+function specDir(fr, th) {
+  const c = Math.cos(th), s = Math.sin(th), b = fr.beam, m = fr.marker;
+  return { dx: c * b.x + s * m.x, dy: c * b.y + s * m.y, dz: c * b.z + s * m.z, lx: -s * b.x + c * m.x, ly: -s * b.y + c * m.y, lz: -s * b.z + c * m.z };
+}
+// Valve clicks: brief broadband spikes when a valve opens or (louder) shuts near the gate or the CW line
+const VALVES = [
+  { p: [0.2, 0, 0], t: [0.5, 0.978], k: [0.45, 0.9] }, // mitral
+  { p: [0.35 + TVA, TVB, TVC], t: [0.5, 0.978], k: [0.35, 0.7] }, // tricuspid
+  { p: AV_LOC, t: [0.1, 0.44], k: [0.55, 1] }, // aortic
+  { p: PV_LOC, t: [0.1, 0.44], k: [0.45, 0.8] }, // pulmonary
+];
+const vNear = new Float32Array(4);
+function valveDist(x, y, z) {
+  const hx = x - SWB * e2x - Ox, hy = y - SWB * e2y - Oy, hz = z - SWB * e2z + RZ - Oz;
+  const a = hx * e1x + hy * e1y + hz * e1z, b = hx * e2x + hy * e2y + hz * e2z, c = hx * e3x + hy * e3y + hz * e3z;
+  for (let i = 0; i < 4; i++) { const p = VALVES[i].p, d = (a - p[0]) ** 2 + (b - p[1]) ** 2 + (c - p[2]) ** 2; if (d < vNear[i]) vNear[i] = d; }
+}
+// o: { mode: 'pw' | 'cw', tdi, theta, gate (cm), depth (cm), lo, hi (display range, m/s), gain (dB), dt (s per column) }; n: display rows.
+// Fills SPEC.H (sample weights per row: the envelope and measurements use this) and SPEC.P (signal power per row).
+function specSpectrum(fr, o, n) {
+  if (!SPEC.H || SPEC.H.length !== n) {
+    SPEC.H = new Float32Array(n); SPEC.P = new Float32Array(n); SPEC.A = new Float32Array(n); SPEC.sk = new Float32Array(n).fill(1); SPEC.out = new Float32Array(n); SPEC.Pp = new Float32Array(n);
+  }
+  const H = SPEC.H, P = SPEC.P; H.fill(0); P.fill(0); vNear.fill(99);
+  const { lo, hi } = o, span = hi - lo, rowK = (n - 1) / span, wrap = o.mode === 'pw' && !o.tdi, cw = o.mode === 'cw', tdi = o.tdi;
+  const D = specDir(fr, o.theta), Pp = fr.pos, Nn = fr.normal;
+  // to: 1 = envelope weights only, 2 = display power only, 3 = both. Display power is spread over the broadened width.
+  const add = (v, sig, w, to) => {
+    if (wrap) v = ((v - lo) % span + span) % span + lo; // aliasing: PW wraps at the Nyquist limit
+    const c = (hi - v) * rowK, sr = Math.max(0.7, sig * rowK), y0 = Math.floor(c - 3 * sr), y1 = Math.ceil(c + 3 * sr), pk = w / Math.sqrt(sr);
+    for (let y = y0; y <= y1; y++) {
+      let yy = y; if (wrap) yy = ((y % n) + n) % n; else if (y < 0 || y >= n) continue;
+      const g = Math.exp(-0.5 * ((y - c) / sr) ** 2);
+      if (to & 1) H[yy] += w * g;
+      if (to & 2) P[yy] += pk * g;
+    }
+  };
+  const sample = (r, l, e) => {
+    const x = Pp.x + D.dx * r + D.lx * l + Nn.x * e, y = Pp.y + D.dy * r + D.ly * l + Nn.y * e, z = Pp.z + D.dz * r + D.lz * l + Nn.z * e;
+    tissue(x, y, z);
+    if (tdi) {
+      if (!OUT.myo) return;
+      FLOW.world = false; FLOW.a = tdiVel(TA, OUT.myo, PHASE); FLOW.b = FLOW.c = 0;
+      const v = towardProbe(D.dx, D.dy, D.dz), av = Math.abs(v);
+      add(v, 0.006, 3, 1);
+      // wall signal is strong and spread by the velocity gradient across the gate: a thick band, filled toward zero
+      add(v * 0.9, 0.005 + 0.09 * av, 3, 2);
+      return;
+    }
+    if (OUT.kind !== 1) {
+      // walls in the gate or on the line: strong slow echoes (wall thump), mostly removed by the wall filter
+      if (OUT.myo) { FLOW.world = false; FLOW.a = 0.8 * tdiVel(TA, OUT.myo, PHASE); FLOW.b = FLOW.c = 0; const vt = towardProbe(D.dx, D.dy, D.dz); add(vt, 0.02 + 0.25 * Math.abs(vt), cw ? 1.2 : 4, 2); }
+      return;
+    }
+    flowAt();
+    const v = towardProbe(D.dx, D.dy, D.dz), av = Math.abs(v), sv = Math.sign(v);
+    const t = FLOW.turb, w = cw && (t > 0 || av > 1.5) ? 3 : 1;
+    // Spectral broadening sits mostly below the true peak (slower blood in the beam), so the dense edge reads the real Vmax
+    const sg = t > 0 ? 0.05 + 0.045 * t * av : 0.025 + 0.03 * av;
+    if (av >= 0.05) add(v - sv * 1.2 * sg, sg, w, 1);
+    // On screen, broadening grows with speed (beam aperture and transit time) on top of the FFT's ~1 cm/s resolution,
+    // so slow flow stays narrow and the wall filter can remove it; the wide CW beam through a turbulent jet fills in a broad, smooth band
+    const sd = t > 0 ? (cw ? 0.07 + 0.07 * t * av : 0.05 + 0.05 * t * av) : 0.011 + 0.045 * av;
+    add(v - sv * sd, sd, w, 2);
+  };
+  // The beam has a few mm of thickness out of the image plane too, so a jet just off the plane is still caught
+  if (o.mode === 'pw') {
+    for (const dr of [-0.15, -0.075, 0, 0.075, 0.15]) for (const l of [-0.1, 0, 0.1]) sample(o.gate + dr, l, l);
+    valveDist(Pp.x + D.dx * o.gate, Pp.y + D.dy * o.gate, Pp.z + D.dz * o.gate);
+  } else for (let r = 0.4; r < o.depth; r += 0.1) {
+    // the CW beam is several mm thick out of the image plane at depth
+    for (const e of [-0.3, -0.1, 0.1, 0.3]) sample(r, 0, e);
+    valveDist(Pp.x + D.dx * r, Pp.y + D.dy * r, Pp.z + D.dz * r);
+  }
+  // Envelope: fastest velocity with a real signal (absolute threshold: a jet is a few samples among many slow ones)
+  let mx = 0; for (let y = 0; y < n; y++) if (H[y] > mx) mx = H[y];
+  const thr = Math.max(0.45, 0.012 * Math.max(mx, 6)), base = hi * rowK;
+  let eP = 0, eN = 0;
+  for (let y = 0; y < base; y++) if (H[y] > thr) { eP = hi - y / rowK; break; }
+  for (let y = n - 1; y > base; y--) if (H[y] > thr) { eN = hi - y / rowK; break; }
+  SPEC.eP = eP; SPEC.eN = eN;
+  // Valve clicks (~6 ms); mitral stenosis gives a loud opening snap
+  let clk = 0;
+  if (!tdi) {
+    const pw = 0.0062 * MODEL.HR / 60;
+    for (let i = 0; i < 4; i++) {
+      const V = VALVES[i], near = Math.exp(-vNear[i] / (cw ? 0.3 : 0.7));
+      if (near < 0.02) continue;
+      const k0 = V.k[0] * (i === 0 && MODEL.mv === 'ms' ? 2.5 : 1);
+      clk += near * (k0 * Math.exp(-((cd(PHASE, V.t[0]) / pw) ** 2)) + V.k[1] * Math.exp(-((cd(PHASE, V.t[1]) / pw) ** 2)));
+    }
+  }
+  SPEC.clk = clk;
+}
+// Reference power (0 dB on the display) for each mode, the noise floor, and the compression (dynamic range)
+const SPEC_REF = { pw: 8, cw: 100, tdi: 22 }, SPEC_NOISE = 10 ** -3.8, SPEC_DR = 42;
+// Turn SPEC.P into one column of grey pixels, and leave the filtered power per row in SPEC.out (for Doppler audio)
+function specPaint(data, W, col, o, n) {
+  const P = SPEC.P, Pp = SPEC.Pp, A = SPEC.A, sk = SPEC.sk, out = SPEC.out, { lo, hi } = o, rowK = (n - 1) / (hi - lo);
+  // Each FFT window is 10-20 ms long and overlaps the next, so a column also holds some of the one before it
+  const carry = Math.exp(-(o.dt || 0.008) / 0.008);
+  for (let y = 0; y < n; y++) { P[y] += (Pp[y] - P[y]) * carry; Pp[y] = P[y]; }
+  const S = Math.max(hi, -lo), mode = o.tdi ? 'tdi' : o.mode;
+  // wall filter (velocity high-pass): ~5-10 cm/s for PW, higher for CW; TDI keeps the slow wall signal
+  const vc = o.tdi ? 0.006 : o.mode === 'cw' ? 0.035 * S : Math.max(0.06, 0.045 * S);
+  const G = 10 ** ((o.gain || 0) / 10) / SPEC_REF[mode], nf = SPEC_NOISE * SPEC_REF[mode];
+  const ck = SPEC.clk * SPEC_REF[mode], cs = 0.14 * S;
+  // Spectral speckle: each FFT bin's power fluctuates (chi-square); neighbouring bins and overlapping FFT windows
+  // share some of it, so the grain is a few pixels tall and wide
+  let rs = SPEC.rs;
+  for (let y = 0; y < n; y++) { rs ^= rs << 13; rs ^= rs >>> 17; rs ^= rs << 5; A[y] = -Math.log(((rs >>> 0) + 1) / 4294967297); }
+  SPEC.rs = rs;
+  for (let y = 0; y < n; y++) {
+    const s = 0.25 * A[y > 0 ? y - 1 : y] + 0.5 * A[y] + 0.25 * A[y < n - 1 ? y + 1 : y];
+    sk[y] = 0.4 * sk[y] + 0.6 * s;
+  }
+  for (let y = 0; y < n; y++) {
+    const v = hi - y / rowK, av = Math.abs(v);
+    let p = P[y];
+    // faint mirror image of strong signals on the other side of the baseline (channel crosstalk)
+    const ym = Math.round((hi + v) * rowK); if (ym >= 0 && ym < n) p += 0.00025 * P[ym];
+    if (ck > 0) p += ck * Math.exp(-((av / cs) ** 2));
+    p = (p + nf) * G;
+    const x = (av / vc) ** 8; p *= x / (1 + x);
+    out[y] = p;
+    p *= sk[y];
+    let g = 1 + 10 * Math.log10(p + 1e-9) / SPEC_DR;
+    g = g < 0.12 ? 0 : (g - 0.12) / 0.88; // low-level reject
+    const q = g >= 1 ? 255 : 255 * g ** 1.15, k = (y * W + col) * 4;
+    data[k] = q; data[k + 1] = q; data[k + 2] = q * 0.96;
+  }
+}
+// Doppler audio: the Doppler shift is audible (≈ 2.6 kHz per m/s at 2 MHz). Each frame is noise shaped by the
+// current spectrum (random phase per bin) and overlap-added, which is what the "whoosh" of a real Doppler sounds like.
+// Flow toward the probe plays mostly in the left channel, flow away in the right, as on a scanner.
+const DOP_SYNTH_SRC = `
+class DopSynth {
+  constructor(sr) {
+    const N = 512; this.N = N; this.hop = N / 2; this.sr = sr;
+    this.cf = new Float32Array(N / 2 + 1); this.cr = new Float32Array(N / 2 + 1); this.tf = new Float32Array(N / 2 + 1); this.tr = new Float32Array(N / 2 + 1);
+    this.re = new Float32Array(N); this.im = new Float32Array(N); this.aL = new Float32Array(N); this.aR = new Float32Array(N);
+    this.win = new Float32Array(N); for (let i = 0; i < N; i++) this.win[i] = Math.sin(Math.PI * (i + 0.5) / N) ** 2;
+    this.rev = new Uint16Array(N); for (let i = 0, b = Math.log2(N); i < N; i++) { let r = 0; for (let k = 0; k < b; k++) r |= ((i >> k) & 1) << (b - 1 - k); this.rev[i] = r; }
+    this.cs = new Float32Array(N / 2); this.sn = new Float32Array(N / 2); for (let k = 0; k < N / 2; k++) { this.cs[k] = Math.cos(2 * Math.PI * k / N); this.sn[k] = Math.sin(2 * Math.PI * k / N); }
+    this.i = this.hop; this.vol = 0; this.gv = 0; this.s = 0x1234567;
+  }
+  set(f, r, vol) { if (f) { this.tf.set(f); this.tr.set(r); } if (vol != null) this.vol = vol; }
+  g() { let s = this.s; s ^= s << 13; s ^= s >>> 17; s ^= s << 5; this.s = s; return ((s >>> 0) / 4294967296 - 0.5) * 3.46; }
+  fft() {
+    const N = this.N, re = this.re, im = this.im, rev = this.rev;
+    for (let i = 0; i < N; i++) { const j = rev[i]; if (j > i) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; } }
+    for (let len = 2; len <= N; len <<= 1) {
+      const h = len >> 1, st = N / len;
+      for (let i = 0; i < N; i += len) for (let k = 0; k < h; k++) {
+        const c = this.cs[k * st], s = this.sn[k * st], a = i + k, b = a + h;
+        const xr = re[b] * c - im[b] * s, xi = re[b] * s + im[b] * c;
+        re[b] = re[a] - xr; im[b] = im[a] - xi; re[a] += xr; im[a] += xi;
+      }
+    }
+  }
+  frame(cur, acc) {
+    const N = this.N, re = this.re, im = this.im; re.fill(0); im.fill(0);
+    for (let k = 1; k < N / 2; k++) {
+      const a = Math.sqrt(cur[k]); if (a < 1e-5) continue;
+      const x = a * this.g(), y = a * this.g();
+      re[k] = x; im[k] = y; re[N - k] = x; im[N - k] = -y;
+    }
+    this.fft();
+    for (let n = 0; n < N; n++) acc[n] += re[n] * this.win[n];
+  }
+  render(L, R) {
+    const N = this.N, hop = this.hop;
+    for (let n = 0; n < L.length; n++) {
+      if (this.i >= hop) {
+        this.i = 0;
+        for (let k = 0; k <= N / 2; k++) { this.cf[k] += (this.tf[k] - this.cf[k]) * 0.5; this.cr[k] += (this.tr[k] - this.cr[k]) * 0.5; }
+        this.aL.copyWithin(0, hop); this.aL.fill(0, N - hop); this.aR.copyWithin(0, hop); this.aR.fill(0, N - hop);
+        this.frame(this.cf, this.aL); this.frame(this.cr, this.aR);
+      }
+      this.gv += (this.vol - this.gv) * 0.002;
+      const f = this.aL[this.i] * 0.06, r = this.aR[this.i] * 0.06; this.i++;
+      L[n] = Math.tanh((f + 0.3 * r) * this.gv); R[n] = Math.tanh((r + 0.3 * f) * this.gv);
+    }
+  }
+}`;
+// Spread one spectral column (power per display row, row 0 = hi) into forward / reverse audio frequency bins
+function specAudioBins(o, n, sr, f, r) {
+  const out = SPEC.out, { lo, hi } = o, dv = (hi - lo) / (n - 1), N2 = f.length - 1, bw = sr / (2 * N2);
+  const hz = (o.tdi ? 2.6e6 : 2.0e6) * 2 / 1540; // Hz per m/s
+  f.fill(0); r.fill(0);
+  for (let y = 0; y < n; y++) {
+    const p = out[y]; if (p < 1e-6) continue;
+    const v = hi - y * dv, a = Math.abs(v) * hz / bw, w = Math.max(1, dv * hz / bw), k0 = Math.max(1, Math.floor(a - w / 2)), k1 = Math.min(N2 - 1, Math.ceil(a + w / 2));
+    if (k1 < k0) continue;
+    const pk = p / (k1 - k0 + 1), dst = v >= 0 ? f : r;
+    for (let k = k0; k <= k1; k++) dst[k] += pk;
+  }
+}
+
 // ---------- Contact sheet (open the page with #grid, #grid:caseId or #grid:caseId:phase) ----------
 if (location.hash.startsWith('#grid')) {
   const [, cid, ph, col, big, only] = location.hash.slice(1).split(':');
@@ -2049,11 +2270,11 @@ function startApp() {
   const mmImg = mmCtx.createImageData(MM_W, MM_H); for (let k = 3; k < mmImg.data.length; k += 4) mmImg.data[k] = 255;
   const spc = document.getElementById('spec'), spCtx = spc.getContext('2d'), SP_W = spc.width, SP_H = spc.height;
   const spImg = spCtx.createImageData(SP_W, SP_H); for (let k = 3; k < spImg.data.length; k += 4) spImg.data[k] = 255;
-  const SP_COLS_PER_S = SP_W / 4;
+  const spColsPerS = () => SP_W / st.sweep; // strip columns per second (sweep speed)
 
   const st = { pose: { ...VIEWS[0].pose, S: VIEWS[0].pose.S.clone() }, depth: VIEWS[0].depth, gain: 1, hr: 72, labels: true, frozen: false,
     practice: false, target: 7, tween: null, phase: 0, beat: 0, rr: 1, caseIdx: 0, mmode: false, mTheta: 0,
-    calOn: false, traceOn: false, clickMode: 'm', resp: true, respT: 0, saved: [], curView: null };
+    calOn: false, traceOn: false, clickMode: 'm', sweep: 4, resp: true, respT: 0, saved: [], curView: null };
 
   // Scene
   const scene = new THREE.Scene();
@@ -2240,7 +2461,7 @@ function startApp() {
 
   // Imaging modes: colour, M-mode and spectral Doppler (PW / CW / tissue Doppler)
   const mmOn = $('mmodeOn'), colOn = $('colorOn'), pwOn = $('pwOn'), cwOn = $('cwOn'), tdiOn = $('tdiOn'), clickSel = $('clickMode'), mmHint = $('mmHint');
-  const spec = { on: false, mode: 'pw', tdi: false, theta: 0, gate: 8, base: 0, scale: 5, hist: new Float32Array(SP_H),
+  const spec = { on: false, mode: 'pw', tdi: false, theta: 0, gate: 8, base: 0, scale: 5, gain: 0,
     envP: new Float32Array(SP_W), envN: new Float32Array(SP_W), colPh: new Float32Array(SP_W), colBeat: new Int32Array(SP_W).fill(-1), measure: null, result: null };
   const modeOn = m => m === 'm' ? st.mmode : m === 'c' ? COLOR.on : spec.on;
   const updateHint = () => {
@@ -2277,6 +2498,50 @@ function startApp() {
   $('nyq').addEventListener('input', e => { COLOR.nyq = +e.target.value; $('nyqO').textContent = '±' + Math.round(COLOR.nyq * 100); });
   $('specBase').addEventListener('input', e => { spec.base = +e.target.value; clearSpec(); });
   $('specScale').addEventListener('input', e => { spec.scale = +e.target.value; $('specScaleO').textContent = `±${spec.scale} m/s`; clearSpec(); });
+  $('specGain').addEventListener('input', e => { spec.gain = +e.target.value; $('specGainO').textContent = `${spec.gain > 0 ? '+' : ''}${spec.gain} dB`; });
+  // Doppler audio: an AudioWorklet (or a ScriptProcessor where worklets are missing) plays noise shaped by the spectrum
+  const dopAudio = {
+    on: false, ctx: null, node: null, synth: null, sr: 48000, f: null, r: null, pend: false,
+    async start() {
+      if (!this.ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) throw new Error('no audio');
+        this.ctx = new AC(); this.sr = this.ctx.sampleRate; this.f = new Float32Array(257); this.r = new Float32Array(257);
+        try {
+          const url = URL.createObjectURL(new Blob([DOP_SYNTH_SRC + `
+registerProcessor('dop-synth', class extends AudioWorkletProcessor {
+  constructor() { super(); this.s = new DopSynth(sampleRate); this.port.onmessage = e => this.s.set(e.data.f, e.data.r, e.data.vol); }
+  process(_, outs) { const o = outs[0]; this.s.render(o[0], o[1] || o[0]); return true; }
+});`], { type: 'text/javascript' }));
+          await this.ctx.audioWorklet.addModule(url); URL.revokeObjectURL(url);
+          this.node = new AudioWorkletNode(this.ctx, 'dop-synth', { numberOfInputs: 0, outputChannelCount: [2] });
+        } catch {
+          const Synth = new Function(DOP_SYNTH_SRC + '; return DopSynth;')();
+          this.synth = new Synth(this.sr);
+          this.node = this.ctx.createScriptProcessor(1024, 0, 2);
+          this.node.onaudioprocess = e => this.synth.render(e.outputBuffer.getChannelData(0), e.outputBuffer.getChannelData(1));
+        }
+        this.node.connect(this.ctx.destination);
+      }
+      await this.ctx.resume(); this.on = true; this.send(null, +$('specVol').value);
+    },
+    stop() { this.on = false; if (this.ctx) { this.send(null, 0); this.f.fill(0); this.r.fill(0); this.send(true); } },
+    send(spectrum, vol) {
+      const f = spectrum ? this.f : null, r = spectrum ? this.r : null;
+      if (this.synth) this.synth.set(f, r, vol); else if (this.node) this.node.port.postMessage({ f, r, vol });
+    },
+    column(o) { specAudioBins(o, SP_H, this.sr, this.f, this.r); this.pend = true; },
+    // once per animation frame: the latest column, or silence while frozen / with Doppler off
+    tick() {
+      if (!this.on) return;
+      if (!spec.on || st.frozen) { this.f.fill(0); this.r.fill(0); this.pend = true; }
+      if (this.pend) { this.send(true); this.pend = false; }
+    },
+  };
+  $('specSound').addEventListener('change', e => {
+    if (e.target.checked) dopAudio.start().catch(() => { e.target.checked = false; e.target.parentElement.title = 'Audio is not available in this browser'; });
+    else dopAudio.stop();
+  });
+  $('specVol').addEventListener('input', e => { if (dopAudio.on) dopAudio.send(null, +e.target.value); });
   // PW Nyquist limit falls with gate depth (pulse repetition frequency is limited by the round-trip time)
   const nyqPW = g => clamp(0.1186 / Math.max(0.02, g / 100), 0.5, 2.5);
   const specRange = () => { const S = spec.tdi ? 0.2 : spec.mode === 'pw' ? nyqPW(spec.gate) : spec.scale; return { lo: -S * (1 - spec.base), hi: S * (1 + spec.base), S }; };
@@ -2297,14 +2562,14 @@ function startApp() {
   const vAt = y => { const { lo, hi } = specRange(); return hi - y / (SP_H - 1) * (hi - lo); };
   // Doppler caliper: velocities at both ends, time between them, peak gradient and (if decelerating) pressure half-time
   const spVal = m => {
-    const v1 = vAt(m.p[1]), v2 = vAt(m.q[1]), dt = Math.abs(m.q[0] - m.p[0]) / SP_COLS_PER_S, a1 = Math.abs(v1), a2 = Math.abs(v2);
+    const v1 = vAt(m.p[1]), v2 = vAt(m.q[1]), dt = Math.abs(m.q[0] - m.p[0]) / spColsPerS(), a1 = Math.abs(v1), a2 = Math.abs(v2);
     const out = { v1, v2, ms: dt * 1000, pg: 4 * Math.max(a1, a2) ** 2 };
     if (dt > 0.02 && a1 > a2 + 0.05 && Math.sign(v1) === Math.sign(v2 || v1)) { const slope = (a1 - a2) / dt; out.pht = 0.293 * a1 / slope * 1000; out.dec = a1 / slope * 1000; }
     return out;
   };
   const cvXY = (cv, e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * cv.width, (e.clientY - r.top) / r.height * cv.height]; };
   const usCm = m => Math.hypot(m.q[0] - m.p[0], m.q[1] - m.p[1]) / (MAXR / st.depth);
-  const mmVal = m => ({ cm: Math.abs(m.q[1] - m.p[1]) / MM_H * st.depth, ms: Math.abs(m.q[0] - m.p[0]) / (MM_W / 4) * 1000 });
+  const mmVal = m => ({ cm: Math.abs(m.q[1] - m.p[1]) / MM_H * st.depth, ms: Math.abs(m.q[0] - m.p[0]) / (MM_W / st.sweep) * 1000 });
   // Caliper input: drag from edge to edge, or click the first point, move, and click the second (trackball + Set)
   const cvKind = cv => cv === usCanvas ? 'us' : cv === mm ? 'mm' : 'sp';
   const dropCal = d => { const k = d.list.indexOf(d.m); if (k >= 0) d.list.splice(k, 1); };
@@ -2433,56 +2698,13 @@ function startApp() {
   }
 
   // ---- Spectral Doppler ----
-  const specDir = (fr, th) => {
-    const c = Math.cos(th), s = Math.sin(th), b = fr.beam, m = fr.marker;
-    return { dx: c * b.x + s * m.x, dy: c * b.y + s * m.y, dz: c * b.z + s * m.z, lx: -s * b.x + c * m.x, ly: -s * b.y + c * m.y, lz: -s * b.z + c * m.z };
-  };
-  // One time column: velocity histogram of every blood (or wall, for TDI) sample in the gate / along the CW line
+  // One time column: the spectrum at the gate / along the CW line (specSpectrum), painted as a scanner shows it
+  const specOpts = () => { const { lo, hi } = specRange(); return { mode: spec.mode, tdi: spec.tdi, theta: spec.theta, gate: spec.gate, depth: st.depth, lo, hi, gain: spec.gain, dt: st.sweep / SP_W }; };
   function specColumn(fr, col, beatIdx, ph) {
-    const H = spec.hist; H.fill(0);
-    const { lo, hi } = specRange(), span = hi - lo, wrap = spec.mode === 'pw' && !spec.tdi;
-    const D = specDir(fr, spec.theta), P = fr.pos, rowK = (SP_H - 1) / span;
-    const add = (v, sig, w) => {
-      if (wrap) v = ((v - lo) % span + span) % span + lo; // aliasing: PW wraps at the Nyquist limit
-      const c = (hi - v) * rowK, sr = Math.max(0.7, sig * rowK), y0 = Math.floor(c - 3 * sr), y1 = Math.ceil(c + 3 * sr);
-      for (let y = y0; y <= y1; y++) {
-        let yy = y; if (wrap) yy = ((y % SP_H) + SP_H) % SP_H; else if (y < 0 || y >= SP_H) continue;
-        H[yy] += w * Math.exp(-0.5 * ((y - c) / sr) ** 2);
-      }
-    };
-    const Nn = fr.normal;
-    const sample = (r, l, e = 0) => {
-      tissue(P.x + D.dx * r + D.lx * l + Nn.x * e, P.y + D.dy * r + D.ly * l + Nn.y * e, P.z + D.dz * r + D.lz * l + Nn.z * e);
-      if (spec.tdi) {
-        if (!OUT.myo) return;
-        FLOW.world = false; FLOW.a = tdiVel(TA, OUT.myo, PHASE); FLOW.b = FLOW.c = 0;
-        add(towardProbe(D.dx, D.dy, D.dz), 0.006, 3); return;
-      }
-      if (OUT.kind !== 1) return;
-      flowAt();
-      const v = towardProbe(D.dx, D.dy, D.dz), av = Math.abs(v);
-      if (av < 0.05) return; // wall filter
-      const t = FLOW.turb, w = spec.mode === 'cw' && (t > 0 || av > 1.5) ? 3 : 1;
-      // Spectral broadening sits mostly below the true peak (slower blood in the beam), so the dense edge reads the real Vmax
-      const sg = t > 0 ? 0.05 + 0.045 * t * av : 0.025 + 0.03 * av;
-      add(v - Math.sign(v) * 1.2 * sg, sg, w);
-    };
-    // The beam has a few mm of thickness out of the image plane too, so a jet just off the plane is still caught
-    if (spec.mode === 'pw') { for (const dr of [-0.15, -0.075, 0, 0.075, 0.15]) for (const l of [-0.1, 0, 0.1]) sample(spec.gate + dr, l, l); }
-    else for (let r = 0.4; r < st.depth; r += 0.1) for (const e of [-0.2, 0, 0.2]) sample(r, 0, e);
-    let mx = 0; for (let y = 0; y < SP_H; y++) if (H[y] > mx) mx = H[y];
-    // Envelope: fastest velocity with a real signal (absolute threshold: a jet is a few samples among many slow ones)
-    const ref = Math.max(mx, 6), thr = Math.max(0.45, 0.012 * ref), base = hi * rowK, LK = 1 / Math.log1p(ref * 2.5);
-    let eP = 0, eN = 0;
-    for (let y = 0; y < base; y++) if (H[y] > thr) { eP = hi - y / rowK; break; }
-    for (let y = SP_H - 1; y > base; y--) if (H[y] > thr) { eN = hi - y / rowK; break; }
-    spec.envP[col] = Math.max(0, eP); spec.envN[col] = Math.min(0, eN); spec.colBeat[col] = beatIdx; spec.colPh[col] = ph;
-    const d = spImg.data;
-    for (let y = 0; y < SP_H; y++) {
-      let g = H[y] > 0.02 ? Math.log1p(H[y] * 2.5) * LK : 0;
-      g = g * (0.55 + 0.9 * Math.random()) + 0.045 * Math.random(); // spectral speckle + noise floor
-      const q = g > 1 ? 255 : g * 255, p = (y * SP_W + col) * 4; d[p] = q; d[p + 1] = q; d[p + 2] = q * 0.96;
-    }
+    const o = specOpts();
+    specSpectrum(fr, o, SP_H); specPaint(spImg.data, SP_W, col, o, SP_H);
+    spec.envP[col] = Math.max(0, SPEC.eP); spec.envN[col] = Math.min(0, SPEC.eN); spec.colBeat[col] = beatIdx; spec.colPh[col] = ph;
+    if (dopAudio.on) dopAudio.column(o);
   }
   function blankSpecCol(col) { const d = spImg.data; for (let y = 0; y < SP_H; y++) { const p = (y * SP_W + col) * 4; d[p] = d[p + 1] = d[p + 2] = 0; } spec.colBeat[col] = -1; }
   function drawSpec(sweepAt) {
@@ -2545,7 +2767,7 @@ function startApp() {
     const cur = spec.colBeat[order[0]];
     let cols = order.filter(c => spec.colBeat[c] === cur - 1).reverse();
     if (cols.length < 30) cols = order.filter(c => spec.colBeat[c] === cur).reverse();
-    const dt = 1 / SP_COLS_PER_S, site = guessSite(frameFromPose(st.pose));
+    const dt = 1 / spColsPerS(), site = guessSite(frameFromPose(st.pose));
     const sm3 = a => a.map((v, i) => (a[Math.max(0, i - 1)] + 2 * v + a[Math.min(a.length - 1, i + 1)]) / 4);
     const P = sm3(cols.map(c => spec.envP[c])), N = sm3(cols.map(c => -spec.envN[c])), ph = cols.map(c => spec.colPh[c]);
     const r = { site, items: [], data: {} };
@@ -3268,7 +3490,7 @@ function startApp() {
     else { setFrozen(false); hideCase(false); loadCase(st.caseIdx, false); }
   };
 
-  // ECG + M-mode sweep (shared time base: 4 s across)
+  // ECG + M-mode + Doppler sweep (shared time base: st.sweep seconds across)
   const ecgBuf = new Float32Array(ecg.width).fill(NaN), respBuf = new Float32Array(ecg.width).fill(NaN), fpsAcc = []; let sweepCol = 0, sweepT = 0;
   // Doppler cursor on the 2D image: dashed line, PW gate brackets
   function drawDopCursor(ctx) {
@@ -3298,6 +3520,12 @@ function startApp() {
   }
   const RGBm = [0, 0, 0];
   function blankMCol(col) { const d = mmImg.data; for (let y = 0; y < MM_H; y++) { const p = (y * MM_W + col) * 4; d[p] = d[p + 1] = d[p + 2] = 0; } }
+  // A new sweep speed restarts the strips: old columns and calipers were drawn on the old time scale
+  $('sweepSel').addEventListener('change', e => {
+    st.sweep = +e.target.value; sweepT = 0;
+    ecgBuf.fill(NaN); respBuf.fill(NaN); for (let c = 0; c < MM_W; c++) blankMCol(c);
+    cal.mm.length = 0; cal.sp.length = 0; clearSpec();
+  });
 
   const resize = () => { if (!renderer) return; const w = vp.clientWidth, h = vp.clientHeight; renderer.setPixelRatio(Math.min(2, window.devicePixelRatio)); renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); };
   new ResizeObserver(resize).observe(vp); resize();
@@ -3345,7 +3573,7 @@ function startApp() {
 
     // Sweep: ECG, respiration, M-mode and spectral columns
     if (!st.frozen) {
-      sweepT += dt; const colsPerSec = ecg.width / 4; let n = Math.floor(sweepT * colsPerSec); sweepT -= n / colsPerSec;
+      sweepT += dt; const colsPerSec = ecg.width / st.sweep; let n = Math.floor(sweepT * colsPerSec); sweepT -= n / colsPerSec;
       for (let k = 0; k < n; k++) {
         const f = (k + 1) / n, abs = lerp(prevAbs, curAbs, f), b = Math.floor(abs);
         ecgBuf[sweepCol] = ecgV(abs - b, b, simT);
@@ -3360,6 +3588,7 @@ function startApp() {
       cine.buf.push({ beat: st.beat, phase: st.phase, respT: st.respT, rr: st.rr, t: simT, col: (sweepCol + ecg.width - 1) % ecg.width });
       while (cine.buf.length && cine.buf[0].t < simT - CINE_S) cine.buf.shift();
     }
+    dopAudio.tick();
     const cineCol = st.frozen && cine.buf[cine.i] ? cine.buf[cine.i].col : -1;
     ecgCtx.fillStyle = '#000'; ecgCtx.fillRect(0, 0, ecg.width, ecg.height);
     ecgCtx.strokeStyle = 'rgba(240,194,122,.55)'; ecgCtx.lineWidth = 1; ecgCtx.beginPath(); let pen = false;
