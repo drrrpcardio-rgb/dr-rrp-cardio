@@ -215,6 +215,94 @@ body.gridmode #grid{display:block}
 .calc-hint{margin:0;font-size:12px;color:#c9d2e6}
 .calc-hint.warn{color:var(--warn)}
 
+/* Probe console: the handle wheels, tip, multiplane dial, turn dial and insertion ruler */
+.pw{margin:0;border:1px solid var(--line);border-radius:8px;background:#081132;padding:6px 7px 7px;display:flex;flex-direction:column;gap:4px;min-width:0;transition:border-color .2s,box-shadow .2s}
+.pw.ok{border-color:rgba(79,209,161,.75);box-shadow:inset 0 0 0 1px rgba(79,209,161,.25)}
+.pw.go{border-color:rgba(245,179,1,.55)}
+.pw-h{display:flex;justify-content:space-between;align-items:baseline;gap:4px 8px;flex-wrap:wrap;font-family:var(--f-display);font-weight:800;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pw-h output{font-family:var(--f-mono);font-weight:500;font-size:12px;letter-spacing:0;color:var(--fg);text-transform:none;font-variant-numeric:tabular-nums}
+.pw svg{width:100%;height:auto;display:block;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.pw svg.drag{cursor:grabbing}
+.pw svg.static{cursor:default}
+.coach{font-size:12px;line-height:1.3;color:var(--muted);min-height:16px;margin:0}
+.coach.go{color:var(--accent);font-weight:600}
+.coach.ok{color:var(--ok)}
+.coach.warn{color:var(--warn)}
+.hbtns{display:flex;gap:5px}
+.hbtn{flex:1;min-width:0;padding:6px 6px 5px;border-radius:6px;border:1px solid #26387a;background:linear-gradient(#15225e,#0b1440);box-shadow:inset 0 -2px 0 rgba(0,0,0,.5);cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;touch-action:none;user-select:none;-webkit-user-select:none}
+.hbtn:hover{border-color:#3a50a8}
+.hbtn.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.pwarn{margin:0;padding:6px 9px;border-radius:6px;border:1px solid rgba(255,122,107,.5);background:rgba(255,122,107,.1);font-size:12.5px;color:var(--warn)}
+details.exact summary{cursor:pointer;color:var(--muted);font-size:12px;width:max-content}
+details.exact[open] summary{margin-bottom:8px}
+details.exact .ctl+.ctl{margin-top:8px}
+.pw .sc{stroke:#56679c;stroke-width:1.3}
+.pw .scl{fill:#8f9cc2;font:500 9px var(--f-mono)}
+.pw .lbl{fill:#8f9cc2;font:800 9px var(--f-display);letter-spacing:.1em}
+.pw .wbody{fill:#1b2763;stroke:#33468f;stroke-width:1.5}
+.pw .wbody2{fill:#2a397f;stroke:#4a5fb0;stroke-width:1.5}
+.pw .whub{fill:#0b1440;stroke:#2a3b80;stroke-width:1.2}
+.pw .ridge{stroke:#0a1235;stroke-width:2.4;stroke-linecap:round}
+.pw .acc{fill:var(--accent)}
+.pw .acc2{fill:#ffe08a}
+.pw .accs{stroke:var(--accent);stroke-width:2}
+.pw .tgt{stroke:var(--ok);stroke-width:2.6;stroke-dasharray:4 2.5;fill:none;stroke-linecap:round}
+.pw .arc{fill:none;stroke:#2c3d86;stroke-width:7;stroke-linecap:round}
+.pw .needle{stroke:var(--accent);stroke-width:3.2;stroke-linecap:round}
+.pw .eso{fill:rgba(214,120,130,.1);stroke:#c77b86;stroke-width:2}
+.pw .heartb{fill:none;stroke:rgba(230,80,90,.5);stroke-width:9}
+.pw .ao{fill:rgba(230,80,90,.55);stroke:#e6505a;stroke-width:1.2}
+.pw .anat{fill:#ffd0d4;font:700 8.5px var(--f-display)}
+.pw .beam{fill:rgba(245,179,1,.24)}
+.pw .pbody{fill:#cfd6e6;stroke:#8e99b5;stroke-width:1}
+.pw .shaft{fill:none;stroke:#34458e;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.pw .tiph{fill:none;stroke:#d9dfec;stroke-width:10;stroke-linecap:round}
+.pw .bandt{fill:#e6eaf6;font:800 8px var(--f-display);letter-spacing:.08em}
+.pw .div{stroke:#21316f;stroke-width:1}
+.hsel{padding:3px 6px;font-size:12px;border-radius:999px}
+.steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.steps:empty{display:none}
+.steps li{display:flex;gap:8px;align-items:baseline;line-height:1.3}
+.steps li::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;border:1.5px solid #5d6d9e;transform:translateY(1px)}
+.steps li.ok{color:var(--muted)}
+.steps li.ok::before{background:var(--ok);border-color:var(--ok)}
+.steps li.next{color:var(--accent);font-weight:600}
+.steps li.next::before{border-color:var(--accent);background:var(--accent-soft)}
+.steps li.safety{color:var(--warn);font-weight:600}
+.steps li.safety::before{border-color:var(--warn);background:rgba(255,122,107,.15)}
+.prac-meta{font-family:var(--f-mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.drill-tip{margin:0;font-size:13px;color:#c9d2e6;line-height:1.4}
+/* The probe controls dock along the bottom of the 3D view; the 3D picture zooms out a little and moves up to stay clear of it */
+.vwrap{position:relative;min-height:0;min-width:0}
+.stage{grid-template-columns:minmax(0,1fr)}
+.vwrap > .viewport{position:absolute;inset:0}
+.vwrap.docked .hud-bl{display:none}
+.dock{position:absolute;left:8px;right:8px;bottom:8px;z-index:2;display:flex;gap:6px;align-items:stretch;padding:6px;border:1px solid var(--line);border-radius:10px;
+  background:rgba(6,11,34,.86);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.vwrap:not(.docked) .dock{display:none}
+.dock .pw{min-width:0;padding:5px 6px 6px;gap:3px;background:rgba(10,20,58,.92)}
+.dock .pw-h{font-size:9.5px;letter-spacing:.1em}
+.dock .pw-h output{font-size:11px}
+.dock .coach{font-size:11px;min-height:14px;width:0;min-width:100%}
+.dock .hbtn{padding:4px 4px 3px;font-size:11.5px}
+.dock .pwarn{position:absolute;left:6px;right:6px;bottom:calc(100% + 6px);background:rgba(40,10,20,.92)}
+/* each control shrinks with the 3D view, within limits that keep it easy to grab */
+#pwWheel{flex:1 1 104px;max-width:128px}
+#pwTip{flex:1 1 112px;max-width:140px}
+#pwOmega{flex:1.2 1 120px;max-width:150px}
+#pwTurn{flex:1 1 92px;max-width:116px}
+#pwTurn svg{max-width:92px;align-self:center}
+#pwDepth{flex:3 1 220px}
+/* short desktop windows: view presets in one scrolling row and only the live hints in the dock, to leave room for the 3D */
+@media (min-width:981px) and (max-height:820px){
+  .presets{flex-direction:column;flex-wrap:nowrap;gap:3px;padding:6px 10px}
+  .pgroup{flex-direction:row;align-items:center;gap:8px}
+  .pgroup h3{flex:none;width:118px}
+  .presets .prow{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding-top:3px}
+  .vbtn{padding:3px 8px}
+  .dock .coach:not(.go):not(.ok):not(.warn){display:none}
+}
+
 @media (max-width:980px){
   body{overflow:auto;height:auto}
   .app{height:auto}
@@ -222,6 +310,15 @@ body.gridmode #grid{display:block}
   .stage{height:auto}
   .viewport{height:52vh;min-height:300px}
   .side{overflow:visible}
+  /* on narrow screens the controls sit under the 3D view instead of over it */
+  .vwrap > .viewport{position:relative;inset:auto}
+  .vwrap.docked .hud-bl{display:block}
+  .dock{position:relative;left:auto;right:auto;bottom:auto;flex-wrap:wrap;overflow:visible;border-width:1px 0 0;border-radius:0;background:var(--panel)}
+  .dock .pw,#pwWheel,#pwTip,#pwOmega,#pwTurn{flex:1 1 150px;max-width:none}
+  .dock .pw svg{width:100%;max-width:190px;align-self:center}
+  #pwTurn svg{max-width:150px}
+  #pwDepth{flex-basis:100%}
+  #pwDepth svg{max-width:none}
 }
 @media (max-width:640px){
   body{padding-block:8px}
@@ -250,6 +347,7 @@ body.gridmode #grid{display:block}
   </header>
   <div class="main">
     <section class="stage" aria-label="3D probe stage">
+      <div class="vwrap docked" id="vwrap">
       <div class="viewport" id="viewport">
         <canvas id="three"></canvas>
         <div class="hud hud-tl" id="layers">
@@ -259,9 +357,44 @@ body.gridmode #grid{display:block}
           <label class="chip"><input type="checkbox" id="lyVessels" checked> Vessels</label>
           <label class="chip"><input type="checkbox" id="lyLiver" checked> Organs</label>
           <label class="chip"><input type="checkbox" id="lyPlane" checked> Scan plane</label>
+          <label class="chip"><input type="checkbox" id="lyDock" checked> Probe controls</label>
           <button class="chip" id="recenter" type="button">Recenter camera</button>
         </div>
         <div class="hud hud-bl">Drag the probe up or down the oesophagus · drag the background to orbit · scroll to zoom · use the probe controls to turn, flex and rotate the multiplane angle</div>
+      </div>
+      <!-- Probe controls docked on the 3D view, like the handle in your hand -->
+      <div class="dock" id="dock" role="group" aria-label="TEE probe controls">
+        <p class="pwarn" id="pwarn" role="status" hidden></p>
+        <figure class="pw" id="pwWheel">
+          <div class="pw-h"><span>Wheels</span><output id="oWheel">ante 0° · 0°</output></div>
+          <svg id="svWheel" viewBox="0 0 200 200" role="img" aria-label="Control wheels: drag the outer big wheel to anteflex or retroflex, the inner small wheel to flex left or right"></svg>
+          <p class="coach" id="cWheel"></p>
+        </figure>
+        <figure class="pw" id="pwTip">
+          <div class="pw-h"><span>Tip</span><output id="oTip"></output></div>
+          <svg id="svTip" class="static" viewBox="0 0 200 124" role="img" aria-label="The bending tip seen from the side and from the front"></svg>
+          <div class="hbtns"><button class="hbtn" id="neutralBtn" type="button" title="Release both wheels: the tip goes back to straight (N)">Neutral tip</button></div>
+          <p class="coach" id="cTip"></p>
+        </figure>
+        <figure class="pw" id="pwOmega">
+          <div class="pw-h"><span>Multiplane</span><output id="oOmega">0°</output></div>
+          <svg id="svOmega" viewBox="0 0 220 116" role="img" aria-label="Multiplane angle: drag the needle from 0 to 180 degrees"></svg>
+          <div class="hbtns"><button class="hbtn" type="button" data-hold="omega:-1" title="Multiplane back toward 0° (Q)">◀ 0°</button><button class="hbtn" type="button" data-hold="omega:1" title="Multiplane forward toward 180° (E)">180° ▶</button></div>
+          <p class="coach" id="cOmega"></p>
+        </figure>
+        <figure class="pw" id="pwTurn">
+          <div class="pw-h"><span>Turn</span><output id="oTurn">0°</output></div>
+          <svg id="svTurn" viewBox="0 0 170 170" role="img" aria-label="Probe turn, seen from the head: drag around the dial to turn the probe left or right"></svg>
+          <div class="hbtns"><button class="hbtn" type="button" data-hold="turn:-1" title="Turn left, anticlockwise (←)">⟲ L</button><button class="hbtn" type="button" data-hold="turn:1" title="Turn right, clockwise (→)">R ⟳</button></div>
+          <p class="coach" id="cTurn"></p>
+        </figure>
+        <figure class="pw" id="pwDepth">
+          <div class="pw-h"><span>Insertion · cm from the teeth</span><output id="oDepth">28.0 cm</output></div>
+          <svg id="svDepth" viewBox="0 0 320 60" role="img" aria-label="Insertion depth: drag along the ruler to advance or withdraw the probe"></svg>
+          <div class="hbtns"><button class="hbtn" type="button" data-hold="d:-1" title="Withdraw (↑)">◀ Withdraw</button><button class="hbtn" type="button" data-hold="d:1" title="Advance (↓)">Advance ▶</button></div>
+          <p class="coach" id="cDepth"></p>
+        </figure>
+      </div>
       </div>
       <nav class="presets" id="presets" aria-label="View presets"></nav>
     </section>
@@ -401,31 +534,49 @@ body.gridmode #grid{display:block}
           <h2>Practice</h2>
           <div class="row">
             <label class="chip"><input type="checkbox" id="ghost" checked> Target ghost</label>
-            <button class="btn" id="lessonToggle" type="button" title="Step through the standard views in order, with tips">Guided lesson</button>
-            <button class="btn primary" id="pracToggle" type="button">Start practice</button>
+            <select id="hintLvl" class="hsel" aria-label="Hints" title="How much help the probe console gives">
+              <option value="steps">Hints: step by step</option>
+              <option value="arrows">Hints: on the controls</option>
+              <option value="off">Hints: off</option>
+            </select>
           </div>
+        </div>
+        <div class="row" id="pracBtns">
+          <button class="btn primary" id="pracToggle" type="button" title="A random standard view to find">Random view</button>
+          <button class="btn" id="drillToggle" type="button" title="Move from one view to the next with a single probe manoeuvre, as in a real exam">Probe drills</button>
+          <button class="btn" id="lessonToggle" type="button" title="Step through every standard view in order, with tips">Guided lesson</button>
         </div>
         <div id="pracBody" hidden>
           <div class="prac-line"><b id="pracName">ME 4C</b><span id="pracScore">Match 0%</span></div>
           <div class="meter" id="pracMeter" style="margin-top:6px"><i></i></div>
+          <p class="drill-tip" id="pracTip" style="margin-top:8px" hidden></p>
+          <ol class="steps" id="coachSteps" style="margin-top:8px" aria-live="polite"></ol>
           <div class="row" style="margin-top:8px;justify-content:space-between">
             <span class="note" id="pracHint">Find the view. The green ghost shows where the probe should sit.</span>
-            <button class="btn" id="pracNext" type="button">Next view →</button>
+            <span class="prac-meta" id="pracTime">0 s</span>
+          </div>
+          <div class="row" style="margin-top:8px;justify-content:space-between">
+            <button class="btn" id="pracStop" type="button">Stop</button>
+            <button class="btn" id="pracNext" type="button">Skip →</button>
           </div>
         </div>
-        <p class="note" id="pracIntro">Pick a random target view and steer the probe until the match reaches 85%, or take the guided lesson through every view.</p>
+        <p class="note" id="pracIntro">Find a random view, work through the probe drills (one manoeuvre from view to view), or take the guided lesson through every view. A view counts when the match reaches 85%.</p>
         <p class="note" id="pracDone" style="margin-top:6px"></p>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="probePanel">
         <div class="row" style="justify-content:space-between"><h2>TEE probe</h2><span class="note" id="probeLevel">Mid-oesophagus</span></div>
-        <div class="ctl" title="Advance (deeper) or withdraw the probe. Distance from the incisors"><label for="pd">Advance</label><input type="range" id="pd" min="15" max="50" step="0.1" value="28"><output id="pdO">28 cm</output></div>
-        <div class="ctl" title="Turn the whole probe: right (clockwise) toward the patient's right, left (anticlockwise) toward the patient's left"><label for="pturn">Turn L / R</label><input type="range" id="pturn" min="-180" max="180" step="1" value="0"><output id="pturnO">0°</output></div>
-        <div class="ctl" title="Large wheel: anteflex (+) or retroflex (−) the tip"><label for="pante">Ante / retro</label><input type="range" id="pante" min="-90" max="120" step="1" value="0"><output id="panteO">0°</output></div>
-        <div class="ctl" title="Small wheel: flex the tip to the left (+) or right (−)"><label for="plat">Flex L / R</label><input type="range" id="plat" min="-45" max="45" step="1" value="0"><output id="platO">0°</output></div>
-        <div class="ctl" title="Multiplane angle: rotates the image plane electronically from 0° (transverse) to 180°"><label for="pomega">Multiplane</label><input type="range" id="pomega" min="0" max="180" step="1" value="0"><output id="pomegaO">0°</output></div>
-        <div class="ctl"><label for="depth">Depth</label><input type="range" id="depth" min="4" max="20" step="0.5" value="14"><output id="depthO">14 cm</output></div>
-        <p class="keys"><kbd>↑</kbd><kbd>↓</kbd> advance / withdraw · <kbd>←</kbd><kbd>→</kbd> turn · <kbd>W</kbd><kbd>S</kbd> ante / retro · <kbd>A</kbd><kbd>D</kbd> flex · <kbd>Q</kbd><kbd>E</kbd> multiplane · scroll on the image for depth</p>
+        <p class="note">The probe controls sit along the bottom of the 3D view. Use the sliders below for exact values.</p>
+        <div class="ctl"><label for="depth">Image depth</label><input type="range" id="depth" min="4" max="20" step="0.5" value="14"><output id="depthO">14 cm</output></div>
+        <details class="exact">
+          <summary>Exact values</summary>
+          <div class="ctl" title="Advance (deeper) or withdraw the probe. Distance from the incisors"><label for="pd">Advance</label><input type="range" id="pd" min="15" max="50" step="0.1" value="28"><output id="pdO">28 cm</output></div>
+          <div class="ctl" title="Turn the whole probe: right (clockwise) toward the patient's right, left (anticlockwise) toward the patient's left"><label for="pturn">Turn L / R</label><input type="range" id="pturn" min="-180" max="180" step="1" value="0"><output id="pturnO">0°</output></div>
+          <div class="ctl" title="Large wheel: anteflex (+) or retroflex (−) the tip"><label for="pante">Ante / retro</label><input type="range" id="pante" min="-90" max="120" step="1" value="0"><output id="panteO">0°</output></div>
+          <div class="ctl" title="Small wheel: flex the tip to the left (+) or right (−)"><label for="plat">Flex L / R</label><input type="range" id="plat" min="-45" max="45" step="1" value="0"><output id="platO">0°</output></div>
+          <div class="ctl" title="Multiplane angle: rotates the image plane electronically from 0° (transverse) to 180°"><label for="pomega">Multiplane</label><input type="range" id="pomega" min="0" max="180" step="1" value="0"><output id="pomegaO">0°</output></div>
+        </details>
+        <p class="keys"><kbd>↑</kbd><kbd>↓</kbd> withdraw / advance · <kbd>←</kbd><kbd>→</kbd> turn · <kbd>W</kbd><kbd>S</kbd> ante / retro · <kbd>A</kbd><kbd>D</kbd> flex · <kbd>Q</kbd><kbd>E</kbd> multiplane · <kbd>N</kbd> neutral tip · <kbd>Shift</kbd> fine · hold a button to keep moving</p>
       </div>
 
       <div class="panel">
@@ -3122,6 +3273,248 @@ function startApp() {
   };
   for (const k of Object.keys(PK)) sliders[k].addEventListener('input', () => { unfreezeToScan(); st.tween = null; st.pose[k] = +sliders[k].value; });
   sliders.depth.addEventListener('input', () => { unfreezeToScan(); st.depth = +sliders.depth.value; });
+
+  // ---- Probe console: the controls on a TEE handle. Drag the wheels, dials and ruler, or hold the buttons ----
+  const LIM = { d: [S_MIN, S_MAX], turn: [-180, 180], ante: [-90, 120], lat: [-45, 45], omega: [0, 180] };
+  const setPose = (k, v) => { unfreezeToScan(); st.tween = null; st.pose[k] = clamp(v, LIM[k][0], LIM[k][1]); };
+  const nudge = (k, dv) => setPose(k, st.pose[k] + dv);
+  // Release both wheels: the tip springs back to straight
+  const neutralTip = () => { unfreezeToScan(); st.tween = { from: { ...st.pose }, to: { ...st.pose, ante: 0, lat: 0 }, d0: st.depth, d1: st.depth, t0: performance.now(), dur: 450 }; };
+  $('neutralBtn').onclick = neutralTip;
+  const svgPt = (svg, e) => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); };
+  // a: degrees clockwise from 12 o'clock
+  const pol = (cx, cy, r, a) => [cx + r * Math.sin(a * DEG), cy - r * Math.cos(a * DEG)];
+  const tk = (cx, cy, r1, r2, a, cls) => { const [x1, y1] = pol(cx, cy, r1, a), [x2, y2] = pol(cx, cy, r2, a); return `<line class="${cls}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`; };
+  const setLine = (el, [x1, y1], [x2, y2]) => { el.setAttribute('x1', x1.toFixed(1)); el.setAttribute('y1', y1.toFixed(1)); el.setAttribute('x2', x2.toFixed(1)); el.setAttribute('y2', y2.toFixed(1)); };
+  const angAt = (p, cx, cy) => Math.atan2(p.x - cx, -(p.y - cy)) / DEG;
+  const wrap180 = a => a > 180 ? a - 360 : a < -180 ? a + 360 : a;
+  function dragOn(svg, onDown, onMove) {
+    svg.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      e.preventDefault(); svg.setPointerCapture(e.pointerId); svg.classList.add('drag');
+      const s = onDown(svgPt(svg, e), e);
+      const mv = ev => onMove(svgPt(svg, ev), s, ev);
+      const up = () => { svg.classList.remove('drag'); svg.removeEventListener('pointermove', mv); svg.removeEventListener('pointerup', up); svg.removeEventListener('pointercancel', up); };
+      svg.addEventListener('pointermove', mv); svg.addEventListener('pointerup', up); svg.addEventListener('pointercancel', up);
+    });
+  }
+  const onScroll = (el, fn) => el.addEventListener('wheel', e => { e.preventDefault(); fn(e.deltaY < 0 ? 1 : -1, e); }, { passive: false });
+
+  // Wheels: the big (outer) wheel anteflexes / retroflexes, the small (inner) wheel flexes left / right
+  const WC = 100, svWheel = $('svWheel');
+  {
+    let m = '';
+    for (let a = -90; a <= 120; a += 15) m += tk(WC, WC, 68, a % 30 ? 72 : 77, a, 'sc');
+    for (const a of [-90, -60, -30, 0, 30, 60, 90, 120]) { const [x, y] = pol(WC, WC, 87, a); m += `<text class="scl" x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="middle">${a > 0 ? '+' + a : a}</text>`; }
+    m += `<g id="wBig"><circle cx="${WC}" cy="${WC}" r="65" class="wbody"/>`;
+    for (let a = 0; a < 360; a += 10) m += tk(WC, WC, 51, 63, a, 'ridge');
+    m += `<circle class="acc" cx="${WC}" cy="${WC - 57}" r="4.5"/></g>`;
+    m += `<circle cx="${WC}" cy="${WC}" r="47" class="whub"/>`;
+    for (let l = -45; l <= 45; l += 15) m += tk(WC, WC, 39, l % 45 ? 43 : 46, -l * 2, 'sc');
+    m += `<g id="wSmall"><circle cx="${WC}" cy="${WC}" r="36" class="wbody2"/>`;
+    for (let a = 0; a < 360; a += 20) m += tk(WC, WC, 26, 35, a, 'ridge');
+    m += `<circle class="acc2" cx="${WC}" cy="${WC - 30}" r="3.5"/></g><circle cx="${WC}" cy="${WC}" r="11" class="whub"/>`;
+    m += `<line id="wTgtB" class="tgt" x1="0" y1="0" x2="0" y2="0"/><line id="wTgtS" class="tgt" x1="0" y1="0" x2="0" y2="0"/>`;
+    m += `<text class="lbl" x="4" y="12">RETRO</text><text class="lbl" x="196" y="12" text-anchor="end">ANTE</text>`;
+    m += `<text class="lbl" x="4" y="196">◂ FLEX L</text><text class="lbl" x="196" y="196" text-anchor="end">FLEX R ▸</text>`;
+    svWheel.innerHTML = m;
+  }
+  dragOn(svWheel, p => ({ k: Math.hypot(p.x - WC, p.y - WC) < 42 ? 'lat' : 'ante', a: angAt(p, WC, WC) }), (p, s) => {
+    const a = angAt(p, WC, WC), da = wrap180(a - s.a); s.a = a;
+    nudge(s.k, s.k === 'ante' ? da : -da / 2);
+  });
+  onScroll(svWheel, (sg, e) => { const p = svgPt(svWheel, e); nudge(Math.hypot(p.x - WC, p.y - WC) < 42 ? 'lat' : 'ante', sg * 2); });
+
+  // Tip: the 4 cm bending section seen from the side (ante / retroflexion) and from the front (left / right flexion)
+  const svTip = $('svTip');
+  svTip.innerHTML = `<line class="div" x1="100" y1="4" x2="100" y2="120"/>
+    <text class="lbl" x="4" y="66">P</text><text class="lbl" x="96" y="66" text-anchor="end">A</text>
+    <text class="lbl" x="104" y="66">R</text><text class="lbl" x="196" y="66" text-anchor="end">L</text>
+    <text class="lbl" x="50" y="120" text-anchor="middle">SIDE</text><text class="lbl" x="150" y="120" text-anchor="middle">FRONT</text>
+    <path id="tBeam" class="beam"/><path id="tShaftS" class="shaft"/><path id="tHeadS" class="tiph"/>
+    <path id="tShaftF" class="shaft"/><path id="tHeadF" class="tiph"/><circle id="tFaceF" class="acc" r="3.5"/>`;
+  const bend = (x0, th, L = 34, H = 13, y0 = 38) => {
+    const pts = [];
+    for (let i = 0; i <= 14; i++) { const s = L * i / 14; pts.push(Math.abs(th) < 1e-4 ? [x0, y0 + s] : [x0 + (L / th) * (1 - Math.cos(th * s / L)), y0 + (L / th) * Math.sin(th * s / L)]); }
+    const [ex, ey] = pts[14], dx = Math.sin(th), dy = Math.cos(th);
+    return { d: `M${x0} 6 ` + pts.map(p => `L${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' '), e: [ex, ey], h: [ex + dx * H, ey + dy * H], dir: [dx, dy] };
+  };
+
+  // Multiplane: 0° at the left, 90° at the top, 180° at the right, as on the scanner's multiplane icon
+  const svOmega = $('svOmega'), OX = 110, OY = 104, OR = 82;
+  const omXY = (w, r) => [OX - r * Math.cos(w * DEG), OY - r * Math.sin(w * DEG)];
+  {
+    let m = `<path class="arc" d="M${OX - OR} ${OY} A${OR} ${OR} 0 0 1 ${OX + OR} ${OY}"/>`;
+    for (let w = 0; w <= 180; w += 15) { const [x1, y1] = omXY(w, OR - 7), [x2, y2] = omXY(w, w % 45 ? OR - 12 : OR - 16); m += `<line class="sc" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`; }
+    for (const w of [0, 45, 90, 135, 180]) { const [x, y] = omXY(w, OR + 13); m += `<text class="scl" x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="middle">${w}°</text>`; }
+    m += `<line id="oTgt" class="tgt" x1="0" y1="0" x2="0" y2="0"/><line id="oNeedle" class="needle" x1="${OX}" y1="${OY}" x2="${OX - 70}" y2="${OY}"/><circle id="oDot" class="acc" r="5.5" cx="${OX - 78}" cy="${OY}"/><circle cx="${OX}" cy="${OY}" r="7" class="whub"/>`;
+    svOmega.innerHTML = m;
+  }
+  const omegaAt = p => { const dx = p.x - OX, dy = OY - p.y; return dy < 0 ? (dx < 0 ? 0 : 180) : Math.atan2(dy, -dx) / DEG; };
+  dragOn(svOmega, p => setPose('omega', Math.round(omegaAt(p))), p => setPose('omega', Math.round(omegaAt(p))));
+  onScroll(svOmega, sg => nudge('omega', sg * 2));
+
+  // Turn: the oesophagus seen from the head, as the operator looks down the probe. Anterior is up; turning right
+  // (clockwise) swings the probe face toward the patient's right
+  const svTurn = $('svTurn'), TC = 85;
+  {
+    const [ax, ay] = pol(TC, TC, 63, -132), [hx, hy] = pol(TC, TC, 64, 0);
+    let m = `<path class="heartb" d="M${pol(TC, TC, 64, -38).map(v => v.toFixed(1)).join(' ')} A64 64 0 0 1 ${pol(TC, TC, 64, 38).map(v => v.toFixed(1)).join(' ')}"/>`;
+    m += `<text class="anat" x="${hx}" y="${hy + 3}" text-anchor="middle">LA</text>`;
+    m += `<circle class="ao" cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="11"/><text class="anat" x="${ax.toFixed(1)}" y="${(ay + 3).toFixed(1)}" text-anchor="middle">Ao</text>`;
+    m += `<circle class="eso" cx="${TC}" cy="${TC}" r="48"/>`;
+    for (let a = -180; a < 180; a += 30) m += tk(TC, TC, 48, a % 90 ? 44 : 41, a, 'sc');
+    m += `<text class="lbl" x="${TC}" y="9" text-anchor="middle">A</text><text class="lbl" x="${TC}" y="167" text-anchor="middle">P</text>`;
+    m += `<text class="lbl" x="2" y="${TC + 3}">L</text><text class="lbl" x="168" y="${TC + 3}" text-anchor="end">R</text>`;
+    m += `<line id="tTgt" class="tgt" x1="0" y1="0" x2="0" y2="0"/>`;
+    const [b1x, b1y] = pol(TC, TC, 46, -24), [b2x, b2y] = pol(TC, TC, 46, 24);
+    m += `<g id="tProbe"><path class="beam" d="M${TC - 6} ${TC - 11} L${b1x.toFixed(1)} ${b1y.toFixed(1)} A46 46 0 0 1 ${b2x.toFixed(1)} ${b2y.toFixed(1)} L${TC + 6} ${TC - 11} Z"/>`;
+    m += `<rect class="pbody" x="${TC - 13}" y="${TC - 11}" width="26" height="22" rx="7"/><rect class="acc" x="${TC - 10}" y="${TC - 13}" width="20" height="5" rx="2"/></g>`;
+    svTurn.innerHTML = m;
+  }
+  dragOn(svTurn, p => ({ a: angAt(p, TC, TC) }), (p, s) => { const a = angAt(p, TC, TC), da = wrap180(a - s.a); s.a = a; nudge('turn', da); });
+  onScroll(svTurn, sg => nudge('turn', sg * 2));
+
+  // Insertion ruler: depth from the incisors, with the levels the probe passes
+  const svDepth = $('svDepth'), RX0 = 12, RX1 = 308, dX = d => RX0 + (d - S_MIN) / (S_MAX - S_MIN) * (RX1 - RX0);
+  {
+    const bands = [['UE', S_MIN, 24, '#24356f'], ['MID-OESOPHAGEAL', 24, S_GEJ - 1, '#1d3f7a'], ['GEJ', S_GEJ - 1, S_GEJ + 1, '#6a4b16'], ['TG', S_GEJ + 1, S_GEJ + 7.5, '#17544a'], ['DEEP TG', S_GEJ + 7.5, S_MAX, '#123f3a']];
+    let m = '';
+    for (const [t, a, b, c] of bands) { const x = dX(a), w = dX(b) - x; m += `<rect x="${x.toFixed(1)}" y="18" width="${w.toFixed(1)}" height="15" fill="${c}"/>`; if (w > 16) m += `<text class="bandt" x="${(x + w / 2).toFixed(1)}" y="28.5" text-anchor="middle">${w > 40 || t.length < 6 ? t : ''}</text>`; }
+    for (let d = Math.ceil(S_MIN); d <= S_MAX; d++) { const x = dX(d).toFixed(1), big = d % 5 === 0; m += `<line class="sc" x1="${x}" y1="34" x2="${x}" y2="${big ? 41 : 37}"/>`; if (big) m += `<text class="scl" x="${x}" y="52" text-anchor="middle">${d}</text>`; }
+    m += `<line id="dTgt" class="tgt" x1="0" y1="12" x2="0" y2="41"/>`;
+    m += `<g id="dMark"><path class="acc" d="M-6 4 L6 4 L0 14 Z"/><line class="accs" x1="0" y1="14" x2="0" y2="35"/></g>`;
+    svDepth.innerHTML = m;
+  }
+  const depthAt = p => S_MIN + (p.x - RX0) / (RX1 - RX0) * (S_MAX - S_MIN);
+  dragOn(svDepth, p => setPose('d', Math.round(depthAt(p) * 4) / 4), p => setPose('d', Math.round(depthAt(p) * 4) / 4));
+  onScroll(svDepth, sg => nudge('d', sg * 0.25));
+
+  // Hold-to-move buttons: one click is a single step, holding keeps the control moving and speeds up
+  const RATE = { d: 2, turn: 36, omega: 36, ante: 36, lat: 24 }, STEP = { d: 0.5, turn: 5, omega: 5, ante: 5, lat: 5 };
+  let holdM = null;
+  const holdLoop = now => {
+    if (!holdM) return;
+    const dt = Math.min(0.05, (now - holdM.last) / 1000), age = now - holdM.t0; holdM.last = now;
+    if (age > 380) nudge(holdM.k, holdM.dir * RATE[holdM.k] * (age > 1600 ? 2 : 1) * (holdM.fine ? 0.3 : 1) * dt);
+    requestAnimationFrame(holdLoop);
+  };
+  document.querySelectorAll('[data-hold]').forEach(b => {
+    const [k, dir] = b.dataset.hold.split(':');
+    b.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      e.preventDefault(); b.setPointerCapture(e.pointerId); b.classList.add('on');
+      nudge(k, +dir * STEP[k] * (e.shiftKey ? 0.3 : 1));
+      holdM = { k, dir: +dir, t0: performance.now(), last: performance.now(), fine: e.shiftKey, b }; requestAnimationFrame(holdLoop);
+    });
+    const stop = () => { if (holdM && holdM.b === b) holdM = null; b.classList.remove('on'); };
+    b.addEventListener('pointerup', stop); b.addEventListener('pointercancel', stop); b.addEventListener('lostpointercapture', stop);
+    b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); nudge(k, +dir * STEP[k] * (e.shiftKey ? 0.3 : 1)); } });
+  });
+
+  // Coaching: what to move, and which way, to get from the current pose to the target view
+  const TOL = { d: 0.75, omega: 6, turn: 6, ante: 6, lat: 5 };
+  const hintSel = $('hintLvl');
+  let hintLvl = 'steps';
+  try { const h = localStorage.getItem('rrp-tee-hints'); if (h && [...hintSel.options].some(o => o.value === h)) hintLvl = h; } catch { }
+  hintSel.value = hintLvl;
+  hintSel.addEventListener('change', () => { hintLvl = hintSel.value; try { localStorage.setItem('rrp-tee-hints', hintLvl); } catch { } });
+  function coachFor(cur, tgt) {
+    const dl = k => tgt[k] - cur[k], ok = k => Math.abs(dl(k)) <= TOL[k], n = k => Math.round(Math.abs(dl(k)));
+    const s = {
+      d: ok('d') ? `Depth: ${tgt.d.toFixed(1)} cm` : `${dl('d') > 0 ? 'Advance' : 'Withdraw'} ${Math.abs(dl('d')).toFixed(1)} cm, to ${tgt.d.toFixed(1)} cm (${probeLevel(tgt.d).toLowerCase()})`,
+      omega: ok('omega') ? `Multiplane: ${Math.round(tgt.omega)}°` : `Multiplane ${dl('omega') > 0 ? 'forward' : 'back'} ${n('omega')}°, to ${Math.round(tgt.omega)}°`,
+      turn: ok('turn') ? 'Turn: in position' : `Turn ${dl('turn') > 0 ? 'right (clockwise)' : 'left (anticlockwise)'} ${n('turn')}°`,
+      ante: ok('ante') ? 'Big wheel: in position' : `Big wheel: ${dl('ante') > 0 ? 'anteflex' : 'retroflex'} ${n('ante')}°`,
+      lat: ok('lat') ? 'Small wheel: in position' : `Small wheel: flex ${dl('lat') > 0 ? 'left' : 'right'} ${n('lat')}°`,
+    };
+    const short = {
+      d: ok('d') ? '✓ depth' : `${dl('d') > 0 ? 'Advance' : 'Withdraw'} ${Math.abs(dl('d')).toFixed(1)} cm`,
+      omega: ok('omega') ? '✓ angle' : `${dl('omega') > 0 ? 'Forward' : 'Back'} to ${Math.round(tgt.omega)}°`,
+      turn: ok('turn') ? '✓ turn' : `Turn ${dl('turn') > 0 ? 'right' : 'left'} ${n('turn')}°`,
+      ante: ok('ante') ? '' : `${dl('ante') > 0 ? 'Anteflex' : 'Retroflex'} ${n('ante')}°`,
+      lat: ok('lat') ? '' : `flex ${dl('lat') > 0 ? 'left' : 'right'} ${n('lat')}°`,
+    };
+    const steps = [];
+    // passing the gastro-oesophageal junction with the tip bent can tear the mucosa: straighten it first
+    const crossing = (cur.d - S_GEJ) * (tgt.d - S_GEJ) < 0 && !ok('d');
+    if (crossing && (Math.abs(cur.ante) > 15 || Math.abs(cur.lat) > 10)) steps.push({ k: 'safe', ok: false, safety: true, text: 'Neutral tip first: release both wheels before passing the GE junction (N)' });
+    for (const k of ['d', 'omega', 'turn', 'ante', 'lat']) steps.push({ k, ok: ok(k), text: s[k] });
+    return { steps, short, ok };
+  }
+
+  // Safety: moving the probe with the tip bent hard. In the oesophagus large flexion is the problem; across the
+  // gastro-oesophageal junction any flexion is.
+  const pwarn = $('pwarn');
+  let lastD = st.pose.d, warnUntil = 0;
+  function checkSafety(now) {
+    const P = st.pose, moved = !st.tween && Math.abs(P.d - lastD) > 0.004; lastD = P.d;
+    if (moved) {
+      const nearGej = P.d > S_GEJ - 2 && P.d < S_GEJ + 1.5, inEso = P.d < S_GEJ - 2;
+      const msg = nearGej && (Math.abs(P.ante) > 20 || Math.abs(P.lat) > 15) ? 'Straighten the tip before moving through the gastro-oesophageal junction: press Neutral tip (N).'
+        : inEso && (Math.abs(P.ante) > 50 || Math.abs(P.lat) > 30) ? 'Release the flexion before advancing or withdrawing: a bent tip can injure the oesophagus.' : '';
+      if (msg) { pwarn.textContent = msg; pwarn.hidden = false; warnUntil = now + 3500; }
+    }
+    if (!pwarn.hidden && now > warnUntil) pwarn.hidden = true;
+  }
+
+  // Draw the console. Only touches the DOM when something it shows has changed.
+  const PUI = { wBig: $('wBig'), wSmall: $('wSmall'), wTgtB: $('wTgtB'), wTgtS: $('wTgtS'), oNeedle: $('oNeedle'), oDot: $('oDot'), oTgt: $('oTgt'),
+    tProbe: $('tProbe'), tTgt: $('tTgt'), dMark: $('dMark'), dTgt: $('dTgt'), tShaftS: $('tShaftS'), tHeadS: $('tHeadS'), tBeam: $('tBeam'), tShaftF: $('tShaftF'), tHeadF: $('tHeadF'), tFaceF: $('tFaceF'),
+    fig: { wheel: $('pwWheel'), omega: $('pwOmega'), turn: $('pwTurn'), d: $('pwDepth') }, key: '' };
+  const flexTxt = (a, l) => `${a > 0.5 ? 'ante ' + Math.round(a) + '°' : a < -0.5 ? 'retro ' + Math.round(-a) + '°' : 'ante 0°'} · ${l > 0.5 ? 'L' + Math.round(l) + '°' : l < -0.5 ? 'R' + Math.round(-l) + '°' : '0°'}`;
+  const setCoach = (id, txt, cls) => { const el = $(id); if (el.textContent !== txt) el.textContent = txt; el.className = 'coach' + (cls ? ' ' + cls : ''); };
+  function drawProbeUI(tgt) {
+    const P = st.pose, inG = P.d > S_GEJ + 0.8;
+    const key = [P.d.toFixed(2), P.turn.toFixed(1), P.ante.toFixed(1), P.lat.toFixed(1), P.omega.toFixed(1), tgt ? [tgt.d, tgt.turn, tgt.ante, tgt.lat, tgt.omega].join() : '', Math.round(CONTACT * 10)].join('|');
+    if (key === PUI.key) return; PUI.key = key;
+    PUI.wBig.setAttribute('transform', `rotate(${P.ante.toFixed(1)} ${WC} ${WC})`);
+    PUI.wSmall.setAttribute('transform', `rotate(${(-2 * P.lat).toFixed(1)} ${WC} ${WC})`);
+    $('oWheel').textContent = flexTxt(P.ante, P.lat);
+    const [nx, ny] = omXY(P.omega, OR - 14), [dx2, dy2] = omXY(P.omega, OR - 22);
+    setLine(PUI.oNeedle, [OX, OY], [dx2, dy2]); PUI.oDot.setAttribute('cx', nx.toFixed(1)); PUI.oDot.setAttribute('cy', ny.toFixed(1));
+    $('oOmega').textContent = Math.round(P.omega) + '°';
+    PUI.tProbe.setAttribute('transform', `rotate(${P.turn.toFixed(1)} ${TC} ${TC})`);
+    $('oTurn').textContent = Math.abs(P.turn) < 0.5 ? '0°' : (P.turn > 0 ? 'right ' : 'left ') + Math.round(Math.abs(P.turn)) + '°';
+    PUI.dMark.setAttribute('transform', `translate(${dX(P.d).toFixed(1)} 0)`);
+    $('oDepth').textContent = `${P.d.toFixed(1)} cm · ${probeLevel(P.d)}`;
+    // tip, side view: the probe face looks anterior (to the right); front view: the face looks at you
+    const sd = bend(50, P.ante * DEG), fd = bend(150, P.lat * DEG);
+    PUI.tShaftS.setAttribute('d', sd.d); PUI.tHeadS.setAttribute('d', `M${sd.e[0].toFixed(1)} ${sd.e[1].toFixed(1)} L${sd.h[0].toFixed(1)} ${sd.h[1].toFixed(1)}`);
+    PUI.tShaftF.setAttribute('d', fd.d); PUI.tHeadF.setAttribute('d', `M${fd.e[0].toFixed(1)} ${fd.e[1].toFixed(1)} L${fd.h[0].toFixed(1)} ${fd.h[1].toFixed(1)}`);
+    PUI.tFaceF.setAttribute('cx', ((fd.e[0] + fd.h[0]) / 2).toFixed(1)); PUI.tFaceF.setAttribute('cy', ((fd.e[1] + fd.h[1]) / 2).toFixed(1));
+    { const mx = (sd.e[0] + sd.h[0]) / 2, my = (sd.e[1] + sd.h[1]) / 2, th = P.ante * DEG, n = [Math.cos(th), -Math.sin(th)];
+      const fx = mx + n[0] * 5, fy = my + n[1] * 5, r = (a, l) => [fx + l * (n[0] * Math.cos(a) - n[1] * Math.sin(a)), fy + l * (n[0] * Math.sin(a) + n[1] * Math.cos(a))];
+      const [ax1, ay1] = r(-0.42, 34), [ax2, ay2] = r(0.42, 34);
+      PUI.tBeam.setAttribute('d', `M${fx.toFixed(1)} ${fy.toFixed(1)} L${ax1.toFixed(1)} ${ay1.toFixed(1)} L${ax2.toFixed(1)} ${ay2.toFixed(1)} Z`); }
+    $('oTip').textContent = inG ? `contact ${CONTACT > 0.8 ? 'good' : CONTACT > 0.45 ? 'partial' : 'poor'}` : '';
+    const fl = Math.hypot(P.ante, P.lat);
+    if (inG && CONTACT < 0.8) setCoach('cTip', 'Poor contact: anteflex onto the gastric wall.', 'warn');
+    else if (!inG && fl > 55) setCoach('cTip', 'Hard flexion lifts the face off the wall.', 'warn');
+    else setCoach('cTip', inG ? 'Face on the gastric wall.' : 'Face on the oesophageal wall.', '');
+    // targets and coaching on each control
+    const c = tgt ? coachFor(P, tgt) : null;
+    for (const [el, on] of [[PUI.wTgtB, c], [PUI.wTgtS, c], [PUI.oTgt, c], [PUI.tTgt, c], [PUI.dTgt, c]]) el.style.display = on ? '' : 'none';
+    if (c) {
+      setLine(PUI.wTgtB, pol(WC, WC, 66, tgt.ante), pol(WC, WC, 80, tgt.ante));
+      setLine(PUI.wTgtS, pol(WC, WC, 37, -2 * tgt.lat), pol(WC, WC, 48, -2 * tgt.lat));
+      setLine(PUI.oTgt, omXY(tgt.omega, 10), omXY(tgt.omega, OR + 4));
+      setLine(PUI.tTgt, pol(TC, TC, 14, tgt.turn), pol(TC, TC, 58, tgt.turn));
+      PUI.dTgt.setAttribute('x1', dX(tgt.d).toFixed(1)); PUI.dTgt.setAttribute('x2', dX(tgt.d).toFixed(1));
+      const wOk = c.ok('ante') && c.ok('lat');
+      const parts = [['wheel', wOk, wOk ? '✓ wheels' : [c.short.ante, c.short.lat].filter(Boolean).join(' · ').replace(/^f/, 'F')], ['omega', c.ok('omega'), c.short.omega], ['turn', c.ok('turn'), c.short.turn], ['d', c.ok('d'), c.short.d]];
+      for (const [k, ok, txt] of parts) {
+        PUI.fig[k].classList.toggle('ok', ok); PUI.fig[k].classList.toggle('go', !ok);
+        setCoach({ wheel: 'cWheel', omega: 'cOmega', turn: 'cTurn', d: 'cDepth' }[k], txt, ok ? 'ok' : 'go');
+      }
+    } else {
+      for (const f of Object.values(PUI.fig)) f.classList.remove('ok', 'go');
+      setCoach('cWheel', 'Outer: ante / retro · inner: L / R', '');
+      setCoach('cOmega', '0° transverse · 90° long axis', '');
+      setCoach('cTurn', 'Seen from the head', '');
+      setCoach('cDepth', '', '');
+    }
+  }
   $('gain').addEventListener('input', e => { st.gain = DISP.gain = +e.target.value; $('gainO').textContent = Math.round(st.gain * 50); });
   $('dr').addEventListener('input', e => { DISP.dr = +e.target.value; $('drO').textContent = DISP.dr + ' dB'; buildGrayLUT(); });
   $('sri').addEventListener('input', e => { DISP.sri = +e.target.value; $('sriO').textContent = 'SRI ' + DISP.sri; });
@@ -3170,6 +3563,8 @@ function startApp() {
   $('cineED').onclick = () => seekPhase(0); $('cineES').onclick = () => seekPhase(0.26);
   $('cinePlay').onclick = () => { cine.play = !cine.play; $('cinePlay').textContent = cine.play ? 'Stop' : 'Play'; };
   const layer = (id, obj) => $(id).addEventListener('change', e => { obj.visible = e.target.checked; });
+  const vwrap = $('vwrap');
+  $('lyDock').addEventListener('change', e => { vwrap.classList.toggle('docked', e.target.checked); });
   layer('lySkin', skin); layer('lySkin', head); layer('lyRibs', ribs); layer('lyHeart', heart); layer('lyVessels', vessels); layer('lyLiver', liverG); layer('lyPlane', fan);
   // Wheel on the image: depth while live, cine frames (trackball) while frozen
   usCanvas.addEventListener('wheel', e => { e.preventDefault(); if (st.frozen) { cineStep(e.deltaY > 0 ? 1 : -1); return; } st.depth = clamp(st.depth + (e.deltaY > 0 ? 0.5 : -0.5), 4, 20); }, { passive: false });
@@ -3871,6 +4266,7 @@ registerProcessor('dop-synth', class extends AudioWorkletProcessor {
     if (k === 'x') { clearScreenCal(); if (st.tool) refreshTool(); return; }
     if (k === 'escape') { if (cal.pending) { dropCal(cal.pending); cal.pending = null; } else if (st.tool) setTool(null); return; }
     if (st.frozen && (k === 'arrowleft' || k === 'arrowright')) { e.preventDefault(); cineStep(k === 'arrowleft' ? -1 : 1); return; }
+    if (k === 'n') { neutralTip(); return; }
     if (st.frozen && ['arrowup', 'arrowdown', 'q', 'e', 'w', 's', 'a', 'd'].includes(k)) setFrozen(false); // steering the probe goes back to live
     const P = st.pose, fine = e.shiftKey ? 0.3 : 1;
     if (k === 'arrowdown') P.d = clamp(P.d + 0.25 * fine, S_MIN, S_MAX);
@@ -4016,10 +4412,11 @@ registerProcessor('dop-synth', class extends AudioWorkletProcessor {
   $('caseReset').onclick = () => loadCase(st.caseIdx, false);
 
   // Practice
-  const pr = { body: $('pracBody'), intro: $('pracIntro'), name: $('pracName'), score: $('pracScore'), meter: $('pracMeter'), hint: $('pracHint') };
-  // Progress (views found, quiz totals) is saved in this browser only
+  const pr = { body: $('pracBody'), intro: $('pracIntro'), btns: $('pracBtns'), name: $('pracName'), score: $('pracScore'), meter: $('pracMeter'), hint: $('pracHint'), tip: $('pracTip'), steps: $('coachSteps'), time: $('pracTime') };
+  // Progress (views found, best times, quiz totals) is saved in this browser only
   const PROG_KEY = 'rrp-tee-lab-progress';
-  const prog = (() => { try { const o = JSON.parse(localStorage.getItem(PROG_KEY) || '{}'); return { views: Array.isArray(o.views) ? o.views : [], quiz: o.quiz && typeof o.quiz === 'object' ? o.quiz : {} }; } catch { return { views: [], quiz: {} }; } })();
+  const isObj = x => x && typeof x === 'object' && !Array.isArray(x);
+  const prog = (() => { try { const o = JSON.parse(localStorage.getItem(PROG_KEY) || '{}'); return { views: Array.isArray(o.views) ? o.views : [], quiz: isObj(o.quiz) ? o.quiz : {}, best: isObj(o.best) ? o.best : {} }; } catch { return { views: [], quiz: {}, best: {} }; } })();
   const saveProg = () => { try { localStorage.setItem(PROG_KEY, JSON.stringify(prog)); } catch { } };
   const pracDone = $('pracDone'), quizAll = $('quizAll');
   const showProg = () => {
@@ -4037,26 +4434,69 @@ registerProcessor('dop-synth', class extends AudioWorkletProcessor {
     Aorta: 'Turn the probe left (anticlockwise) until the face points back at the descending aorta; withdraw to 20–24 cm for the arch. For the ascending aorta withdraw a little from the AV views and face forward.',
     Transgastric: 'Advance past the gastro-oesophageal junction (about 38–44 cm), then anteflex so the transducer presses on the stomach wall. For deep TG advance further with strong anteflexion.',
   };
-  const lesson = { on: false, i: 0, holdSince: 0 };
-  const setTarget = n => { st.target = n; pr.name.textContent = lesson.on ? `Lesson ${n + 1} / ${VIEWS.length} · ${VIEWS[n].full}` : VIEWS[n].full; lesson.holdSince = 0; };
+  // Probe drills: the everyday moves of a TEE exam, each from one standard view to the next
+  const DRILLS = [
+    ['me4c', 'me5c', 'Withdraw slightly until the LVOT and aortic valve come into the plane.'],
+    ['me4c', 'mecomm', 'Rotate the multiplane forward to about 60°: the mitral valve opens out between the two commissures.'],
+    ['mecomm', 'me2c', 'Keep rotating forward (about 70–90°) until the RV drops out and the LA appendage appears.'],
+    ['me2c', 'melax', 'Rotate forward to about 120–150° until the LVOT and the aortic valve open out.'],
+    ['melax', 'meavlax', 'Turn right toward the aortic root, bring the valve to the centre and reduce the image depth.'],
+    ['meavlax', 'meavsax', 'Rotate back about 90° (to 30–45°) to cut the aortic valve in short axis: three cusps, the Mercedes sign.'],
+    ['meavsax', 'rvio', 'Rotate forward a little and advance slightly until the tricuspid and pulmonary valves are both in view.'],
+    ['rvio', 'bicaval', 'Rotate forward to about 90–110° and turn right (clockwise) until the SVC and IVC enter the RA.'],
+    ['bicaval', 'melaa', 'Turn left (anticlockwise) back across the left atrium to the appendage, at about 60–90°.'],
+    ['meavsax', 'ascsax', 'Lift the plane above the aortic valve to the ascending aorta: withdraw slightly or anteflex, multiplane 0–30°.'],
+    ['ascsax', 'asclax', 'Rotate forward to about 100–120° to open the ascending aorta out in long axis.'],
+    ['me4c', 'dsax', 'Turn left (anticlockwise) until the face points back at the descending aorta; reduce the image depth.'],
+    ['dsax', 'dlax', 'Rotate the multiplane to 90° to see the descending aorta in long axis.'],
+    ['dsax', 'uearch', 'Withdraw slowly, turning to keep the aorta in view, up to the arch at about 20–24 cm.'],
+    ['uearch', 'uesax', 'Rotate the multiplane to 90° to cut the arch in short axis.'],
+    ['me4c', 'tgbas', 'Neutral tip, advance through the GE junction into the stomach, then anteflex until the LV base appears.'],
+    ['tgbas', 'tgmid', 'Advance a little and anteflex more to reach the papillary muscles: the doughnut view.'],
+    ['tgmid', 'tg2c', 'Rotate the multiplane forward to about 90°.'],
+    ['tg2c', 'tglax', 'Rotate forward to about 100–120° to open the LVOT and the aortic valve.'],
+    ['tgmid', 'dtg', 'Anteflex strongly and flex left (advance a little if needed) until the LVOT and aortic valve point at the probe.'],
+  ].filter(([a, b]) => VIEWS.some(v => v.id === a) && VIEWS.some(v => v.id === b));
+  const vIdx = id => VIEWS.findIndex(v => v.id === id);
+  const lesson = { mode: null, i: 0, holdSince: 0, t0: 0, found: 0 };
+  const setTarget = n => {
+    st.target = n; lesson.holdSince = 0; lesson.t0 = performance.now(); lesson.found = 0;
+    const v = VIEWS[n];
+    if (lesson.mode === 'drill') { const [a, , tip] = DRILLS[lesson.i]; pr.name.textContent = `Drill ${lesson.i + 1} / ${DRILLS.length} · ${VIEWS[vIdx(a)].name} → ${v.name}`; pr.tip.textContent = tip; }
+    else if (lesson.mode === 'lesson') { pr.name.textContent = `Lesson ${n + 1} / ${VIEWS.length} · ${v.full}`; pr.tip.textContent = TIPS[v.group] || ''; }
+    else { pr.name.textContent = v.full; pr.tip.textContent = ''; }
+    pr.tip.hidden = !pr.tip.textContent; pr.steps.textContent = ''; pr.stepsKey = '';
+  };
+  // a drill starts from its first view, set up for you
+  const startDrill = i => { lesson.i = i; const [a, b] = DRILLS[i]; goView(vIdx(a)); setTarget(vIdx(b)); };
   const pickTarget = () => {
-    if (lesson.on) { if (lesson.i < VIEWS.length - 1) setTarget(++lesson.i); else stopPractice('Lesson complete: you have found every standard view.'); return; }
+    if (lesson.mode === 'lesson') { if (lesson.i < VIEWS.length - 1) setTarget(++lesson.i); else stopPractice('Lesson complete: you have found every standard view.'); return; }
+    if (lesson.mode === 'drill') { if (lesson.i < DRILLS.length - 1) startDrill(lesson.i + 1); else stopPractice('Drills complete: you have practised every probe manoeuvre.'); return; }
     let n; do { n = Math.floor(Math.random() * VIEWS.length); } while (n === st.target && VIEWS.length > 1); setTarget(n);
   };
-  const pracBtn = $('pracToggle'), lessonBtn = $('lessonToggle');
-  const startPractice = asLesson => {
-    lesson.on = asLesson; lesson.i = 0; st.practice = true; pr.body.hidden = false; pr.intro.hidden = true;
-    pracBtn.textContent = 'Stop practice'; lessonBtn.hidden = true;
-    if (asLesson) setTarget(0); else pickTarget();
+  const startPractice = mode => {
+    lesson.mode = mode; lesson.i = 0; st.practice = true; pr.body.hidden = false; pr.intro.hidden = true; pr.btns.hidden = true;
+    $('pracNext').textContent = mode === 'random' ? 'Next view →' : 'Skip →';
+    if (mode === 'lesson') setTarget(0); else if (mode === 'drill') startDrill(0); else pickTarget();
   };
   function stopPractice(msg) {
-    st.practice = false; lesson.on = false; pr.body.hidden = true; pr.intro.hidden = false;
-    pracBtn.textContent = 'Start practice'; lessonBtn.hidden = false;
+    st.practice = false; lesson.mode = null; pr.body.hidden = true; pr.intro.hidden = false; pr.btns.hidden = false;
     if (msg) pracDone.textContent = msg; else showProg();
   }
-  pracBtn.onclick = () => (st.practice ? stopPractice() : startPractice(false));
-  lessonBtn.onclick = () => startPractice(true);
+  $('pracToggle').onclick = () => startPractice('random');
+  $('drillToggle').onclick = () => startPractice('drill');
+  $('lessonToggle').onclick = () => startPractice('lesson');
+  $('pracStop').onclick = () => stopPractice();
   $('pracNext').onclick = pickTarget;
+  // Step-by-step coaching list in the practice panel
+  function renderSteps(c, good) {
+    let html = '';
+    if (c && !good && hintLvl === 'steps') {
+      const firstTodo = c.steps.find(s => !s.ok);
+      html = c.steps.map(s => `<li class="${s.safety ? 'safety' : s.ok ? 'ok' : s === firstTodo ? 'next' : ''}">${esc(s.text)}</li>`).join('');
+    }
+    if (html !== pr.stepsKey) { pr.stepsKey = html; pr.steps.innerHTML = html; }
+  }
   showProg();
   const ghostToggle = $('ghost');
 
@@ -4245,8 +4685,20 @@ registerProcessor('dop-synth', class extends AudioWorkletProcessor {
     cal.mm.length = 0; cal.sp.length = 0; clearSpec();
   });
 
-  const resize = () => { if (!renderer) return; const w = vp.clientWidth, h = vp.clientHeight; renderer.setPixelRatio(Math.min(2, window.devicePixelRatio)); renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); };
-  new ResizeObserver(resize).observe(vp); resize();
+  const resize = () => {
+    if (!renderer) return; const w = vp.clientWidth, h = vp.clientHeight; renderer.setPixelRatio(Math.min(2, window.devicePixelRatio)); renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h);
+    // On wide screens the dock covers the bottom of the view: zoom the picture out a little and centre it in the
+    // space above the dock, so the whole patient stays in sight
+    const vwrapEl = document.getElementById('vwrap'), dockBox = document.getElementById('dock');
+    const cover = vwrapEl.classList.contains('docked') && getComputedStyle(dockBox).position === 'absolute' ? dockBox.offsetHeight + 16 : 0, vis = h - cover;
+    if (cover > 0 && vis > 60) {
+      const k = clamp(vis / (h * 0.9), 0.5, 1), fw = w * k, fh = h * k;
+      camera.setViewOffset(fw, fh, (fw - w) / 2, fh / 2 - vis / 2, w, h);
+    } else camera.clearViewOffset();
+    camera.updateProjectionMatrix();
+  };
+
+  { const ro = new ResizeObserver(resize); ro.observe(vp); ro.observe(document.getElementById('dock')); } resize();
 
   let simT = 0, last = performance.now(), frameNo = 0;
   const liveEl = $('liveView'), monView = $('monView'), monInfo = $('monInfo');
@@ -4353,15 +4805,29 @@ registerProcessor('dop-synth', class extends AudioWorkletProcessor {
       if (!dragging) syncSliders();
       renderCalList();
       if (st.practice) {
-        const s = match(fr, VIEWS[st.target].frame), good = s >= 85;
+        // a preset still sliding into place (the start of a drill) does not count
+        const tv = VIEWS[st.target], s = match(fr, tv.frame), good = s >= 85 && !st.tween, tnow = performance.now();
         pr.score.textContent = `Match ${Math.round(s)}%`; pr.meter.firstChild.style.width = s.toFixed(0) + '%'; pr.meter.classList.toggle('good', good);
-        if (good) markView(st.target);
-        if (lesson.on) {
-          pr.hint.textContent = good ? 'On target. Hold it there…' : TIPS[VIEWS[st.target].group] || 'Find the view. The green ghost shows where the probe should sit.';
-          if (good) { const now = performance.now(); if (!lesson.holdSince) lesson.holdSince = now; else if (now - lesson.holdSince > 1200) pickTarget(); } else lesson.holdSince = 0;
-        } else pr.hint.textContent = good ? 'On target. Try the next view.' : 'Find the view. The green ghost shows where the probe should sit.';
+        if (good) {
+          markView(st.target);
+          if (!lesson.found) {
+            lesson.found = Math.max(0.1, (tnow - lesson.t0) / 1000);
+            if (!(prog.best[tv.id] <= lesson.found)) { prog.best[tv.id] = +lesson.found.toFixed(1); saveProg(); }
+          }
+        }
+        const best = prog.best[tv.id];
+        pr.time.textContent = lesson.found ? `Found in ${lesson.found.toFixed(1)} s${best ? ` · best ${best} s` : ''}` : `${Math.floor((tnow - lesson.t0) / 1000)} s${best ? ` · best ${best} s` : ''}`;
+        const auto = lesson.mode === 'lesson' || lesson.mode === 'drill';
+        pr.hint.textContent = good ? (auto ? 'On target. Hold it there…' : 'On target. Try the next view.')
+          : hintLvl === 'steps' ? 'Work down the list. The green marks on the probe controls show where each one should be.'
+          : hintLvl === 'arrows' ? 'Follow the green marks and the hints on the probe controls.' : 'Find the view on your own: no hints.';
+        if (auto) { if (good) { if (!lesson.holdSince) lesson.holdSince = tnow; else if (tnow - lesson.holdSince > 1200) pickTarget(); } else lesson.holdSince = 0; }
+        renderSteps(hintLvl === 'off' ? null : coachFor(st.pose, VIEWS[st.target].pose), good);
       }
     }
+    // Probe console: green targets only while practising with hints on
+    checkSafety(now);
+    drawProbeUI(st.practice && hintLvl !== 'off' ? VIEWS[st.target].pose : null);
 
     if (renderer) {
       // the heart swings (tamponade) and drops a little on inspiration, as in the ultrasound

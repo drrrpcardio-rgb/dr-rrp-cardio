@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 const features = [
-  { title: "Real probe controls", text: "Advance or withdraw, turn, anteflex, flex left or right and rotate the multiplane from 0 to 180°, with the big and small wheels moving on the handle." },
+  { title: "Real probe controls", text: "Drag the big and small wheels, the multiplane dial, the turn dial and the insertion ruler, or hold the buttons, and watch the tip bend as you go." },
   { title: "21 standard views", text: "Mid-oesophageal, transgastric, deep transgastric, aortic and upper oesophageal views from the ASE/SCA comprehensive TEE exam." },
   { title: "Full Doppler", text: "Colour flow with aliasing, PW, CW and tissue Doppler with sound, plus an agitated saline bubble study for shunts." },
   { title: "17 TEE cases", text: "LAA thrombus, flail mitral leaflet, endocarditis, ASD, PFO, aortic dissection, tamponade and more, with a quiz and a report." },
@@ -80,8 +80,9 @@ export default function TeeSimulatorPage() {
       <section id="lab" className="mx-auto max-w-7xl scroll-mt-24 px-3 py-8 sm:px-8 sm:py-14">
         <EchoLabFrame src="/tee-lab/index.html" title="Dr. RRP Cardio TEE Lab" loadingText="Loading the TEE lab…" />
         <p className="mt-4 text-center text-sm text-royal-700">
-          Drag the probe along the oesophagus, use the probe sliders, or pick a view under the 3D model. Click inside the simulator to use
-          the keyboard: ↑/↓ withdraw and advance, ←/→ turn, W/S anteflex, A/D flex left and right, Q/E multiplane angle, Space freezes.
+          Use the probe console in the simulator: the handle wheels, multiplane and turn dials, and the insertion ruler. You can also drag the
+          probe along the oesophagus or pick a view under the 3D model. Click inside the simulator to use the keyboard: ↑/↓ withdraw and
+          advance, ←/→ turn, W/S anteflex, A/D flex left and right, Q/E multiplane angle, N neutral tip, Space freezes.
         </p>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -108,7 +109,10 @@ export default function TeeSimulatorPage() {
               </p>
             ))}
             <p>
-              Practice mode scores how close your view is to the target, and the case quiz asks for the diagnosis. Look for an LAA thrombus
+              Practice mode scores how close your view is to the target and coaches you step by step: how far to advance, which way to turn,
+              and where each wheel and the multiplane angle should be. Probe drills take you through 20 everyday manoeuvres, such as ME four
+              chamber to two chamber or into the stomach for the transgastric views, and warn you if you move the probe with the tip still
+              flexed. The case quiz asks for the diagnosis. Look for an LAA thrombus
               before cardioversion, grade mitral regurgitation, track a dissection flap down the aorta or run a saline contrast study across a
               PFO. For the transthoracic views, try the{" "}
               <Link href="/echo-simulator" className="font-semibold text-royal-700 underline-offset-2 hover:underline">
