@@ -142,6 +142,34 @@ Every feature pointed to the same place:
 
 *Figure 7. The right bundle branch and the left anterior fascicle share the upper septum and its blood supply from the first septal perforators. An occlusion above those branches knocks out both, producing RBBB + LAFB.*
 
+The echo showed the cost of a proximal LAD occlusion: severe LV dysfunction and a layered apical thrombus, a reminder of why every minute counts.
+
+<div class="media-trio">
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-1.mp4 loop -->
+
+*Figure 8a. Parasternal long-axis view.*
+
+</figure>
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-2.mp4 loop -->
+
+*Figure 8b. Parasternal short-axis view.*
+
+</figure>
+<figure>
+
+<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-3.mp4 loop -->
+
+*Figure 8c. Apical four-chamber view.*
+
+</figure>
+</div>
+
+*Case 2 echo: severe LV dysfunction with a layered apical thrombus.*
+
 The ECG said *proximal LAD*, and angiography confirmed it: a **100% thrombus-laden occlusion at the ostium of the LAD**. The lesion was crossed with a wire, thrombus was aspirated, and a 3.5 × 24 mm drug-eluting stent was deployed, followed by high-pressure post-dilatation.
 
 <div class="media-pair">
@@ -149,45 +177,17 @@ The ECG said *proximal LAD*, and angiography confirmed it: a **100% thrombus-lad
 
 <!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-proximal-lad-pre.mp4 loop -->
 
-*Figure 8a. Before: the LAD is occluded at its origin.*
+*Figure 9a. Before: the LAD is occluded at its origin.*
 
 </figure>
 <figure>
 
 <!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-proximal-lad-post.mp4 loop -->
 
-*Figure 8b. After stenting: the whole LAD and its branches fill again.*
+*Figure 9b. After stenting: the whole LAD and its branches fill again.*
 
 </figure>
 </div>
-
-The cost of a proximal LAD occlusion was still visible on echo: severe LV dysfunction and a layered apical thrombus, a reminder of why every minute counts.
-
-<div class="media-trio">
-<figure>
-
-<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-1.mp4 loop -->
-
-*Figure 9a. Parasternal long-axis view.*
-
-</figure>
-<figure>
-
-<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-2.mp4 loop -->
-
-*Figure 9b. Parasternal short-axis view.*
-
-</figure>
-<figure>
-
-<!-- VIDEO: /images/blog/lbbb-vs-qrbbb/case2-echo-3.mp4 loop -->
-
-*Figure 9c. Apical four-chamber view.*
-
-</figure>
-</div>
-
-*Case 2 echo: severe LV dysfunction with a layered apical thrombus.*
 
 **The lesson:** RBBB does not hide ST elevation. A qR in V1 with LAFB during chest pain means a large septal infarct and a proximal LAD culprit.
 
