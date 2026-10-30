@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Calculator,
   HeartPulse,
+  Radar,
   ScanHeart,
   Waves,
 } from "lucide-react";
@@ -17,6 +18,7 @@ import { simulators } from "@/lib/tools-data";
 
 const ICONS = {
   echo: Waves,
+  tee: Radar,
   ct: ScanHeart,
   ecg: Activity,
   cath: HeartPulse,
@@ -38,11 +40,11 @@ export function SimulationLab() {
           eyebrow="Free simulation lab"
           title="Learn it. Then practise it."
           accent="practise"
-          description="Courses give you the theory. The simulators let you practise echo, cardiac CT, ECG and cath lab skills before you meet a patient, free in your browser."
+          description="Courses give you the theory. The simulators let you practise echo, TEE, cardiac CT, ECG and cath lab skills before you meet a patient, free in your browser."
         />
 
         {/* The other tools */}
-        <StaggerGroup className="mt-12 grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <StaggerGroup className="mt-12 grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {simulators.map((t) => {
             const Icon = ICONS[t.id];
             return (

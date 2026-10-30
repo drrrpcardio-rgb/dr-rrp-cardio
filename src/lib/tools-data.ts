@@ -10,6 +10,15 @@ export const simulators = [
     points: ["16 TTE views", "Colour, PW, CW and tissue Doppler", "22 cases with quiz and report"],
   },
   {
+    id: "tee",
+    title: "TEE Simulator",
+    tag: "New",
+    text: "Pass a TEE probe down the oesophagus of a 3D patient: advance, turn, flex and rotate the multiplane to build 21 standard views, with colour, PW, CW and tissue Doppler, a bubble study and 17 cases.",
+    href: "/tee-simulator",
+    image: "/images/sim-tee.jpg",
+    points: ["21 TEE views, 0–180° multiplane", "Colour, PW, CW and bubble study", "17 cases with quiz and report"],
+  },
+  {
     id: "ct",
     title: "CT Simulator",
     tag: "New",

@@ -13,7 +13,7 @@ import { simulators } from "@/lib/tools-data";
 // The free simulators that pair with each course track
 const PRACTICE: Record<string, string[]> = {
   ecg: ["ecg"],
-  echo: ["echo", "calc"],
+  echo: ["echo", "tee", "calc"],
   "cath-lab": ["cath", "ct"],
   ivus: ["cath"],
   "interventional-cardiology": ["cath", "ct", "ecg"],
