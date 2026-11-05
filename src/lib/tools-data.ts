@@ -56,6 +56,19 @@ export const simulators = [
   },
 ] as const;
 
+/**
+ * CathLab Visual: the animated patient guide to angiogram and angioplasty (prebuilt static app in
+ * /public/cathlab-visual). Listed apart from the simulators, on /simulators and /cath-lab.
+ */
+export const cathLabVisual = {
+  title: "CathLab Visual",
+  tag: "Patient guide",
+  text: "An animated, step-by-step guide to coronary angiogram and angioplasty in plain language, with types of plaque, clot removal in a heart attack, recovery and common questions. Students can open the clinical notes at every step.",
+  href: "/cathlab-visual/",
+  image: "/images/sim-cathlab-visual.jpg",
+  points: ["Angiogram and angioplasty, step by step", "Plaque types with IVUS views", "English, Tamil and Hindi"],
+};
+
 /** The two free interactive tools hosted under this site (prebuilt static apps in /public). */
 export const ecgTool = {
   title: "ECG Mastery",

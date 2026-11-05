@@ -1,6 +1,52 @@
-import { ArrowRight, ExternalLink, GraduationCap } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Check, ExternalLink, GraduationCap } from "lucide-react";
 import { Reveal } from "./Reveal";
 import { Button } from "./Button";
+import { cathLabVisual } from "@/lib/tools-data";
+import { cn } from "@/lib/utils";
+
+/**
+ * Wide card for CathLab Visual, the patient guide. A plain <a>, not <Link>, because the guide is a
+ * static app in /public rather than an app route.
+ */
+export function CathLabVisualCard({ className, headingAs: Heading = "h3" }: { className?: string; headingAs?: "h2" | "h3" }) {
+  const g = cathLabVisual;
+  return (
+    <a
+      href={g.href}
+      className={cn(
+        "group grid overflow-hidden rounded-3xl border border-royal-100 bg-white shadow-sm transition-shadow hover:shadow-xl md:grid-cols-[1.15fr_1fr]",
+        className,
+      )}
+    >
+      <div className="relative aspect-[16/10] overflow-hidden bg-royal-950 md:aspect-auto md:min-h-72">
+        <Image
+          src={g.image}
+          alt={`${g.title} screenshot`}
+          fill
+          sizes="(max-width: 768px) 100vw, 640px"
+          className="object-cover object-left-top transition-transform duration-700 group-hover:scale-[1.03]"
+        />
+      </div>
+      <div className="flex flex-col p-7 sm:p-9">
+        <p className="text-xs font-semibold tracking-widest text-gold-700 uppercase">{g.tag}</p>
+        <Heading className="mt-2 font-heading text-2xl font-semibold text-royal-950 sm:text-3xl">{g.title}</Heading>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">{g.text}</p>
+        <ul className="mt-4 flex-1 space-y-1.5 text-sm text-ink-soft">
+          {g.points.map((p) => (
+            <li key={p} className="flex items-center gap-2">
+              <Check size={15} className="shrink-0 text-gold-500" aria-hidden="true" /> {p}
+            </li>
+          ))}
+        </ul>
+        <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-royal-700">
+          Open {g.title}
+          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
+        </span>
+      </div>
+    </a>
+  );
+}
 
 interface ToolFrameProps {
   src: string;

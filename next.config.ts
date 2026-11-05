@@ -12,6 +12,7 @@ const devRewrites =
             { source: "/ecg-simulator/", destination: "/ecg-simulator/index.html" },
             { source: "/cath-sim/", destination: "/cath-sim/index.html" },
             { source: "/ct-lab/", destination: "/ct-lab/index.html" },
+            { source: "/cathlab-visual/", destination: "/cathlab-visual/index.html" },
             { source: "/cath-sim/:page/", destination: "/cath-sim/:page/index.html" },
           ];
         },

@@ -3,7 +3,7 @@ import { Activity, Boxes, ListChecks } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal, StaggerGroup } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
-import { CourseCrossLink, ToolFrame } from "@/components/ui/ToolShowcase";
+import { CathLabVisualCard, CourseCrossLink, ToolFrame } from "@/components/ui/ToolShowcase";
 import { brand } from "@/lib/site-data";
 import { cathLabTools } from "@/lib/tools-data";
 
@@ -66,6 +66,16 @@ export default function CathLabPage() {
             manufacturer&apos;s instructions and local protocols. Anatomy: BodyParts3D, © The
             Database Center for Life Science, licensed under CC Attribution 4.0 International.
           </p>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <div className="mt-16">
+            <h2 className="text-center font-heading text-3xl font-semibold text-ink">For patients and families</h2>
+            <p className="mx-auto mt-2 max-w-2xl text-center text-sm leading-relaxed text-mist-700">
+              What happens during an angiogram and an angioplasty, shown step by step in plain language.
+            </p>
+            <CathLabVisualCard className="mt-8" />
+          </div>
         </Reveal>
 
         <div className="mt-16 flex flex-col items-start gap-4 rounded-2xl border border-gold-200 bg-gold-50 p-8 sm:flex-row sm:items-center sm:justify-between">

@@ -3,10 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Activity, ArrowRight, Calculator, Check, HeartPulse, Radar, ScanHeart, Waves, type LucideIcon } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
-import { simulators } from "@/lib/tools-data";
+import { CathLabVisualCard } from "@/components/ui/ToolShowcase";
+import { cathLabVisual, simulators } from "@/lib/tools-data";
 import { brand } from "@/lib/site-data";
 
-const description = `Free cardiology simulators and tools from ${brand.name}: a 3D echo simulator, a TEE simulator, a cardiac CT simulator, a 12-lead ECG simulator, a virtual cath lab and 30 graded echo calculators. Practise in your browser.`;
+const description = `Free cardiology simulators and tools from ${brand.name}: a 3D echo simulator, a TEE simulator, a cardiac CT simulator, a 12-lead ECG simulator, a virtual cath lab, 30 graded echo calculators and an animated patient guide to angiogram and angioplasty. Practise in your browser.`;
 
 export const metadata: Metadata = {
   title: "Simulators",
@@ -17,7 +18,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   name: `${brand.name} simulators and tools`,
-  itemListElement: simulators.map((s, i) => ({ "@type": "ListItem", position: i + 1, name: s.title, url: s.href })),
+  itemListElement: [...simulators, cathLabVisual].map((s, i) => ({ "@type": "ListItem", position: i + 1, name: s.title, url: s.href })),
 };
 
 const heroIcons: Record<(typeof simulators)[number]["id"], LucideIcon> = {
@@ -97,6 +98,15 @@ export default function SimulatorsPage() {
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-16">
+          <p className="text-xs font-semibold tracking-[0.2em] text-gold-700 uppercase">Also free</p>
+          <h2 className="mt-2 font-heading text-3xl font-semibold text-ink">A guide for patients and families</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-mist-700">
+            Share it with anyone booked for an angiogram or angioplasty, so they can see what will happen before the day.
+          </p>
+          <CathLabVisualCard className="mt-8" />
         </div>
 
         <div className="mt-16 rounded-3xl bg-royal-950 p-8 text-white sm:p-12">
