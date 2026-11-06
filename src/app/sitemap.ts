@@ -16,7 +16,7 @@ const staticRoutes = [
   "/cheat-sheets",
   "/ecg-cheat-sheet",
   "/cath-lab",
-  "/cathlab-visual",
+  "/inside-your-heart",
   "/simulators",
   "/echo-simulator",
   "/tee-simulator",

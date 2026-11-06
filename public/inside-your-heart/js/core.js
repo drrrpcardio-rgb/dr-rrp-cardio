@@ -1,4 +1,4 @@
-/* CathLab Visual — core helpers shared by every scene.
+/* Inside Your Heart — core helpers shared by every scene.
    - CV.el / CV.html: build SVG nodes
    - CV.ticker: one requestAnimationFrame loop for all blood-flow fields (only runs while one is on screen)
    - CV.FlowField: red blood cells moving along a lumen; speed depends on the global flow and the local width

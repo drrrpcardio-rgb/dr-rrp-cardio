@@ -1,4 +1,4 @@
-/* CathLab Visual — step player.
+/* Inside Your Heart — step player.
    Each procedure is one paused GSAP timeline with labels "s0".."s6" (start of each step) and
    "e0".."e6" (end of each step). The player animates the timeline between those labels.
 
@@ -49,8 +49,6 @@
     });
 
     function title(i) { var h = cards[i].querySelector("h3"); return h ? h.textContent.trim() : ""; }
-    function stepWord() { return (CV.t && CV.t("ui.step")) || "Step"; }
-    function ofWord() { return (CV.t && CV.t("ui.of")) || "of"; }
 
     function update() {
       var shown = Math.max(0, current);
@@ -60,17 +58,17 @@
       dots.forEach(function (d, i) {
         d.classList.toggle("done", i < current);
         if (i === shown) d.setAttribute("aria-current", "step"); else d.removeAttribute("aria-current");
-        d.setAttribute("aria-label", stepWord() + " " + (i + 1) + ": " + title(i));
+        d.setAttribute("aria-label", "Step " + (i + 1) + ": " + title(i));
       });
       fill.style.width = "calc(" + (shown / (n - 1)).toFixed(4) + " * (100% - 18px))";
-      if (current >= 0) live.textContent = stepWord() + " " + (current + 1) + " " + ofWord() + " " + n + ": " + title(current);
+      if (current >= 0) live.textContent = "Step " + (current + 1) + " of " + n + ": " + title(current);
       if (opts.onStep) opts.onStep(current);
     }
 
     function setPlaying(p) {
       playing = p;
       playBtn.setAttribute("aria-pressed", p ? "true" : "false");
-      playBtn.setAttribute("aria-label", p ? (CV.t ? CV.t("ui.pause") : "Pause") : (CV.t ? CV.t("ui.play") : "Play"));
+      playBtn.setAttribute("aria-label", p ? "Pause" : "Play");
       if (!p && hold) { hold.kill(); hold = null; }
     }
 
@@ -188,7 +186,7 @@
     update();
 
     return {
-      goTo: goTo, play: play, pause: pause, restart: restart, refreshText: update,
+      goTo: goTo, play: play, pause: pause, restart: restart,
       get current() { return current; },
       /** Scroll to the first step and play the whole procedure (hero buttons). */
       watch: function () {

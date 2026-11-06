@@ -1,4 +1,4 @@
-/* CathLab Visual — types of plaque.
+/* Inside Your Heart — types of plaque.
    Left: a side view of the artery with the selected plaque; blood cells slow down as the opening narrows.
    Right: a slice through the narrowest point, drawn as tissue or as a schematic IVUS (ultrasound) image.
    CV.plaque(section) builds the scene and wires up the tabs and the Tissue / IVUS toggle. */
@@ -22,12 +22,12 @@
   };
   var ORDER = ["fibrous", "lipid", "calcific", "thrombotic"];
 
-  // Labels on the side view: [i18n key, English, label x, target x, target y, optional id]
+  // Labels on the side view: [text, label x, target x, target y, optional id]
   var LABELS = {
-    fibrous: [["plq.l.fib", "Tough, scar-like tissue", 170, 215, 190]],
-    lipid: [["plq.l.cap", "Thin cap", 150, 205, 204], ["plq.l.core", "Soft fatty core", 345, 275, 192]],
-    calcific: [["plq.l.ca", "Calcium, hard as bone", 170, 222, 190]],
-    thrombotic: [["plq.l.crack", "Cracked cap", 150, RUP - 1, 211], ["plq.l.clot", "Blood clot", 372, 300, 236, "plq-clot-lbl"]],
+    fibrous: [["Tough, scar-like tissue", 170, 215, 190]],
+    lipid: [["Thin cap", 150, 205, 204], ["Soft fatty core", 345, 275, 192]],
+    calcific: [["Calcium, hard as bone", 170, 222, 190]],
+    thrombotic: [["Cracked cap", 150, RUP - 1, 211], ["Blood clot", 372, 300, 236, "plq-clot-lbl"]],
   };
 
   /* ---------- geometry helpers ---------- */
@@ -160,10 +160,10 @@
 
   function labelMarkup(list) {
     return list.map(function (l) {
-      return "<g" + (l[5] ? ' id="' + l[5] + '"' : "") + ">" +
-        '<line x1="' + l[2] + '" y1="106" x2="' + n1(l[3]) + '" y2="' + n1(l[4]) + '" stroke="#f8fafc" stroke-opacity=".8" stroke-width="1.5"/>' +
-        circ(l[3], l[4], 3, 'fill="#f8fafc"') +
-        '<text class="svg-lbl" x="' + l[2] + '" y="98" text-anchor="middle" data-i18n="' + l[0] + '">' + l[1] + "</text></g>";
+      return "<g" + (l[4] ? ' id="' + l[4] + '"' : "") + ">" +
+        '<line x1="' + l[1] + '" y1="106" x2="' + n1(l[2]) + '" y2="' + n1(l[3]) + '" stroke="#f8fafc" stroke-opacity=".8" stroke-width="1.5"/>' +
+        circ(l[2], l[3], 3, 'fill="#f8fafc"') +
+        '<text class="svg-lbl" x="' + l[1] + '" y="98" text-anchor="middle">' + l[0] + "</text></g>";
     }).join("");
   }
 
@@ -353,8 +353,8 @@
       groups[k].push(lg, xg);
     });
     CV.html(xs,
-      '<text class="svg-lbl x-cap x-tissue" x="' + XC + '" y="' + (YC + RO + 34) + '" text-anchor="middle" data-i18n="plq.xsec">Cross-section</text>' +
-      '<text class="svg-lbl x-cap x-ivus" x="' + XC + '" y="' + (YC + RO + 34) + '" text-anchor="middle" data-i18n="plq.ivuscap">IVUS image (schematic)</text>');
+      '<text class="svg-lbl x-cap x-tissue" x="' + XC + '" y="' + (YC + RO + 34) + '" text-anchor="middle">Cross-section</text>' +
+      '<text class="svg-lbl x-cap x-ivus" x="' + XC + '" y="' + (YC + RO + 34) + '" text-anchor="middle">IVUS image (schematic)</text>');
 
     var clotEl = svg.querySelector("#plq-clot");
     var linked = [svg.querySelector("#plq-white"), svg.querySelector("#plq-clot-lbl")].concat([].slice.call(svg.querySelectorAll(".xclot")));

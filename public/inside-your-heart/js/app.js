@@ -1,5 +1,5 @@
-/* CathLab Visual — boot. Wires up the page: theme, nav, language, the CAD demo,
-   both procedure players, the before/after slider, FAQ accordion and the print summary. */
+/* Inside Your Heart — boot. Wires up the page: theme, nav, the CAD demo, the procedure
+   players, the before/after slider, FAQ accordion, print summary and installing as an app. */
 (function () {
   "use strict";
   var CV = window.CV;
@@ -44,6 +44,25 @@
   function closeMenu() { links.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); navState(); }
   window.addEventListener("scroll", navState, { passive: true });
   navState();
+
+  /* ---------- Back to top: shows after the hero; the gold ring fills as you read ---------- */
+  var toTop = $("#to-top"), arc = $("#to-top-arc");
+  function topState() {
+    var max = doc.documentElement.scrollHeight - window.innerHeight;
+    var p = max > 0 ? Math.min(1, window.scrollY / max) : 0, show = p > 0.06;
+    arc.style.strokeDashoffset = String(100 - p * 100);
+    if (show !== toTop.classList.contains("show")) {
+      toTop.classList.toggle("show", show);
+      toTop.tabIndex = show ? 0 : -1;
+    }
+  }
+  toTop.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: CV.reduced ? "auto" : "smooth" });
+    $(".app-name").focus({ preventScroll: true });
+  });
+  window.addEventListener("scroll", topState, { passive: true });
+  window.addEventListener("resize", topState);
+  topState();
   menuBtn.addEventListener("click", function () {
     var open = links.classList.toggle("open");
     menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
@@ -99,9 +118,9 @@
       '<circle cx="' + CX + '" cy="' + CY + '" r="' + RI + '" fill="url(#cad-xs-plq)"/>' +
       '<circle id="cad-lumen" cx="' + CX + '" cy="' + CY + '" r="' + RI + '" fill="#7f1d1d" stroke="#fef3c7" stroke-width="2"/>' +
       '<g id="cad-xs-cells" fill="#e3342f"><ellipse cx="0" cy="0" rx="7" ry="5"/><ellipse cx="-20" cy="14" rx="7" ry="5"/><ellipse cx="18" cy="-16" rx="7" ry="5"/><ellipse cx="22" cy="18" rx="7" ry="5"/><ellipse cx="-24" cy="-12" rx="7" ry="5"/></g>' +
-      '<text x="' + CX + '" y="356" text-anchor="middle" font-size="17" font-weight="700" fill="#e6eef7" font-family="Manrope, sans-serif"><tspan data-i18n="cad.open">Opening</tspan>: <tspan id="cad-open">100%</tspan></text>' +
-      '<text x="270" y="356" text-anchor="middle" font-size="15" font-weight="600" fill="#a3b5ca" font-family="Manrope, sans-serif" data-i18n="cad.side">Side view</text>' +
-      '<text x="' + CX + '" y="104" text-anchor="middle" font-size="15" font-weight="600" fill="#a3b5ca" font-family="Manrope, sans-serif" data-i18n="cad.cut">Cross-section</text>');
+      '<text x="' + CX + '" y="356" text-anchor="middle" font-size="17" font-weight="700" fill="#e6eef7" font-family="Manrope, sans-serif"><tspan>Opening</tspan>: <tspan id="cad-open">100%</tspan></text>' +
+      '<text x="270" y="356" text-anchor="middle" font-size="15" font-weight="600" fill="#a3b5ca" font-family="Manrope, sans-serif">Side view</text>' +
+      '<text x="' + CX + '" y="104" text-anchor="middle" font-size="15" font-weight="600" fill="#a3b5ca" font-family="Manrope, sans-serif">Cross-section</text>');
     var lumen = $("#cad-lumen"), cellsXS = $("#cad-xs-cells"), openTxt = $("#cad-open");
     var bar = $("#cad-flow-bar"), val = $("#cad-flow-val");
     var field = new CV.FlowField(art.cells, { x0: -10, x1: 520, edges: art.edges, count: 32, speed: 160, refW: 112, maxBoost: 2.4 });
@@ -191,7 +210,7 @@
     });
   }
 
-  /* ---------- Print summary: filled from the page so it follows the chosen language ---------- */
+  /* ---------- Print summary: filled from the page, so it always matches what is on screen ---------- */
   function fillPrint() {
     function list(target, items) {
       var el = $(target);
@@ -210,31 +229,57 @@
       return "<strong>" + esc($(".tl-mark", it).textContent) + " · " + esc($("h3", it).textContent) + "</strong>: " +
         $$("li", it).map(function (li) { return esc(li.textContent); }).join("; ");
     }));
-    list("#ps-warn", $$(".warn").map(function (w) {
+    list("#ps-warn", $$(".warn-grid .warn").map(function (w) {
       return "<strong>" + esc($("h3", w).textContent) + "</strong>: " + esc($("p", w).textContent);
     }));
   }
   window.addEventListener("beforeprint", fillPrint);
   $("#print-btn").addEventListener("click", function () { fillPrint(); window.print(); });
 
+  /* ---------- Install as an app (works offline) ---------- */
+  // sw.js saves the guide for offline use. Chrome, Edge and Android have their own install
+  // prompt, which the Install buttons open; Safari has none, so they show the steps instead.
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  }
+  var ua = navigator.userAgent, installPrompt = null;
+  var asApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  var ios = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var macSafari = !ios && /Macintosh/.test(ua) && /Safari\//.test(ua) && !/Chrome|Chromium|Edg|OPR|Firefox/.test(ua);
+  var STEPS = {
+    ios: '<li>Tap the Share button <svg class="step-icon" role="img" aria-label="(square with an arrow)"><use href="#i-share"/></svg> in the browser bar.</li>' +
+      "<li>Scroll down and tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong>.</li>",
+    mac: "<li>In the menu bar at the top of the screen, click <strong>File</strong>.</li><li>Choose <strong>Add to Dock</strong>, then click <strong>Add</strong>.</li>",
+    other: "<li>Open your browser\u2019s menu (<strong>\u22ee</strong> or <strong>\u2630</strong>).</li>" +
+      "<li>Choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li><li>Not there? Open this page in Chrome, Edge or Safari.</li>",
+  };
+  var installDlg = $("#install-dialog");
+  function showInstall(on) { $("#install-btn").hidden = !on; $("#app-cta").hidden = !on; }
+  if (!asApp && (ios || macSafari)) showInstall(true);
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    installPrompt = e;
+    if (!asApp) showInstall(true);
+  });
+  window.addEventListener("appinstalled", function () { installPrompt = null; showInstall(false); });
+  $$("[data-install]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (installPrompt) {
+        installPrompt.prompt();
+        installPrompt = null; // a prompt can be shown once; after "Cancel" the buttons show the steps
+        return;
+      }
+      $("#install-steps").innerHTML = STEPS[ios ? "ios" : macSafari ? "mac" : "other"];
+      if (installDlg.showModal) installDlg.showModal(); else installDlg.setAttribute("open", "");
+    });
+  });
+  installDlg.addEventListener("click", function (e) { if (e.target === installDlg) installDlg.close(); });
+
   /* ---------- Boot ---------- */
   initCAD();
   if (window.gsap && CV.plaque) CV.plaque($("#plaque"));
   initPlayers();
   CV.beforeAfter($("#compare"));
-
-  CV.i18n.harvest(doc);
-  var langSel = $("#lang");
-  function setLang(l) {
-    CV.i18n.apply(l);
-    langSel.value = CV.i18n.lang;
-    store("cv-lang", CV.i18n.lang);
-    Object.keys(players).forEach(function (k) { players[k].refreshText(); });
-    if (window.ScrollTrigger) ScrollTrigger.refresh();
-  }
-  langSel.addEventListener("change", function () { setLang(langSel.value); });
-  var saved = store("cv-lang");
-  if (saved && saved !== "en") setLang(saved);
 
   // Card heights change once the web font arrives; re-measure the scroll triggers.
   if (window.ScrollTrigger && doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { ScrollTrigger.refresh(); });

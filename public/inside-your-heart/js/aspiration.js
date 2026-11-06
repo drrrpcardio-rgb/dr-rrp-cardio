@@ -1,4 +1,4 @@
-/* CathLab Visual — thrombus aspiration in a heart attack.
+/* Inside Your Heart — thrombus aspiration in a heart attack.
    Same magnified side view as the angioplasty scene, but the artery is blocked by a clot on a cracked plaque.
      clot      a path rebuilt from T.amp (how far it reaches into the channel) and T.eat (everything
                upstream of this x has been sucked out), so the blood cells and the drawing always agree
@@ -29,7 +29,7 @@
     var svg = CV.el("svg", { viewBox: "0 0 800 450", id: "asp-svg", "aria-hidden": "true", focusable: "false" });
     canvas.appendChild(svg);
     canvas.insertAdjacentHTML("beforeend",
-      '<div class="stage-hud" aria-hidden="true"><span class="chip flow-meter"><span data-i18n="ui.flow">Blood flow</span> <span class="bar"><i id="asp-flow-bar"></i></span> <b id="asp-flow-val">0%</b></span></div>');
+      '<div class="stage-hud" aria-hidden="true"><span class="chip flow-meter"><span>Blood flow</span> <span class="bar"><i id="asp-flow-bar"></i></span> <b id="asp-flow-val">0%</b></span></div>');
     CV.tissue(svg, 800, 450);
     CV.html(svg, '<defs><pattern id="asp-clot" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#8f1d1d"/>' +
       '<path d="M0 9 L14 4 M-2 2 L6 0 M5 14 L14 10" stroke="#fca5a5" stroke-opacity=".45" stroke-width="1"/>' +
@@ -86,13 +86,13 @@
         '<circle cx="432" cy="' + WY + '" r="50" fill="none" stroke="#f87171" stroke-width="3"/>' +
         '<line x1="432" y1="188" x2="432" y2="124" stroke="#f87171" stroke-width="2.5"/>' +
         '<rect x="302" y="84" width="260" height="40" rx="20" fill="#dc2626"/>' +
-        '<text x="432" y="110" text-anchor="middle" class="svg-lbl" font-size="17" fill="#fff" stroke="none" data-i18n="asp.blocked">Blocked by a clot</text>' +
+        '<text x="432" y="110" text-anchor="middle" class="svg-lbl" font-size="17" fill="#fff" stroke="none">Blocked by a clot</text>' +
       "</g>" +
       '<g id="a2-removed" opacity="0"><rect x="' + (LX - 100) + '" y="84" width="200" height="40" rx="20" fill="#f8fafc"/>' +
-        '<text x="' + LX + '" y="110" text-anchor="middle" class="svg-lbl" font-size="17" fill="#0a1233" stroke="none" data-i18n="asp.removed">Clot removed</text></g>' +
+        '<text x="' + LX + '" y="110" text-anchor="middle" class="svg-lbl" font-size="17" fill="#0a1233" stroke="none">Clot removed</text></g>' +
       '<g id="a2-ok" opacity="0"><rect x="' + (LX - 110) + '" y="84" width="220" height="40" rx="20" fill="#14b8a6"/>' +
         '<path d="M' + (LX - 94) + ' 104 l7 7 l13 -14" fill="none" stroke="#0a1233" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<text x="' + (LX + 12) + '" y="110" text-anchor="middle" class="svg-lbl" font-size="17" fill="#0a1233" stroke="none" data-i18n="pci.restored">Blood flow restored</text></g>');
+        '<text x="' + (LX + 12) + '" y="110" text-anchor="middle" class="svg-lbl" font-size="17" fill="#0a1233" stroke="none">Blood flow restored</text></g>');
 
     // Bottom-right panel: ECG, suction syringe, filter
     var beat = function (x) {
@@ -101,11 +101,11 @@
     };
     CV.html(svg,
       '<g id="a2-ecg" opacity="0"><rect x="586" y="300" width="196" height="132" rx="12" fill="#04130f" stroke="#134e4a" stroke-width="2"/>' +
-        '<text x="600" y="324" class="svg-lbl" font-size="13" fill="#6ee7b7" stroke="none" data-i18n="asp.ecg">ECG: ST elevation</text>' +
+        '<text x="600" y="324" class="svg-lbl" font-size="13" fill="#6ee7b7" stroke="none">ECG: ST elevation</text>' +
         '<path class="ecg-sweep" pathLength="100" d="M596 380' + beat(604) + beat(654) + beat(704) + " L770 380" + '" fill="none" stroke="#34d399" stroke-width="2" stroke-linejoin="round"/>' +
         '<text x="600" y="420" font-size="11" font-weight="700" fill="#34d399" font-family="ui-monospace, Consolas, monospace">HR 98</text></g>' +
       '<g id="a2-syr" opacity="0"><rect x="586" y="300" width="196" height="132" rx="12" fill="#0f172a" stroke="#334155" stroke-width="2"/>' +
-        '<text x="600" y="324" class="svg-lbl" font-size="13" fill="#e2e8f0" stroke="none" data-i18n="asp.syr">Suction syringe</text>' +
+        '<text x="600" y="324" class="svg-lbl" font-size="13" fill="#e2e8f0" stroke="none">Suction syringe</text>' +
         '<line x1="596" y1="366" x2="616" y2="366" stroke="#94a3b8" stroke-width="3"/>' +
         '<line id="a2-tube" x1="596" y1="366" x2="616" y2="366" stroke="#b91c1c" stroke-width="3" opacity="0"/>' +
         '<rect x="616" y="361" width="12" height="10" rx="2" fill="#cbd5e1"/>' +
@@ -113,9 +113,9 @@
         '<rect x="626" y="350" width="94" height="32" rx="4" fill="#e2e8f0" fill-opacity=".14" stroke="#cbd5e1" stroke-width="1.5"/>' +
         '<g stroke="#cbd5e1" stroke-width="1" opacity=".7"><line x1="646" y1="350" x2="646" y2="357"/><line x1="666" y1="350" x2="666" y2="357"/><line x1="686" y1="350" x2="686" y2="357"/><line x1="706" y1="350" x2="706" y2="357"/></g>' +
         '<g id="a2-plunger"><rect x="629" y="352" width="7" height="28" rx="1.5" fill="#334155"/><line x1="636" y1="366" x2="726" y2="366" stroke="#94a3b8" stroke-width="4"/><rect x="724" y="348" width="6" height="36" rx="2" fill="#94a3b8"/></g>' +
-        '<text id="a2-vac" x="600" y="414" class="svg-lbl" font-size="12" fill="#fca5a5" stroke="none" opacity="0" data-i18n="asp.vac">Suction on</text></g>' +
+        '<text id="a2-vac" x="600" y="414" class="svg-lbl" font-size="12" fill="#fca5a5" stroke="none" opacity="0">Suction on</text></g>' +
       '<g id="a2-filter" opacity="0"><rect x="586" y="300" width="196" height="132" rx="12" fill="#0f172a" stroke="#334155" stroke-width="2"/>' +
-        '<text x="600" y="324" class="svg-lbl" font-size="13" fill="#e2e8f0" stroke="none" data-i18n="asp.filter">Clot caught in the filter</text>' +
+        '<text x="600" y="324" class="svg-lbl" font-size="13" fill="#e2e8f0" stroke="none">Clot caught in the filter</text>' +
         '<path d="M636 340 L732 340 L716 414 L652 414 Z" fill="url(#asp-mesh)" stroke="#cbd5e1" stroke-width="1.5"/>' +
         '<g fill="url(#asp-clot)" stroke="#6b1414" stroke-width="1">' +
           '<path d="M660 396 C664 384 680 384 686 392 C692 400 680 408 670 406 C662 405 658 402 660 396 Z"/>' +

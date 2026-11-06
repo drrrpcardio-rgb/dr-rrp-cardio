@@ -57,16 +57,21 @@ export const simulators = [
 ] as const;
 
 /**
- * CathLab Visual: the animated patient guide to angiogram and angioplasty (prebuilt static app in
- * /public/cathlab-visual). Listed apart from the simulators, on /simulators and /cath-lab.
+ * Inside Your Heart: the animated patient guide to angiogram and angioplasty (prebuilt static app in
+ * /public/inside-your-heart). Listed apart from the simulators, on /simulators and /cath-lab.
  */
-export const cathLabVisual = {
-  title: "CathLab Visual",
+export const insideYourHeart = {
+  title: "Inside Your Heart",
   tag: "Patient guide",
   text: "An animated, step-by-step guide to coronary angiogram and angioplasty in plain language, with types of plaque, clot removal in a heart attack, recovery and common questions. Students can open the clinical notes at every step.",
-  href: "/cathlab-visual/",
-  image: "/images/sim-cathlab-visual.jpg",
-  points: ["Angiogram and angioplasty, step by step", "Plaque types with IVUS views", "English, Tamil and Hindi"],
+  href: "/inside-your-heart/",
+  image: "/images/sim-inside-your-heart.jpg",
+  points: [
+    "Angiogram and angioplasty, step by step",
+    "Plaque types with IVUS views",
+    "Printable patient summary",
+    "Install on your phone or computer, works offline",
+  ],
 };
 
 /** The two free interactive tools hosted under this site (prebuilt static apps in /public). */

@@ -1,4 +1,4 @@
-/* CathLab Visual — angioplasty (PCI) scene and the before/after slider.
+/* Inside Your Heart — angioplasty (PCI) scene and the before/after slider.
    A magnified side view of a coronary artery with an eccentric plaque (about 85% narrowing).
    Devices are plain SVG groups moved with GSAP:
      wire      stroke-dashoffset draws it across the lesion
@@ -73,7 +73,7 @@
     var svg = CV.el("svg", { viewBox: "0 0 800 450", id: "pci-svg", "aria-hidden": "true", focusable: "false" });
     canvas.appendChild(svg);
     canvas.insertAdjacentHTML("beforeend",
-      '<div class="stage-hud" aria-hidden="true"><span class="chip flow-meter"><span data-i18n="ui.flow">Blood flow</span> <span class="bar"><i id="pci-flow-bar"></i></span> <b id="pci-flow-val">30%</b></span></div>');
+      '<div class="stage-hud" aria-hidden="true"><span class="chip flow-meter"><span>Blood flow</span> <span class="bar"><i id="pci-flow-bar"></i></span> <b id="pci-flow-val">30%</b></span></div>');
     tissue(svg, 800, 450);
 
     var LX = 420, CY = 225;
@@ -103,12 +103,12 @@
         '<circle cx="' + LX + '" cy="238" r="46" fill="none" stroke="#f59e0b" stroke-width="3"/>' +
         '<line x1="' + LX + '" y1="192" x2="' + LX + '" y2="122" stroke="#f59e0b" stroke-width="2.5"/>' +
         '<rect x="' + (LX - 120) + '" y="84" width="240" height="40" rx="20" fill="#f59e0b"/>' +
-        '<text x="' + LX + '" y="110" text-anchor="middle" font-size="17" font-weight="800" fill="#0a1233" font-family="Manrope, sans-serif" data-i18n="pci.narrow">Narrowing, about 85%</text>' +
+        '<text x="' + LX + '" y="110" text-anchor="middle" font-size="17" font-weight="800" fill="#0a1233" font-family="Manrope, sans-serif">Narrowing, about 85%</text>' +
       '</g>' +
       '<g id="p-ok" opacity="0">' +
         '<rect x="' + (LX - 110) + '" y="84" width="220" height="40" rx="20" fill="#14b8a6"/>' +
         '<path d="M' + (LX - 88) + ' 104 l7 7 l13 -14" fill="none" stroke="#0a1233" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<text x="' + (LX + 10) + '" y="110" text-anchor="middle" font-size="17" font-weight="800" fill="#0a1233" font-family="Manrope, sans-serif" data-i18n="pci.restored">Blood flow restored</text>' +
+        '<text x="' + (LX + 10) + '" y="110" text-anchor="middle" font-size="17" font-weight="800" fill="#0a1233" font-family="Manrope, sans-serif">Blood flow restored</text>' +
       '</g>');
     // Mini angiogram thumbnail for step 1
     CV.html(svg,

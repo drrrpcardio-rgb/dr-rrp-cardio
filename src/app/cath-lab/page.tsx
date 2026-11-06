@@ -3,7 +3,7 @@ import { Activity, Boxes, ListChecks } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal, StaggerGroup } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
-import { CathLabVisualCard, CourseCrossLink, ToolFrame } from "@/components/ui/ToolShowcase";
+import { InsideYourHeartCard, CourseCrossLink, ToolFrame } from "@/components/ui/ToolShowcase";
 import { brand } from "@/lib/site-data";
 import { cathLabTools } from "@/lib/tools-data";
 
@@ -74,7 +74,7 @@ export default function CathLabPage() {
             <p className="mx-auto mt-2 max-w-2xl text-center text-sm leading-relaxed text-mist-700">
               What happens during an angiogram and an angioplasty, shown step by step in plain language.
             </p>
-            <CathLabVisualCard className="mt-8" />
+            <InsideYourHeartCard className="mt-8" />
           </div>
         </Reveal>
 

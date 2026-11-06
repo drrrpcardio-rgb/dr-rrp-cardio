@@ -2,15 +2,15 @@ import Image from "next/image";
 import { ArrowRight, Check, ExternalLink, GraduationCap } from "lucide-react";
 import { Reveal } from "./Reveal";
 import { Button } from "./Button";
-import { cathLabVisual } from "@/lib/tools-data";
+import { insideYourHeart } from "@/lib/tools-data";
 import { cn } from "@/lib/utils";
 
 /**
- * Wide card for CathLab Visual, the patient guide. A plain <a>, not <Link>, because the guide is a
+ * Wide card for Inside Your Heart, the patient guide. A plain <a>, not <Link>, because the guide is a
  * static app in /public rather than an app route.
  */
-export function CathLabVisualCard({ className, headingAs: Heading = "h3" }: { className?: string; headingAs?: "h2" | "h3" }) {
-  const g = cathLabVisual;
+export function InsideYourHeartCard({ className, headingAs: Heading = "h3" }: { className?: string; headingAs?: "h2" | "h3" }) {
+  const g = insideYourHeart;
   return (
     <a
       href={g.href}

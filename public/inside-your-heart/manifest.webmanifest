@@ -1,0 +1,25 @@
+{
+  "id": "/inside-your-heart/",
+  "name": "Inside Your Heart: Angiogram & Angioplasty Guide",
+  "short_name": "Heart Guide",
+  "description": "Animated, step-by-step guide to coronary angiogram and angioplasty for patients, families and students, from Dr. RRP Cardio. Works offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a1233",
+  "theme_color": "#0a1233",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["health", "medical", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    { "src": "icons/screenshot-wide.jpg", "sizes": "1280x800", "type": "image/jpeg", "form_factor": "wide", "label": "The guide on a computer" },
+    { "src": "icons/screenshot-narrow.jpg", "sizes": "824x1830", "type": "image/jpeg", "form_factor": "narrow", "label": "The guide on a phone" }
+  ]
+}

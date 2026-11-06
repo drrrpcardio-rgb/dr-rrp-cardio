@@ -1,4 +1,4 @@
-/* CathLab Visual — angiogram scene.
+/* Inside Your Heart — angiogram scene.
    Three stacked SVG layers in one 800×500 stage:
      body   top-down view of the patient on the table; its viewBox is the "camera" (zooms to wrist/groin/chest)
      heart  close-up of the heart: catheter in the left main, dye filling the arteries, X-ray look, blockage marker
@@ -161,11 +161,11 @@
           '<g id="a-press-femoral" opacity="0" fill="#e5b48f" stroke="#c98f6a" stroke-width="2">' +
             '<rect x="512" y="10" width="34" height="118" rx="17"/><rect x="550" y="0" width="34" height="128" rx="17"/><rect x="588" y="14" width="34" height="114" rx="17"/>' +
           '</g>' +
-          '<text x="520" y="147" text-anchor="middle" font-size="14" font-weight="700" fill="#7c2d12" font-family="Manrope, sans-serif" data-i18n="angio.skin">Skin</text>' +
-          '<text x="700" y="358" text-anchor="end" font-size="14" font-weight="700" fill="#7f1d1d" font-family="Manrope, sans-serif" data-i18n="angio.artery">Artery</text>' +
+          '<text x="520" y="147" text-anchor="middle" font-size="14" font-weight="700" fill="#7c2d12" font-family="Manrope, sans-serif">Skin</text>' +
+          '<text x="700" y="358" text-anchor="end" font-size="14" font-weight="700" fill="#7f1d1d" font-family="Manrope, sans-serif">Artery</text>' +
         '</g>' +
         '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#f5c542" stroke-width="3"/>' +
-        '<text x="' + cx + '" y="' + (cy - r - 12) + '" text-anchor="middle" font-size="15" font-weight="700" fill="#e6eef7" font-family="Manrope, sans-serif" data-i18n="angio.closeup">Close-up under the skin</text>' +
+        '<text x="' + cx + '" y="' + (cy - r - 12) + '" text-anchor="middle" font-size="15" font-weight="700" fill="#e6eef7" font-family="Manrope, sans-serif">Close-up under the skin</text>' +
       '</g>';
   }
 
@@ -227,7 +227,7 @@
         '<circle cx="475.5" cy="331" r="18" fill="none" stroke="#f59e0b" stroke-width="3"/>' +
         '<path d="M492 322 L560 292" stroke="#f59e0b" stroke-width="2.5"/>' +
         '<rect x="556" y="270" width="190" height="40" rx="20" fill="#f59e0b"/>' +
-        '<text x="651" y="296" text-anchor="middle" font-size="17" font-weight="800" fill="#0a1233" font-family="Manrope, sans-serif" data-i18n="angio.blockage">Blockage, about 85%</text>' +
+        '<text x="651" y="296" text-anchor="middle" font-size="17" font-weight="800" fill="#0a1233" font-family="Manrope, sans-serif">Blockage, about 85%</text>' +
       '</g>';
   }
 
