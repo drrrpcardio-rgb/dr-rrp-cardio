@@ -140,10 +140,20 @@
   const E_LA = ell([7, 18, 26], [32, 17, 19]);
   const E_LAA = ell([33, -6, 34], [12, 7, 8]);
   const T_MV = tube([H2W(4, 0, 0), [7, 18, 26]], 15);
+  // pulmonary veins: wide where they join the atrium (the antrum), narrowing out to the hilum where the lung veins start
+  const pvTube = (a, b) => Object.assign(tube([a, b], 8), { r1: 3.9 });
   const T_PVS = [
-    tube([[-15, 22, 30], [-55, 30, 38]], 7), tube([[-15, 26, 16], [-55, 40, 10]], 7),
-    tube([[28, 20, 32], [62, 35, 40]], 7), tube([[28, 26, 16], [62, 45, 10]], 7),
+    pvTube([-15, 22, 30], [-55, 30, 38]), pvTube([-15, 26, 16], [-55, 40, 10]),
+    pvTube([28, 20, 32], [62, 35, 40]), pvTube([28, 26, 16], [62, 45, 10]),
   ];
+  function pvD(t, x, y, z) {
+    const b = t.bb;
+    if (x < b[0] || x > b[1] || y < b[2] || y > b[3] || z < b[4] || z > b[5]) return 1e9;
+    const g = t.segs[0], px = x - g[0], py = y - g[1], pz = z - g[2];
+    let h = (px * g[3] + py * g[4] + pz * g[5]) / g[6];
+    h = h < 0 ? 0 : h > 1 ? 1 : h;
+    return hyp(px - g[3] * h, py - g[4] * h, pz - g[5] * h) - (t.r + (t.r1 - t.r) * Math.sqrt(h));
+  }
   const E_RA = ell([-40, 6, 14], [18, 20, 22]);
   const T_TV = tube([H2W(-4, 24, -4), [-40, 6, 14]], 14);
   const T_SVC = tube([[-38, 6, 30], [-33, 6, 45], [-31, 7, 72]], 10);
@@ -192,11 +202,13 @@
   }
 
   // ───────────────────────── base scene ─────────────────────────
-  let OH = 0, OT = 0, OM = 0, SDH = 1e9, SDV = 1e9; // OM: contrast-mixing code, written to the partial-volume array
+  let OH = 0, OT = 0, OM = 0, SDH = 1e9, SD2 = 1e9, SDV = 1e9; // OM: contrast-mixing code, written to the partial-volume array
   const put = (h, t) => { OH = h; OT = t; return true; };
+  // nearest and second-nearest chamber surface: where both are close, the point lies in a groove between chambers
+  const sdh = (d) => { if (d < SDH) { SD2 = SDH; SDH = d; } else if (d < SD2) SD2 = d; };
 
   function heartScene(x, y, z) {
-    SDH = 1e9; SDV = 1e9;
+    SDH = 1e9; SD2 = 1e9; SDV = 1e9;
     if (x < -85 || x > 105 || y < -90 || y > 82 || z < -95 || z > 80) return false;
     let d, wall = false;
     const dRoot = rootD(x, y, z);
@@ -208,7 +220,7 @@
     d = tubeD(T_SVC, x, y, z); if (d < SDV) SDV = d; if (d < 0) return put(44, tg(L_BODY, C_SVC));
     d = tubeD(T_IVC, x, y, z); if (d < SDV) SDV = d; if (d < 0) return put(40, tg(L_BODY, 0));
     // (the fat sleeve stops at the hilum: out in the lung the vessels carry on as the stamped lung trees)
-    for (let i = 0; i < 4; i++) { d = tubeD(T_PVS[i], x, y, z); if (d < SDV && Math.abs(x) < 40) SDV = d; if (d < 0) return put(44, tg(L_HEART, C_LEFT)); }
+    for (let i = 0; i < 4; i++) { d = pvD(T_PVS[i], x, y, z); if (d < SDV && Math.abs(x) < 40) SDV = d; if (d < 0) return put(44, tg(L_HEART, C_LEFT)); }
 
     const px = x - B[0], py = y - B[1], pz = z - B[2];
     const a = px * e1[0] + py * e1[1] + pz * e1[2];
@@ -216,10 +228,11 @@
     const c3 = px * e3[0] + py * e3[1] + pz * e3[2];
     const rho = hyp(c2, c3);
     // left ventricle
-    if (a > -8 && a < HL + 14) {
+    if (a > -18 && a < HL + 14) {
       const re = Repi(a < 0 ? 0 : a);
-      const sdl = a < 0 ? Math.max(-a, rho - re) : a > HL ? hyp(a - HL, rho) : rho - re;
-      if (sdl < SDH) SDH = sdl;
+      // behind the base the distance rounds off the rim, so the fat around it has no flat edge
+      const sdl = a < 0 ? (rho > re ? hyp(a, rho - re) : Math.max(-a, rho - re)) : a > HL ? hyp(a - HL, rho) : rho - re;
+      sdh(sdl);
       if (a >= 0 && a <= HL && rho < re) {
         const rn = Rendo(a);
         if (a <= HLc && rho < rn) {
@@ -227,11 +240,12 @@
             const pr = 0.58 * rn, w = 4.6 * (1 - Math.abs(a - 40) / 30);
             for (let k = 0; k < 2; k++) if (hyp(c2 - pr * PAP[k][0], c3 - pr * PAP[k][1]) < w) return put(40, tg(L_HEART, C_MYO));
           }
-          // trabeculae: irregular, run base to apex, thicker toward the apex
-          if (a > 32 && rho > rn - 3.4) {
-            const s = Math.atan2(c3, c2) * rn;
-            const n = vnoise(a * 0.15, s * 0.5, rho * 0.35);
-            if (n > 0.1 + (rn - rho) * 0.17 - (a - 32) * 0.004) return put(40, tg(L_HEART, C_MYO));
+          // trabeculae: an irregular fringe of muscle bundles, running base to apex, deeper toward the apex
+          const dep = 2 + 2.6 * sstep(36, 72, a);
+          if (a > 30 && rho > rn - dep) {
+            const s = Math.atan2(c3, c2) * rn, wq = 2.4 * vnoise(a * 0.08 + 1.3, s * 0.08, 4.4);
+            const n = vnoise(a * 0.12 + 0.25 * wq, (s + wq) * 0.3, rho * 0.3) + 0.4 * vnoise(a * 0.3, s * 0.7 + 3.3, rho * 0.6);
+            if (n > 0.12 + ((rn - rho) / dep) * 0.6 - (a - 30) * 0.004) return put(40, tg(L_HEART, C_MYO));
           }
           if (mitralLeaf(a, c2, c3)) return put(60, tg(L_HEART, 0));
           return put(43, tg(L_HEART, C_LEFT));
@@ -245,9 +259,9 @@
     d = tubeD(T_LPA, x, y, z); if (d < SDV && x < 38) SDV = d; if (d < 0) return put(44, tg(L_HEART, C_RIGHT));
     d = tubeD(T_RPA, x, y, z); if (d < SDV && x > -36) SDV = d; if (d < 0) return put(44, tg(L_HEART, C_RIGHT));
     // right ventricle
-    if (a > -16 && a < 72) {
+    if (a > -18 && a < 84) {
       const q = rvQ(a, c2, c3, 0), sdr = (Math.sqrt(q) - 1) * 30;
-      if (sdr < SDH) SDH = sdr;
+      sdh(sdr);
       if (q < 1 && (a >= 0 ? rho >= Repi(a) : c2 > 6)) {
         if (rvQ(a, c2, c3, 3.5) < 1) {
           if (a > 18 && rvQ(a, c2, c3, 7) > 1 && vnoise(a * 0.13, c3 * 0.42, c2 * 0.42) > 0.12 + (a < 30 ? (30 - a) * 0.04 : 0)) return put(40, tg(L_HEART, C_MYO));
@@ -259,13 +273,21 @@
     d = tubeD(T_MV, x, y, z); if (d < 0) return put(43, tg(L_HEART, C_LEFT));
     d = tubeD(T_TV, x, y, z); if (d < 0) return put(43, tg(L_HEART, C_RIGHT));
     // atria
-    d = ellD(E_LA, x, y, z); if (d < SDH) SDH = d; if (d < 0) return put(43, tg(L_HEART, C_LEFT)); if (d < 2) return put(40, tg(L_HEART, C_MYO));
+    d = ellD(E_LA, x, y, z); sdh(d); if (d < 0) return put(43, tg(L_HEART, C_LEFT)); if (d < 2) return put(40, tg(L_HEART, C_MYO));
     d = ellD(E_LAA, x, y, z);
     if (d < 6) d += 2.6 * vnoise(x * 0.16, y * 0.16, z * 0.16); // lobulated appendage
-    if (d < SDH) SDH = d;
-    if (d < 0) return d > -4.5 && vnoise(x * 0.55 + 9, y * 0.55, z * 0.55) > 0.3 ? put(40, tg(L_HEART, C_MYO)) : put(43, tg(L_HEART, C_LEFT)); // pectinate muscles
+    sdh(d);
+    if (d < 0) {
+      // pectinate muscles: parallel ridges on the inner wall, like the teeth of a comb (on the front wall; the back is smooth)
+      if (d > -2) {
+        const w = 1.4 * vnoise(x * 0.18 + 4.1, y * 0.18, z * 0.18);
+        const rg = (0.5 + 0.5 * Math.cos((x - 33 + 0.55 * (z - 34) + w) * 1.4)) ** 4 * sstep(1, -4, y + 6);
+        if (d > -(0.3 + 1.6 * rg)) return put(40, tg(L_HEART, C_MYO));
+      }
+      return put(43, tg(L_HEART, C_LEFT));
+    }
     if (d < 1.6) return put(40, tg(L_HEART, C_MYO));
-    d = ellD(E_RA, x, y, z); if (d < SDH) SDH = d; if (d < 0) { OM = raMix(x, y, z); return put(43, tg(L_HEART, C_RIGHT)); } if (d < 2) return put(40, tg(L_HEART, C_MYO));
+    d = ellD(E_RA, x, y, z); sdh(d); if (d < 0) { OM = raMix(x, y, z); return put(43, tg(L_HEART, C_RIGHT)); } if (d < 2) return put(40, tg(L_HEART, C_MYO));
     // oesophagus and airways sit behind the left atrium; the atrium wins where they would overlap
     d = tubeD(T_ESO, x, y, z); if (d < SDV) SDV = d; if (d < 0) return put(z > -40 && d < -5.4 ? -960 : 38, tg(L_BODY, 0));
     for (let i = 0; i < 3; i++) { d = tubeD(T_AIR[i], x, y, z); if (d < SDV) SDV = d; if (d < 0) return put(d < -1.8 ? -990 : 50, tg(L_BODY, 0)); }
@@ -290,14 +312,14 @@
   function chestWall(x, y, z, dOut) {
     // sternum: flat bone with a cortex; the manubrium higher up is wider
     {
-      const sw = 15 + 7 * sstep(30, 48, z), u = x / sw, v = (y + 87) / 6.5, q = u * u + v * v;
-      if (q < 1) return put(q > 0.8 ? 720 : marrow(x, y, z, 300), tg(L_BONE, 0));
+      const sw = 15 + 7 * sstep(30, 48, z) - 6 * sstep(92, 106, z), u = x / sw, v = (y + 87) / 6.5, q = u * u + v * v;
+      if (q < 1 && z < 106) return put(q > 0.8 ? 720 : marrow(x, y, z, 300), tg(L_BONE, 0));
     }
     const ph = Math.atan2(y - 8, x);
-    if (dOut < 12) {
-      // ribs run obliquely, so each one is cut as an oval with a bright cortex and marrow inside;
-      // in front they become costal cartilage
-      const f = frac((z + 22 * Math.sin(ph) + 6) / 25);
+    if (dOut < 12 && z < 132) {
+      // ribs run obliquely (each one falls from the spine round to the front), so each is cut as an oval with a bright
+      // cortex and marrow inside; in front they become costal cartilage
+      const f = frac((z - 22 * Math.sin(ph) + 6) / 25);
       const zr = (f - 0.15) / 0.15, rr = (dOut - 5.6) / 3.2, q = zr * zr + rr * rr;
       if (q < 1) {
         if (y < -50 && Math.abs(x) < 62) return put(q > 0.78 ? 165 : 112, tg(L_BODY, 0));
@@ -308,7 +330,7 @@
     }
     // scapula: a thin curved plate behind the posterolateral ribs, ending at the inferior angle
     const pa = Math.atan2(y - 8, Math.abs(x)) / DEG;
-    const half = 19 * sstep(-38, -8, z);
+    const half = 19 * sstep(-38, -8, z) * (1 - sstep(118, 136, z));
     if (half > 0.5) {
       const dp = Math.abs(dOut - 19.5), da = Math.abs(pa - 44);
       if (da < half) {
@@ -389,8 +411,16 @@
     // superior mediastinum (around the great vessels), posterior mediastinum, retrosternal fat
     const ws = sstep(18, 34, z);
     if (ws > 0) { const u = (x + 8) / (24 + 14 * ws), v = (y + 14) / 62; if (u * u + v * v < ws) return true; }
-    { const u = (x - 14) / 26, v = (y - 50) / 24; if (z > -46 && u * u + v * v < 1) return true; }
-    { const u = (x - 2) / 30, v = (y + 74) / 12; if (z > -20 && u * u + v * v < 1) return true; }
+    // (the outlines drift and swell with height, so their edges are not straight lines on coronal and sagittal views)
+    if (z > -46) {
+      const w1 = vnoise(z * 0.035 + 3.7, 1.1, 2.3), w2 = vnoise(z * 0.05 + 0.4, 4.4, 0.7);
+      const u = (x - 13 - 4 * w1) / (21 + 5 * w2), v = (y - 52 - 3 * w2) / 21;
+      if (u * u + v * v < 1) return true;
+    }
+    {
+      const t = sstep(-32, -12, z);
+      if (t > 0) { const u = (x - 2 - 5 * vnoise(z * 0.04, 2.2, 5.1)) / (30 * t), v = (y + 74) / (12 * Math.sqrt(t)); if (u * u + v * v < 1) return true; }
+    }
     return false;
   }
 
@@ -409,11 +439,117 @@
     if (heartScene(x, y, z)) return true;
     const zd = diaphragmZ(x, y);
     if (z < zd) return abdomen(x, y, z, zd);
-    if (SDH < 7.4) return SDH > 6.5 ? put(32, tg(L_BODY, 0)) : put(-95, tg(L_FAT, 0));
+    // Epicardial fat and the pericardium. The sac is a smooth union of the chambers, so it bridges the grooves, where
+    // the fat is thickest (around the coronary arteries); elsewhere the fat varies from about 4 to 7 mm.
+    if (SDH < 14) {
+      const hb = Math.max(14 - Math.abs(SDH - SD2), 0) / 14, dp = SDH - hb * hb * 3.5;
+      const T = 5.4 + 1.5 * vnoise(x * 0.045 + 2.1, y * 0.045, z * 0.045) + 0.9 * vnoise(x * 0.11, y * 0.11 + 5.3, z * 0.11);
+      if (dp < T + 0.9) return dp > T ? put(32, tg(L_BODY, 0)) : put(-95, tg(L_FAT, 0));
+    }
     if (SDV < 4.5 || mediast(x, y, z)) return put(-92, tg(L_BODY, 0));
-    if (z < zd + 4) return put(45, tg(L_BODY, 0));
     // dependent (posterior) lung is denser; faint parenchymal texture
-    return put(Math.round(-884 + 0.3 * (y + 40) + 14 * vnoise(x * 0.22, y * 0.22, z * 0.22)), tg(L_LUNG, 0));
+    const lung = -884 + 0.3 * (y + 40) + 14 * vnoise(x * 0.22, y * 0.22, z * 0.22);
+    // The domes lie almost flat, so a plain in/out test would leave stair steps on coronal and sagittal views: within
+    // half a voxel of the surface (measured along its normal) the value ramps from muscle to lung.
+    const dm = zd + 4 - z;
+    if (dm > -1.3) {
+      const gx = diaphragmZ(x + 1, y) - diaphragmZ(x - 1, y), gy = diaphragmZ(x, y + 1) - diaphragmZ(x, y - 1);
+      const dn = dm / Math.sqrt(1 + 0.25 * (gx * gx + gy * gy));
+      if (dn > 0.45) return put(45, tg(L_BODY, 0));
+      if (dn > -0.45) { const f = 0.5 + dn / 0.9; return put(Math.round(lung + (45 - lung) * f), f > 0.5 ? tg(L_BODY, 0) : tg(L_LUNG, 0)); }
+    }
+    return put(Math.round(lung), tg(L_LUNG, 0));
+  }
+
+  // ───────────────────────── topogram anatomy ─────────────────────────
+  // The topogram shows the whole chest, from the base of the neck to the upper abdomen: far more than the CT volume.
+  // Above the volume the anatomy is finished here: the thoracic inlet narrowing to the first ribs, the lung apices,
+  // the aortic arch and its branches, trachea and oesophagus, the clavicles and the shoulders. Below it the scene carries
+  // on into the abdomen, with the ribs ending at the costal margin. (Nothing here reaches the CT volume.)
+  const TOPO_X0 = -180, TOPO_X1 = 180, TOPO_Z0 = -150, TOPO_Z1 = 170, TOPO_SP = 2;
+  const TOPO_NC = Math.round((TOPO_X1 - TOPO_X0) / TOPO_SP), TOPO_NR = Math.round((TOPO_Z1 - TOPO_Z0) / TOPO_SP);
+  const T_ARCH = tube([[-18, -21, 70], [-15, -12, 83], [-5, 5, 91], [10, 28, 89], [21, 47, 81], [26, 58, 70]], 13.5);
+  const T_BRANCH = [
+    tube([[-9, -3, 88], [-16, -10, 118], [-22, -6, 172]], 6.5), tube([[1, 6, 92], [-3, 2, 172]], 4.5), tube([[11, 18, 91], [26, 24, 116], [52, 18, 130]], 5), // arteries
+    tube([[-30, 6, 70], [-31, 6, 90], [-42, -8, 124], [-50, -4, 172]], 8.5), tube([[-28, -2, 92], [8, -30, 104], [40, -20, 124], [52, -4, 172]], 6), // veins
+  ];
+  const T_TRACH = tube([[0, 32, 50], [0, 30, 110], [0, 22, 176]], 9), T_OES2 = tube([[6, 44, 60], [3, 38, 120], [1, 34, 176]], 7);
+  const T_CLAV = [-1, 1].map((s) => tube([[s * 20, -82, 106], [s * 58, -72, 111], [s * 100, -52, 122], [s * 136, -30, 136]], 6));
+  // transverse colon across the upper abdomen, rising to the splenic flexure under the left dome
+  const T_COLON = tube([[-95, -10, -132], [-50, -40, -124], [0, -50, -128], [50, -36, -116], [78, -4, -98], [82, 18, -82]], 15);
+  // half-width of the rib cage above the CT volume: a dome narrowing to the first ribs at the thoracic inlet
+  const cageW = (z) => (z <= 40 ? 135 : 63 + 72 * Math.sqrt(Math.max(0, 1 - ((z - 40) / 90) ** 2)));
+  function upperChest(x, y, z) {
+    // outline: the shoulders slope down from the neck, and the trunk thins front to back toward the neck
+    const ax = Math.abs(x), tn = sstep(110, 160, z);
+    if (ax > 60 && z > 172 - 0.42 * (ax - 60)) return -1000;
+    const wf = sstep(18, 55, ax);
+    const bx = x + wf * 5 * vnoise(y * 0.018 + 1.3, z * 0.012, 2.1), by = y + wf * 4 * vnoise(x * 0.018 + 4.7, z * 0.012, 7.3);
+    const hd = 118 - (14 * sstep(60, 110, z) + 34 * tn) * (1 - sstep(60, 110, ax) * 0.5) - 26 * sstep(70, 120, z) * sstep(60, 120, ax);
+    let u = bx / 165, v = (by - 5 - 10 * tn) / hd;
+    const qo = u * u + v * v;
+    if (qo > 1) return -1000;
+    if ((1 - Math.sqrt(qo)) * hd < 1.6) return 28;
+    for (const t of T_CLAV) { const d = tubeD(t, x, y, z); if (d < 0) return d > -1.4 ? 820 : marrow(x, y, z, 300); }
+    // the bony cage narrows to the first ribs at the thoracic inlet
+    const tc = sstep(64, 130, z), cd = 88 - 22 * tc;
+    u = x / cageW(z); v = (y - 8 - 4 * tc) / cd;
+    const qc = u * u + v * v;
+    if (spine(x, y, z, qc < 1)) return OH;
+    if (qc >= 1) {
+      const dOut = (Math.sqrt(qc) - 1) * cd;
+      if (z < 134) { chestWall(x, y, z, dOut); return OH; }
+      return dOut < 30 + 30 * sstep(60, 120, ax) ? 46 : -100; // neck and shoulder muscles
+    }
+    // inside the cage: airway and oesophagus, the arch and its branches, mediastinal fat, lungs up to the apices
+    let d = tubeD(T_TRACH, x, y, z); if (d < 0) return d < -1.8 ? -990 : 50;
+    d = tubeD(T_OES2, x, y, z); if (d < 0) return d < -5.4 ? -960 : 38;
+    if (tubeD(T_ARCH, x, y, z) < 0) return 42;
+    for (const t of T_BRANCH) if (tubeD(t, x, y, z) < 0) return 40;
+    // superior mediastinum: widest at the arch, narrowing above it around the great vessels and trachea
+    {
+      const hw = 38 - 10 * sstep(88, 122, z) + 3 * vnoise(z * 0.05, 1.7, 3.3);
+      const mu = (x + 5 - 4 * sstep(88, 122, z)) / hw, mv = (y + 4) / 60;
+      if (mu * mu + mv * mv < 1) return z > 120 ? 34 : -88;
+    }
+    // each apex domes a little above the first rib; out at the side the narrowing cage shapes the lung
+    const lx = (ax - 36) / 32;
+    if (z > (lx < 0 ? 138 - 30 * lx * lx : 138 - 5 * lx * lx)) return 40;
+    return -872 + 0.3 * (y + 40);
+  }
+  // HU anywhere a topogram ray passes (no contrast)
+  function topoHU(x, y, z) {
+    if (z > ZTOP) return upperChest(x, y, z);
+    OM = 0; scene(x, y, z);
+    if (z < Z0 - 6 && OT >> 3 !== L_BONE && OT >> 3 !== L_BODY) {
+      // below the volume: the colon is a tube with gas on top, not scattered gas
+      const d = tubeD(T_COLON, x, y, z);
+      if (d < 0) return d < -2.5 && y < -36 + 0.35 * (x + 95) * 0.5 ? -950 : 18;
+      if (OH < -900) return -95;
+    }
+    // below the CT volume the ribs stop at the costal margin: higher in front, lowest at the sides
+    if (z < Z0 && OT >> 3 === L_BONE && !(Math.abs(x - VB[0]) < 44 && y > VB[1] - 16)) {
+      const s = Math.abs(Math.sin(Math.atan2(y - 8, x)));
+      if (z < -92 - 34 * (1 - s)) return 46;
+    }
+    return OH;
+  }
+  // Water-equivalent path length (mm) along each AP ray of topogram rows [r0, r1), on a 2 mm grid. Each ray starts at a
+  // random offset, so thin bone is not aliased into stripes. (The lung vessels are added on the page, see topoVessels.)
+  function topoRows(r0, r1) {
+    const full = new Float32Array((r1 - r0) * TOPO_NC), dy = 2;
+    let sd = 7 + r0 * 977;
+    for (let r = r0; r < r1; r++) {
+      const z = TOPO_Z1 - (r + 0.5) * TOPO_SP;
+      for (let c = 0; c < TOPO_NC; c++) {
+        const x = TOPO_X0 + (c + 0.5) * TOPO_SP;
+        sd = (sd * 1664525 + 1013904223) >>> 0;
+        let s = 0;
+        for (let y = -125 + (sd / 4294967296) * dy; y < 128; y += dy) s += Math.max(0, topoHU(x, y, z) + 1000);
+        full[(r - r0) * TOPO_NC + c] = s * dy * 0.001;
+      }
+    }
+    return { r0, r1, full };
   }
 
   // ───────────────────────── building the volume in slabs ─────────────────────────
@@ -430,7 +566,9 @@
   }
   // Partial volume: boundary voxels (found on the original values) are re-sampled at four sub-points, so edges get
   // in-between values instead of stair steps. The second contrast compartment and its share go to fr.
-  const SUB = [[0.25, 0.25, 0.25], [0.25, -0.25, -0.25], [-0.25, 0.25, -0.25], [-0.25, -0.25, 0.25]];
+  // The sub-points form a rotated grid (four different offsets on every axis), so even a surface lying almost flat
+  // along an axis, like the top of the liver, gets five steps of partial volume.
+  const SUB = [[0.375, 0.125, -0.125], [-0.125, 0.375, 0.375], [-0.375, -0.125, 0.125], [0.125, -0.375, -0.375]];
   function antialiasSlab(hu0, tag0, hu, fr, kb, k0, k1) {
     const cnt = new Uint8Array(8), off = (k0 - kb) * NXY;
     for (let k = Math.max(1, k0); k < Math.min(NZ - 1, k1); k++) {
@@ -468,7 +606,10 @@
     return { k0, k1, hu, tag, fr };
   }
   if (IS_WORKER) {
-    self.onmessage = (e) => { const r = buildSlab(e.data.k0, e.data.k1); self.postMessage(r, [r.hu.buffer, r.tag.buffer, r.fr.buffer]); };
+    self.onmessage = (e) => {
+      if (e.data.topo) { const t = topoRows(e.data.r0, e.data.r1); self.postMessage({ topo: 1, ...t }, [t.full.buffer]); return; }
+      const r = buildSlab(e.data.k0, e.data.k1); self.postMessage(r, [r.hu.buffer, r.tag.buffer, r.fr.buffer]);
+    };
     return;
   }
 
@@ -482,11 +623,18 @@
   // yield to the browser so the progress bar can paint (message channel: not throttled in background tabs)
   const frame = () => new Promise((r) => { const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });
   // Build the base volume in parallel workers when possible, otherwise slab by slab on this thread.
+  // The same jobs also project the topogram rows.
+  const TOPO_FULL = new Float32Array(TOPO_NC * TOPO_NR);
   async function buildVolume(progress) {
     const jobs = [];
-    for (let k = 0; k < NZ; k += 10) jobs.push([k, Math.min(NZ, k + 10)]);
+    for (let k = 0; k < NZ; k += 10) jobs.push({ k0: k, k1: Math.min(NZ, k + 10) });
+    for (let r = 0; r < TOPO_NR; r += 16) jobs.push({ topo: 1, r0: r, r1: Math.min(TOPO_NR, r + 16) });
     let done = 0;
-    const store = (r) => { const o = r.k0 * NXY; baseHU.set(r.hu, o); baseTag.set(r.tag, o); baseFR.set(r.fr, o); progress(++done / jobs.length); };
+    const store = (r) => {
+      if (r.topo) TOPO_FULL.set(r.full, r.r0 * TOPO_NC);
+      else { const o = r.k0 * NXY; baseHU.set(r.hu, o); baseTag.set(r.tag, o); baseFR.set(r.fr, o); }
+      progress(++done / jobs.length);
+    };
     const nW = SELF_SRC && typeof Worker !== 'undefined' && location.protocol !== 'file:' ? clamp((navigator.hardwareConcurrency || 4) - 1, 2, 6) : 0;
     if (nW) {
       try {
@@ -495,7 +643,7 @@
           let next = 0, active = 0;
           const finish = (err) => { workers.forEach((w) => w.terminate()); err ? reject(err) : resolve(); };
           const feed = (w) => {
-            if (next < jobs.length) { const [k0, k1] = jobs[next++]; active++; w.postMessage({ k0, k1 }); }
+            if (next < jobs.length) { active++; w.postMessage(jobs[next++]); }
             else if (!active) finish();
           };
           for (let i = 0; i < nW; i++) {
@@ -512,9 +660,17 @@
         done = 0;
       }
     }
-    for (const [k0, k1] of jobs) { store(buildSlab(k0, k1)); await frame(); }
+    for (const j of jobs) { store(j.topo ? { topo: 1, ...topoRows(j.r0, j.r1) } : buildSlab(j.k0, j.k1)); await frame(); }
   }
 
+  // Lung trees start where the central vessels end: upper-lobe arteries from the pulmonary artery, the rest from the
+  // interlobar artery below it; veins from the superior and inferior pulmonary veins. Trunks point along the lobes.
+  const LUNG_HILA = [
+    { side: -1, pa: T_RPA.pts[2], il: [-40, 16, 34], pv: [T_PVS[0].pts[1], T_PVS[1].pts[1]], bronchus: [-32, 34, 46] },
+    { side: 1, pa: T_LPA.pts[2], il: [42, 20, 36], pv: [T_PVS[2].pts[1], T_PVS[3].pts[1]], bronchus: [38, 36, 40] },
+  ];
+  // [lateral, posterior, superior, upper lobe?]: apical, anterior, posterior upper; middle/lingula; superior and two basal lower
+  const LUNG_LOBES = [[0.35, -0.1, 1, 1], [0.6, -0.8, 0.45, 1], [0.6, 0.75, 0.55, 1], [0.75, -0.7, -0.3, 0], [0.5, 0.9, -0.15, 0], [0.35, 0.6, -1, 0], [0.7, -0.15, -1, 0]];
   // pulmonary arteries and veins: branching trees from each hilum that taper toward the pleura.
   // Each artery has a bronchus beside it (the bronchovascular bundle), starting from the main bronchus.
   function stampLungVessels() {
@@ -552,14 +708,7 @@
         if (rc >= 0.36 && depth < 14) queue.push([q, nd, rc, depth + 1, comp, bq]);
       }
     };
-    // Trees start where the central vessels end: upper-lobe arteries from the pulmonary artery, the rest from the
-    // interlobar artery below it; veins from the superior and inferior pulmonary veins. Trunks point along the lobes.
-    const HILA = [
-      { side: -1, pa: T_RPA.pts[2], il: [-40, 16, 34], pv: [T_PVS[0].pts[1], T_PVS[1].pts[1]], bronchus: [-32, 34, 46] },
-      { side: 1, pa: T_LPA.pts[2], il: [42, 20, 36], pv: [T_PVS[2].pts[1], T_PVS[3].pts[1]], bronchus: [38, 36, 40] },
-    ];
-    // [lateral, posterior, superior, upper lobe?]: apical, anterior, posterior upper; middle/lingula; superior and two basal lower
-    const LOBES = [[0.35, -0.1, 1, 1], [0.6, -0.8, 0.45, 1], [0.6, 0.75, 0.55, 1], [0.75, -0.7, -0.3, 0], [0.5, 0.9, -0.15, 0], [0.35, 0.6, -1, 0], [0.7, -0.15, -1, 0]];
+    const HILA = LUNG_HILA, LOBES = LUNG_LOBES;
     for (const H of HILA) {
       segs.push([H.pa, H.il, 5.2, C_RIGHT]); // interlobar artery
       for (const art of [true, false]) for (const [lx, ly, lz, up] of LOBES) {
@@ -791,14 +940,14 @@
 
   function buildCoronaries(cs) {
     VES = {}; VLIST = [];
-    const gtn = S.gtn ? 1 : 0.9;
-    const mk = (id, anchors, parent, bi) => {
-      const pts = WIG[id] ? wiggle(catmull(anchors), WIG[id], id.charCodeAt(0) * 3.7 + id.length * 11.3 + (id.charCodeAt(1) || 0) * 1.9) : catmull(anchors);
+    const mk = (id, anchors, parent, bi, plain) => {
+      const pts = WIG[id] && !plain ? wiggle(catmull(anchors), WIG[id], id.charCodeAt(0) * 3.7 + id.length * 11.3 + (id.charCodeAt(1) || 0) * 1.9) : catmull(anchors);
       const v = { id, ...VSPEC[id], parent, bi, pts, n: pts.length };
       v.len = (v.n - 1) * 0.5;
       VES[id] = v; VLIST.push(v);
       return v;
     };
+    if (REALBG) { buildCoronariesReal(cs, mk); applyLesions(cs); return; }
     const Bif = epiPt(3, 105, 4);
     const dL = nrm(sub(Bif, ROOT));
     mk('LM', [add(ROOT, mul(dL, ROOT_R - 4)), add(ROOT, mul(dL, ROOT_R + 3)), Bif]);
@@ -843,6 +992,53 @@
     bi = nearestIdx(RCA, rvRing(-8, 32, 4.5));
     mk('RVB', [RCA.pts[bi], rvRing(7, 27, 1.8), rvRing(21, 20, 1.6), rvRing(35, 14, 1.4)], 'RCA', bi);
 
+    applyLesions(cs);
+  }
+  // The real heart's arteries: the tracked centrelines (meta.json) become the anchors, so each simulated case runs
+  // its disease along the patient's own vessel courses. Small branches that were not tracked are laid along the
+  // epicardial surface from the trunks.
+  function buildCoronariesReal(cs, mk) {
+    const RC = REAL.meta.centerlines, lv = REAL.meta.lv;
+    const LVC = add(lv.B, mul(lv.e1, lv.HL * 0.5));
+    const anch = (id, step = 4) => { const a = RC[id], o = []; for (let i = 0; i < a.length; i += step) o.push(a[i].slice()); if ((a.length - 1) % step) o.push(a[a.length - 1].slice()); return o; };
+    // trunks start a few millimetres inside the aorta, as the synthetic ones do
+    const ost = (a) => { a.unshift(sub(a[0], mul(nrm(sub(a[1], a[0])), 3))); return a; };
+    mk('LM', ost(anch('LM', 2)), undefined, undefined, true);
+    const LAD = mk('LAD', anch('LAD'), 'LM', VES.LM.n - 1, true);
+    const LCX = mk('LCX', anch('LCX'), 'LM', VES.LM.n - 1, true);
+    let rca = anch('RCA');
+    if (cs.anomaly === 'rca-left') {
+      // from the left sinus beside the left main, then between the aorta and the pulmonary artery to the right groove
+      const o = add(RC.LM[0], [-4, -6, 1]);
+      rca = [add(o, [2, 3, 0]), o, add(o, [-6, -8, 0]), add(o, [-14, -12, -2]), ...rca.slice(5)];
+    } else ost(rca);
+    const RCA = mk('RCA', rca, undefined, undefined, true);
+    mk('PDA', anch('PDA'), 'RCA', RCA.n - 1, true);
+    mk('PLB', anch('PLB'), 'RCA', RCA.n - 1, true);
+    const br = (id, par) => { const a = anch(id), P = VES[par], bi = nearestIdx(P, a[0]); a[0] = P.pts[bi].slice(); return mk(id, a, par, bi, true); };
+    br('D1', 'LAD'); br('OM1', 'LCX'); br('AM', 'RCA');
+    // twigs: from a point on a trunk, along the heart surface (perpendicular to the trunk), bending in to hug it
+    const twig = (id, par, at, len, want, inward = 0) => {
+      const P = VES[par], bi = clamp(Math.round(at * (P.n - 1)), 3, P.n - 4), p = P.pts[bi];
+      const T = nrm(sub(P.pts[bi + 3], P.pts[bi - 3])), n = nrm(sub(p, LVC));
+      let sd = nrm(cross(n, T));
+      if (dot(sd, want) < 0) sd = mul(sd, -1);
+      const d = nrm(add(sd, mul(n, -inward)));
+      const a = [p.slice()];
+      for (const t of [0.35, 0.7, 1]) a.push(add(add(p, mul(d, len * t)), mul(n, -2.2 * t * t)));
+      mk(id, a, par, bi, true);
+    };
+    twig('D2', 'LAD', 0.5, 26, [1, 0, -0.3]);
+    twig('S1', 'LAD', 0.2, 16, [-0.5, 0.5, -0.5], 1.4);
+    twig('S2', 'LAD', 0.4, 14, [-0.5, 0.5, -0.5], 1.4);
+    twig('OM2', 'LCX', 0.62, 26, [0.3, 0, -1]);
+    twig('CB', 'RCA', cs.anomaly ? 0.25 : 0.07, 18, [0.5, -1, 0]);
+    twig('RVB', 'RCA', 0.3, 22, [0.3, -0.3, -1]);
+  }
+  // disease, bridges and stents on whatever paths were built
+  function applyLesions(cs) {
+    const gtn = S.gtn ? 1 : 0.9;
+    const LVC = REALBG ? add(REAL.meta.lv.B, mul(REAL.meta.lv.e1, REAL.meta.lv.HL * 0.5)) : null;
     // myocardial bridge: push a stretch of the LAD into the myocardium
     for (const br of cs.bridges || []) {
       const v = VES[br.v], c = br.at * v.len, h = br.len / 2;
@@ -850,6 +1046,7 @@
         const s = i * 0.5;
         if (Math.abs(s - c) >= h) return p;
         const b = Math.cos(((s - c) / h) * Math.PI * 0.5) ** 2;
+        if (REALBG) return add(p, mul(nrm(sub(LVC, p)), br.depth * b));
         const hp = toH(p), rr = hyp(hp[1], hp[2]);
         return H2W(hp[0], hp[1] * (1 - (br.depth * b) / rr), hp[2] * (1 - (br.depth * b) / rr));
       });
@@ -966,11 +1163,12 @@
               const qx = dx * N[0] + dy * N[1] + dz * N[2], qy = dx * Bn[0] + dy * Bn[1] + dz * Bn[2];
               if (Math.abs(al) > 0.9) continue;
               xsec(v, i, hyp(qx, qy), Math.atan2(qy, qx), 0.9);
-              const old = baseHU[o];
+              // on the real background the drawn voxels take the scan's own grain, so the vessel is not a flat patch
+              const old = REALBG ? REAL.blend[o] : baseHU[o], nz = REALBG ? NOISE[o] * 0.6 : 0;
               if (XS.ws > 0.35) { HU[o] = Math.round(lerp(old, 1500, XS.ws)); TAG[o] = tg(L_COR, 0); FR[o] = 0; }
-              else if (XS.wl >= 0.55) { HU[o] = 43; TAG[o] = tg(L_COR, XS.lc); FR[o] = 0; }
-              else if (XS.wl >= 0.2) { HU[o] = Math.round(lerp(XS.wo > 0.5 ? XS.ph : old, 43, 0.5)); TAG[o] = tg(L_COR, XS.lc === C_LEFT ? C_HALF : XS.lc); FR[o] = 0; }
-              else if (XS.wo >= 0.5) { HU[o] = Math.round(XS.ph); TAG[o] = tg(L_COR, 0); FR[o] = 0; }
+              else if (XS.wl >= 0.55) { HU[o] = Math.round(43 + nz); TAG[o] = tg(L_COR, XS.lc); FR[o] = 0; }
+              else if (XS.wl >= 0.2) { HU[o] = Math.round(lerp(XS.wo > 0.5 ? XS.ph : old, 43, 0.5) + nz); TAG[o] = tg(L_COR, XS.lc === C_LEFT ? C_HALF : XS.lc); FR[o] = 0; }
+              else if (XS.wo >= 0.5) { HU[o] = Math.round(XS.ph + nz); TAG[o] = tg(L_COR, 0); FR[o] = 0; }
               else if (XS.wo > 0.05) { HU[o] = Math.round(lerp(old, XS.ph, XS.wo)); }
             }
           }
@@ -1123,13 +1321,24 @@
       ],
       teach: ['70% or more in all three vessels is CAD-RADS 4B (as is left main 50% or more). Invasive angiography is recommended.', 'With diabetes and three-vessel disease the heart team usually favours bypass surgery (FREEDOM trial); the SYNTAX score from the angiogram helps decide.', 'Grade each vessel on its own CPR and cross-section. The calcified LCx lesion blooms, so use the wide window.'],
     },
+    {
+      // A real, de-identified coronary CT angiogram (pixel data only) loaded on demand from /ct-lab/real/.
+      // The calcium score and CTA series are real; the topogram, ECG and bolus timing are simulated around them.
+      id: 'ctca1', real: '/ct-lab/real/', title: 'Real scan: calcified plaque, three vessels', pt: '69 M', hr: 58, bmi: 26, circ: 14, rhythm: 'sinus',
+      hx: 'A real coronary CT angiogram, de-identified. Calcium score, then CTA with the vendor’s curved reformats and 3D renderings. Compare the real texture, noise and anatomy with the simulated cases.',
+      lesions: [],
+      teach: ['Real calcium blooms more than the simulated kind: the plaque looks bigger than it is, and the lumen inside it is best judged on the straightened reformat with a wide window.', 'Real noise is fine-grained and not uniform: it is highest through the shoulders and spine. Deep-learning reconstruction smooths it without the plastic look of strong iterative recon.', 'The stenosis grades here are a provisional reading made for teaching, not the clinical report. Make your own call on each vessel, then compare.'],
+    },
   ];
   const GROUPS = ['LM', 'LAD', 'LCX', 'RCA'];
   const GROUP_NAME = { LM: 'Left main', LAD: 'LAD', LCX: 'LCx', RCA: 'RCA' };
   const GRADES = ['0% — none', '1–24% minimal', '25–49% mild', '50–69% moderate', '70–99% severe', '100% occluded'];
   const gradeOf = (s) => (s <= 0 ? 0 : s < 0.25 ? 1 : s < 0.5 ? 2 : s < 0.7 ? 3 : s < 1 ? 4 : 5);
 
+  const plaqueP = (cacTotal) => (cacTotal <= 0 ? '' : cacTotal <= 100 ? 'P1' : cacTotal <= 300 ? 'P2' : cacTotal < 1000 ? 'P3' : 'P4');
   function answerKey(cs, cacTotal) {
+    // a real case carries its own (provisional) key
+    if (cs.real && REAL && REAL.meta.key) { const k = REAL.meta.key; return { g: { ...k.g }, cr: k.cr, mods: k.mods.slice(), P: plaqueP(cacTotal) }; }
     const g = { LM: 0, LAD: 0, LCX: 0, RCA: 0 };
     let hrp = false;
     for (const L of cs.lesions || []) {
@@ -1146,8 +1355,7 @@
     if (hrp) mods.push('HRP');
     if ((cs.stents || []).length) mods.push('S');
     if (cs.anomaly) mods.push('E');
-    const P = cacTotal <= 0 ? '' : cacTotal <= 100 ? 'P1' : cacTotal <= 300 ? 'P2' : cacTotal < 1000 ? 'P3' : 'P4';
-    return { g, cr, mods, P };
+    return { g, cr, mods, P: plaqueP(cacTotal) };
   }
 
   // ───────────────────────── state ─────────────────────────
@@ -1159,9 +1367,149 @@
     scan: null, cac: null, cacUser: {}, art: 'LAD',
     read: { wl: [800, 250], slab: 0, track: 'LAD', alpha: 0, cur: 40, vr: 'heart', yaw: -35, pitch: 18, zoomVr: 1, mpr: 'cor', recon: 75, zoom: 1, kernel: 'std', ir: 1, labels: true },
     cp: [0, -20, 10],
+    bg: 'real', // background for the simulated cases: the real scan, or the synthetic chest
   };
   const hrNow = () => Math.max(50, S.cs.hr - 7 * S.meto + (S.gtn ? 3 : 0));
   const RR = () => 60000 / hrNow();
+
+  // ───────────────────────── real scan (de-identified CTCA) ─────────────────────────
+  // A real study, resampled onto this volume grid and stored as PNG mosaics (16 slices per file, 4 × 4; the red byte
+  // is the high byte and the green byte the low byte of (HU + 1024) / q). It is fetched once, when its case is chosen.
+  // Both series are kept: the non-contrast calcium-score scan and the CTA. What the user sees is the non-contrast
+  // scan plus a share f of the enhancement the real scan achieved, so bolus timing still matters.
+  let REAL = null;
+  const isReal = () => !!(S.cs && S.cs.real);
+  // the simulated cases drawn into the real scan (its own coronaries painted out, see tools/ct-lab-real-export.py)
+  let REALBG = false;
+  const onReal = () => isReal() || REALBG;
+  const REAL_BASE = '/ct-lab/real/';
+  const lerp3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  async function loadPNGVolume(base, files, out, q, nz, progress) {
+    const cv = document.createElement('canvas'); cv.width = NX * 4; cv.height = NY * 4;
+    const ctx = cv.getContext('2d', { willReadFrequently: true });
+    for (let f = 0; f < files.length; f++) {
+      const im = new Image(); im.src = base + files[f];
+      await im.decode();
+      ctx.drawImage(im, 0, 0);
+      const d = ctx.getImageData(0, 0, cv.width, cv.height).data;
+      for (let t = 0; t < 16; t++) {
+        const ks = f * 16 + t;
+        if (ks >= nz) break;
+        const r0 = (t >> 2) * NY, c0 = (t & 3) * NX;
+        for (let j = 0; j < NY; j++) {
+          let p = ((r0 + j) * cv.width + c0) * 4, o = (ks * NY + j) * NX;
+          for (let i = 0; i < NX; i++, p += 4, o++) out[o] = q > 0 ? ((d[p] << 8) | d[p + 1]) * q - 1024 : d[p];
+        }
+      }
+      progress((f + 1) / files.length);
+    }
+  }
+  // the calcium series is stored every other slice (its own slices are 2 mm thick): fill in the slices between
+  async function loadHalfZ(base, files, q, out, progress) {
+    const nz2 = Math.ceil(NZ / 2), tmp = new Int16Array(NXY * nz2);
+    await loadPNGVolume(base, files, tmp, q, nz2, progress);
+    for (let k = 0; k < NZ; k++) {
+      const s = k / 2, a = Math.min(Math.floor(s), nz2 - 1), b = Math.min(a + 1, nz2 - 1), t = s - a, oa = a * NXY, ob = b * NXY, ok = k * NXY;
+      for (let o = 0; o < NXY; o++) out[ok + o] = Math.round(tmp[oa + o] + (tmp[ob + o] - tmp[oa + o]) * t);
+    }
+  }
+  // need: 'case' (the real case: its CTA and calcium series) or 'bg' (the painted-out background for simulated cases)
+  async function loadReal(need, progress) {
+    const base = REAL_BASE;
+    if (!REAL) {
+      const meta = await (await fetch(base + 'meta.json')).json();
+      const tag = new Uint8Array(NV);
+      await loadPNGVolume(base, meta.tag, tag, 0, NZ, (f) => progress(f * 0.08));
+      REAL = { meta, tag, imgs: {}, f: -1, blend: new Int16Array(NV) };
+      REAL.mv = meta.vessels.map((v) => {
+        const pts = [];
+        for (let i = 0; i + 1 < v.pts.length; i++) { const a = v.pts[i], b = v.pts[i + 1], n = Math.max(1, Math.round(vlen(sub(b, a)) / 2)); for (let s = 0; s < n; s++) pts.push(lerp3(a, b, s / n)); }
+        pts.push(v.pts[v.pts.length - 1]);
+        return { id: v.id, group: v.group, mg: v.mg, r: v.r, pts, n: pts.length };
+      });
+      REAL.labels = meta.labels.map(([name, x, y, z, r, rz]) => ({ name, x, y, z, r, rz: rz || r, id: AN[name] ?? -1 }));
+    }
+    const meta = REAL.meta;
+    if (need === 'case' && !REAL.cta) {
+      const cta = new Int16Array(NV), cac = new Int16Array(NV);
+      await loadPNGVolume(base, meta.cta, cta, meta.ctaQ, NZ, (f) => progress(0.08 + f * 0.62));
+      await loadHalfZ(base, meta.cac, meta.cacQ, cac, (f) => progress(0.7 + f * 0.3));
+      REAL.cta = cta; REAL.cac = cac;
+    }
+    if (need === 'bg' && !REAL.bg) {
+      const bg = new Int16Array(NV), bgc = new Int16Array(NV);
+      await loadPNGVolume(base, meta.bg, bg, meta.bgQ, NZ, (f) => progress(0.08 + f * 0.62));
+      await loadHalfZ(base, meta.bgc, meta.bgcQ, bgc, (f) => progress(0.7 + f * 0.3));
+      REAL.bg = bg; REAL.bgc = bgc;
+    }
+    progress(1);
+  }
+  // the displayed volume: the non-contrast series plus the fraction f of the real scan's enhancement
+  function realFill(f) {
+    if (!REAL || REAL.f === f) return;
+    REAL.f = f; IMGV++;
+    const A = REALBG ? REAL.bgc : REAL.cac, B = REALBG ? REAL.bg : REAL.cta;
+    if (f <= 0) HU.set(A);
+    else if (Math.abs(f - 1) < 0.002) HU.set(B);
+    else for (let o = 0; o < NV; o++) HU[o] = A[o] + (B[o] - A[o]) * f;
+    // simulated case on the real background: the arteries (and an old infarct) are drawn into the filled volume
+    if (REALBG) { REAL.blend.set(HU); if (S.cs.infarct) applyInfarctReal(); stampCoronaries(); }
+  }
+  // LV coordinates of the real heart (long axis from the mitral valve to the apex), for the infarct case
+  function realToH(x, y, z) {
+    const L = REAL.meta.lv, dx = x - L.B[0], dy = y - L.B[1], dz = z - L.B[2];
+    return [dx * L.e1[0] + dy * L.e1[1] + dz * L.e1[2], dx * L.e2[0] + dy * L.e2[1] + dz * L.e2[2], dx * L.e3[0] + dy * L.e3[1] + dz * L.e3[2]];
+  }
+  function realRendo(a) { const L = REAL.meta.lv, t = clamp(a / L.step, 0, L.rendo.length - 1.001), i = t | 0; return L.rendo[i] + (L.rendo[i + 1] - L.rendo[i]) * (t - i); }
+  // old inferior infarct in the real heart: the subendocardial half of the inferior wall does not enhance
+  function applyInfarctReal() {
+    const L = REAL.meta.lv;
+    for (let k = 0; k < NZ; k++) for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+      const o = (k * NY + j) * NX + i;
+      if (HU[o] > 230 || HU[o] < -30 || (TAG[o] >> 3) !== L_HEART) continue;
+      const h = realToH(X0 + (i + 0.5) * DX, Y0 + (j + 0.5) * DX, Z0 + (k + 0.5) * DZ);
+      if (h[0] < 14 || h[0] > L.HL - 8) continue;
+      const ph = Math.atan2(h[2], h[1]) / DEG;
+      if (ph > -128 && ph < -52) {
+        const rho = hyp(h[1], h[2]), rn = realRendo(h[0]) - 1;
+        if (rho > rn - 1.5 && rho < rn + L.wall * 0.55) HU[o] = 12;
+      }
+    }
+  }
+  const realEnhFrac = (e) => clamp((e.eA * KVC[S.kv]) / (REAL.meta.enhancement.aorta - 45), 0, 1.3);
+  // noise the user's settings would add on top of what the real scan already has (its own settings are the reference)
+  function realExtraNoise(sigma) { const s0 = noiseSigma(100, 500); return Math.sqrt(Math.max(0, sigma * sigma - s0 * s0)); }
+  // which structure a point lies in, from the hand-placed landmarks (ellipsoids) and the lung tag
+  function realStructAt(x, y, z) {
+    let best = -1, bd = 1;
+    for (const L of REAL.labels) {
+      const d = ((x - L.x) / L.r) ** 2 + ((y - L.y) / L.r) ** 2 + ((z - L.z) / L.rz) ** 2;
+      if (d < bd) { bd = d; best = L.id; }
+    }
+    if (best >= 0) return best;
+    const i = Math.floor((x - X0) / DX), j = Math.floor((y - Y0) / DX), k = Math.floor((z - Z0) / DZ);
+    if (i < 0 || j < 0 || k < 0 || i >= NX || j >= NY || k >= NZ) return -1;
+    return TAG[(k * NY + j) * NX + i] >> 3 === L_LUNG ? (x < 0 ? AN['R lung'] : AN['L lung']) : -1;
+  }
+  // vendor images (curved and straightened reformats, volume renderings), loaded as needed
+  function realImg(file, onload) {
+    let im = REAL.imgs[file];
+    if (!im) { im = new Image(); im.src = S.cs.real + file; im.onload = onload; REAL.imgs[file] = im; }
+    return im.complete && im.naturalWidth ? im : null;
+  }
+  function drawVendor(v, file, rot, key) {
+    const c = v.ctx;
+    c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, v.W, v.H);
+    const im = file ? realImg(file, () => mark(key)) : null;
+    if (!im) { c.fillStyle = '#8f9cc2'; c.font = `${12 * v.dpr}px "IBM Plex Mono", monospace`; c.fillText(file ? 'loading…' : 'no vendor image for this view', 10 * v.dpr, 24 * v.dpr); return; }
+    const w = rot ? im.naturalHeight : im.naturalWidth, h = rot ? im.naturalWidth : im.naturalHeight;
+    const s = Math.min(v.W / w, v.H / h);
+    c.save(); c.translate(v.W / 2, v.H / 2);
+    if (rot) c.rotate(-Math.PI / 2);
+    c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+    c.drawImage(im, (-im.naturalWidth * s) / 2, (-im.naturalHeight * s) / 2, im.naturalWidth * s, im.naturalHeight * s);
+    c.restore();
+  }
 
   // ───────────────────────── motion model ─────────────────────────
   // Coronary velocity is low in end-systole (~330 ms after R) and in diastasis, which shrinks as heart rate rises.
@@ -1190,9 +1538,10 @@
   let MIS = null;
   function buildMotionGrid() {
     const G = ['R', 'C', 'A'], P = {}, lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
+    const vessels = isReal() ? REAL.mv : VLIST;
     for (const g of G) {
       const list = [];
-      for (const v of VLIST) if (v.mg === g) for (let i = 0; i < v.n; i += 4) list.push(v.pts[i]);
+      for (const v of vessels) if (v.mg === g) for (let i = 0; i < v.n; i += isReal() ? 1 : 4) list.push(v.pts[i]);
       const a = new Float64Array(list.length * 3);
       list.forEach((p, n) => { a[3 * n] = p[0]; a[3 * n + 1] = p[1]; a[3 * n + 2] = p[2]; for (let q = 0; q < 3; q++) { lo[q] = Math.min(lo[q], p[q]); hi[q] = Math.max(hi[q], p[q]); } });
       P[g] = a;
@@ -1681,6 +2030,7 @@
   const ANAT = ['Ao root', 'Asc Ao', 'Desc Ao', 'SVC', 'IVC', 'PV', 'LV', 'MPA', 'LPA', 'RPA', 'RV', 'LA', 'LAA', 'RA', 'Oes', 'Trachea', 'L bronchus', 'R bronchus', 'Sternum', 'Vertebra', 'R lung', 'L lung', 'Liver', 'Stomach', 'Spleen'];
   const AN = Object.fromEntries(ANAT.map((n, i) => [n, i]));
   function structAt(x, y, z) {
+    if (onReal()) return realStructAt(x, y, z);
     // the root (sinuses) ends at the sinotubular junction, about 8 mm above the valve centre; above it is the ascending aorta
     if (rootD(x, y, z) < 0) return (x - ROOT[0]) * AV_AX[0] + (y - ROOT[1]) * AV_AX[1] + (z - ROOT[2]) * AV_AX[2] > 8 ? AN['Asc Ao'] : AN['Ao root'];
     if (tubeD(T_ASC, x, y, z) < 0) return AN['Asc Ao'];
@@ -1688,7 +2038,7 @@
     if (tubeD(T_DESC, x, y, z) < 0) return AN['Desc Ao'];
     if (tubeD(T_SVC, x, y, z) < 0) return AN.SVC;
     if (tubeD(T_IVC, x, y, z) < 0) return AN.IVC;
-    for (let i = 0; i < 4; i++) if (tubeD(T_PVS[i], x, y, z) < 0) return AN.PV;
+    for (let i = 0; i < 4; i++) if (pvD(T_PVS[i], x, y, z) < 0) return AN.PV;
     const h = toH([x, y, z]), a = h[0], rho = hyp(h[1], h[2]);
     if (a >= -2 && a <= HL && rho < Repi(Math.max(0, a))) return AN.LV;
     if (tubeD(T_PA, x, y, z) < 0) return AN.MPA;
@@ -1832,6 +2182,22 @@
       const q = worldToView(vp, v.pts[best]);
       items.push({ x: q[0], y: q[1], text: VES_SHORT[id], color: vesColor(v), pin: true, r: Math.max(5 * vp.dpr, v.rad[best] * vp.fit.s + 3 * vp.dpr) });
     }
+    // real scan: pins from the hand-placed centrelines (approximate, so the ring is drawn a little wider)
+    if (opt.vessels !== false && isReal()) for (const v of REAL.mv) {
+      let best = -1, bs = -1e9;
+      for (let i = 0; i < v.n; i++) {
+        const p = v.pts[i];
+        if (!inRange(p[2])) continue;
+        const d = Math.abs(p[ax] - cpv);
+        if (d > v.r + 1.5 + slab / 2) continue;
+        const q = worldToView(vp, p);
+        if (q[0] < 0 || q[1] < 0 || q[0] > vp.W || q[1] > vp.H) continue;
+        if (-d > bs) { bs = -d; best = i; }
+      }
+      if (best < 0) continue;
+      const q = worldToView(vp, v.pts[best]);
+      items.push({ x: q[0], y: q[1], text: VES_SHORT[v.id], color: `rgb(${ART_COL[v.group].join(',')})`, pin: true, r: Math.max(6 * vp.dpr, (v.r + 2) * vp.fit.s + 3 * vp.dpr) });
+    }
     for (const a of regionAnchors(ids, nc, nr, 4)) {
       const q = vp.fromMM(((a.c + 0.5) * pl.w) / nc, ((a.r + 0.5) * pl.h) / nr);
       items.push({ x: q[0], y: q[1], text: ANAT[a.id] });
@@ -1840,11 +2206,11 @@
     drawLabels(vp, items.concat(blocks));
   }
   // topogram: the landmarks used to set the scan range
-  const TOPO_LBL = [['Carina', 0, 52, 1], ['Heart', 6, 2, 0], ['R lung', -66, 22, 0], ['L lung', 70, 26, 0], ['Liver', -58, -60, 0], ['Stomach', 52, -66, 0]];
+  const TOPO_LBL = [['Carina', 0, 52, 1], ['Heart', 6, 2, 0], ['R lung', -84, 40, 0], ['L lung', 86, 40, 0], ['Liver', -70, -84, 0], ['Stomach', 56, -84, 0], ['Trachea', 0, 118, 0], ['Clavicle', -96, 128, 0], ['Aortic arch', 44, 92, 0]];
   function topoLabels(v, blocks) {
     if (!S.read.labels) return;
     const items = TOPO_LBL.map(([text, x, z, pin]) => {
-      const q = v.fromMM(x - X0, ZTOP - z);
+      const q = v.fromMM(x - TOPO_X0, TOPO_Z1 - z);
       return pin ? { x: q[0], y: q[1], text, pin: true, color: '#9fd3ff', r: 4 * v.dpr } : { x: q[0], y: q[1], text };
     });
     drawLabels(v, items.concat(blocks));
@@ -1890,8 +2256,8 @@
     const sc = S.scan, when = sc && sc.when ? sc.when : new Date();
     const date = when.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }), time = when.toTimeString().slice(0, 5);
     return {
-      pt: `SIM-${String(S.caseIdx + 1).padStart(4, '0')} · ${esc(S.cs.pt)}`,
-      study: `CTA · ${SCANNERS[S.scanner].name}`,
+      pt: `${isReal() ? 'REAL' : 'SIM'}-${String(S.caseIdx + 1).padStart(4, '0')} · ${esc(S.cs.pt)}`,
+      study: isReal() ? 'CTA · real scan, de-identified' : `CTA · ${SCANNERS[S.scanner].name}${REALBG ? ' · real background' : ''}`,
       date: `${date} ${time}`,
       kv: `${S.kv} kV · ${S.mas} mAs${sc ? `<br>CTDIvol ${sc.dose.ctdi.toFixed(1)} mGy` : ''}`,
       recon: `${S.read.slab ? 'MIP ' + S.read.slab.toFixed(1) : '0.9'} mm · ${KER_NAME[S.read.kernel]} · ${IR_NAME[S.read.ir]}`,
@@ -2031,7 +2397,8 @@
       }
     });
     // tight box around everything drawn, so rays that miss it cost nothing
-    const bb = [ROOT[0] - 23, ROOT[0] + 23, ROOT[1] - 23, ROOT[1] + 23, ROOT[2] - 23, ROOT[2] + 23];
+    const rc = REALBG ? REAL_ROOT.c : ROOT, bb = [rc[0] - 23, rc[0] + 23, rc[1] - 23, rc[1] + 23, rc[2] - 23, rc[2] + 23];
+    if (REALBG) for (let k = 0; k < 3; k++) { bb[2 * k] = Math.min(bb[2 * k], REAL_ROOT.top[k] - 17); bb[2 * k + 1] = Math.max(bb[2 * k + 1], REAL_ROOT.top[k] + 17); }
     const grow = (k, lo, hi) => { bb[2 * k] = Math.min(bb[2 * k], lo); bb[2 * k + 1] = Math.max(bb[2 * k + 1], hi); };
     for (let k = 0; k < 3; k++) grow(k, T_ASC.bb[2 * k], T_ASC.bb[2 * k + 1]);
     for (const s of segs) { const R = Math.max(s[7], s[8]) + 0.5; for (let k = 0; k < 3; k++) grow(k, Math.min(s[k], s[k] + s[k + 3]) - R, Math.max(s[k], s[k] + s[k + 3]) + R); }
@@ -2041,7 +2408,7 @@
   // Thresholding raw voxels leaves wood-grain terraces; a ~1-voxel blur gives a smooth surface and clean normals.
   const HF_OUT = -100, HF_THR = -20;
   let heartField = null;
-  function heartKey() { return `${S.cs && S.cs.id}|${Array.from(GA, (g) => g | 0).join(',')}|${S.range[0] | 0}|${S.range[1] | 0}`; }
+  function heartKey() { return `${S.cs && S.cs.id}|${+REALBG}|${Array.from(GA, (g) => g | 0).join(',')}|${S.range[0] | 0}|${S.range[1] | 0}`; }
   function buildHeartField() {
     let i0 = clamp(Math.floor((VRBOX[0] - X0) / DX), 0, NX - 1), i1 = clamp(Math.ceil((VRBOX[1] - X0) / DX), 0, NX - 1);
     let j0 = clamp(Math.floor((VRBOX[2] - Y0) / DX), 0, NY - 1), j1 = clamp(Math.ceil((VRBOX[3] - Y0) / DX), 0, NY - 1);
@@ -2070,7 +2437,8 @@
     let a = new Float32Array(n), b = new Float32Array(n);
     // heart isolation, as a cardiac VRT preset does it: the pulmonary arteries and veins are cut off a little way from
     // the heart (a capsule around the long axis); the aorta is kept
-    const HC = { r: 60, a0: -30, a1: 92 }, P0 = add(B, mul(e1, HC.a0)), AX = mul(e1, HC.a1 - HC.a0), AL = dot(AX, AX);
+    const HB = REALBG ? REAL.meta.lv.B : B, HE = REALBG ? REAL.meta.lv.e1 : e1;
+    const HC = { r: 60, a0: -30, a1: 92 }, P0 = add(HB, mul(HE, HC.a0)), AX = mul(HE, HC.a1 - HC.a0), AL = dot(AX, AX);
     for (let k = 0; k < nz; k++) {
       const z = Z0 + (k + k0 + 0.5) * DZ, inR = z >= S.range[0] && z <= S.range[1];
       for (let j = 0; j < ny; j++) {
@@ -2187,8 +2555,18 @@
 
   // aortic root (three sinuses) and ascending aorta, cut flat at the top of the scan
   let TREE_AORTA = true; // the heart view takes the aorta from the volume instead
+  const REAL_ROOT = { c: [-8, -2, 34], r: 14.5, top: [-18, -14, 62], rt: 15 };
   function aortaSD(x, y, z) {
     if (!TREE_AORTA) return 1e9;
+    if (REALBG) {
+      // the real root and ascending aorta as a sphere blending into a tube
+      const R = REAL_ROOT, a = hyp(x - R.c[0], y - R.c[1], z - R.c[2]) - R.r;
+      const dx = R.top[0] - R.c[0], dy = R.top[1] - R.c[1], dz = R.top[2] - R.c[2], L2 = dx * dx + dy * dy + dz * dz;
+      const h = clamp(((x - R.c[0]) * dx + (y - R.c[1]) * dy + (z - R.c[2]) * dz) / L2, 0, 1);
+      const b = hyp(x - R.c[0] - dx * h, y - R.c[1] - dy * h, z - R.c[2] - dz * h) - R.rt;
+      const k = 5, hh = clamp(0.5 + (0.5 * (b - a)) / k, 0, 1), d = b + (a - b) * hh - k * hh * (1 - hh);
+      return Math.max(d, z - Math.min(S.range[1], VRBOX[5]), S.range[0] - z);
+    }
     // smooth union, so the sinuses blend into the tubular aorta without a crease
     const a = rootD(x, y, z), b = tubeD(T_ASC, x, y, z), k = 5, hh = clamp(0.5 + (0.5 * (b - a)) / k, 0, 1);
     const d = b > 1e8 ? a : b + (a - b) * hh - k * hh * (1 - hh);
@@ -2475,21 +2853,35 @@
   // HU at a point near track sample k: volume background blended with the analytic vessel
   function cprHU(k, pt, dirW, rhoSigned, edge) {
     const v = TRACK.tv[k], i = TRACK.ti[k];
-    let bg = sampleScan(pt[0], pt[1], pt[2]);
-    if (bg === NODATA) return NODATA;
     const rho = Math.abs(rhoSigned);
-    if (rho > v.rad[i] * 1.8 + 1.4) return bg;
+    if (rho > v.rad[i] * 2.6 + 3) return sampleScan(pt[0], pt[1], pt[2]);
     const dw = rhoSigned >= 0 ? dirW : mul(dirW, -1);
     const th = Math.atan2(dot(dw, v.Bn[i]), dot(dw, v.N[i]));
     xsec(v, i, rho, th, edge);
+    // The volume holds a coarse copy of this artery (0.9 mm voxels), which would show as a blurred halo around the
+    // sharp drawn lumen. Close to the vessel, take the tissue from just outside that copy, along the same ray,
+    // and keep this point's own noise.
+    const P = TRACK.p[k], rb = XS.ro + 1.35;
+    let bg;
+    if (rho >= rb) bg = sampleScan(pt[0], pt[1], pt[2]);
+    else {
+      if (USE_RANGE && (pt[2] < S.range[0] || pt[2] > S.range[1])) return NODATA;
+      const qx = P[0] + dw[0] * rb, qy = P[1] + dw[1] * rb, qz = P[2] + dw[2] * rb;
+      NW = 0; bg = sampleMoving(qx, qy, qz); NW = 1;
+      if (USE_ART) bg += artAt(pt[0], pt[1], pt[2]);
+      bg += noiseAt(pt[0], pt[1], pt[2]) * (0.7 / 1.35) + NAMP * 32 * grainAt(pt[0], pt[1], pt[2]);
+    }
+    if (bg === NODATA) return NODATA;
     if (XS.wo <= 0.001) return bg;
     const lum = 43 + GA[XS.lc];
     let h = XS.wl * lum + (XS.wo - XS.wl) * XS.ph + (1 - XS.wo) * bg;
-    if (XS.wo > 0.3) h += noiseAt(pt[0], pt[1], pt[2]) * 0.8;
+    if (XS.wo > 0.3) h += noiseAt(pt[0], pt[1], pt[2]) * 0.8 + (REALBG ? noiseRaw(pt[0], pt[1], pt[2]) * 0.6 : 0);
     if (USE_ART) h += XS.wo * artAt(pt[0], pt[1], pt[2]); // streaks cross the vessel too
     if (XS.ws > 0) h = lerp(h, 1500, XS.ws * 0.85);
     return h;
   }
+  // width of the lumen edge ramp (mm): CT blurs a vessel edge over about half a millimetre, less with a sharp kernel
+  const lumEdge = () => (S.read.kernel === 'sharp' ? 0.42 : 0.6);
   function trackDir(k, alpha) {
     const c = Math.cos(alpha), s = Math.sin(alpha);
     const N = TRACK.N[k], Bn = TRACK.Bn[k];
@@ -2526,7 +2918,7 @@
       for (let r = 0; r < rows; r++) {
         const u = half - (r + 0.5) * ((2 * half) / rows);
         const pt = [P[0] + dw[0] * u, P[1] + dw[1] * u, P[2] + dw[2] * u];
-        col[r] = ext ? sampleScan(pt[0], pt[1], pt[2]) : cprHU(k, pt, dw, u, 0.35);
+        col[r] = ext ? sampleScan(pt[0], pt[1], pt[2]) : cprHU(k, pt, dw, u, lumEdge());
       }
       // motion: smear along the image vertical
       const b = blurAtTrack(k);
@@ -2608,14 +3000,14 @@
     const [W, L] = S.read.wl;
     const alpha = S.read.alpha * DEG;
     const P = tr.p[k], ax = trackDir(k, alpha + Math.PI / 2), ay = trackDir(k, alpha);
-    const b = blurAtTrack(k);
+    const b = blurAtTrack(k), eg = lumEdge();
     const buf = new Float32Array(g.c * g.r);
     for (let r = 0; r < g.r; r++) for (let c = 0; c < g.c; c++) {
       const u = (c + 0.5) * (size / g.c) - size / 2, w = size / 2 - (r + 0.5) * (size / g.r);
       const pt = [P[0] + ax[0] * u + ay[0] * w, P[1] + ax[1] * u + ay[1] * w, P[2] + ax[2] * u + ay[2] * w];
       const rho = hyp(u, w);
       const dirW = rho > 1e-6 ? nrm(sub(pt, P)) : ay;
-      buf[r * g.c + c] = cprHU(k, pt, dirW, rho, 0.3);
+      buf[r * g.c + c] = cprHU(k, pt, dirW, rho, eg);
     }
     if (b > 0.3) {
       const rad = Math.max(1, Math.round((b * 0.6) / (size / g.c)));
@@ -2640,9 +3032,11 @@
   function buildCAC() {
     const nS = Math.floor((S.range[1] - S.range[0]) / CAC_T);
     const img = new Int16Array(CAC_G * CAC_G * nS).fill(-1000), map = new Int16Array(CAC_G * CAC_G * nS);
-    const g0 = GA.slice(), n0 = NAMP;
+    const g0 = GA.slice(), n0 = NAMP, f0 = REAL ? REAL.f : 0;
     // automatic exposure control: above BMI 28 the tube current rises to hold the noise
     GA.fill(0); NAMP = noiseSigma(120, 80 * Math.max(1, (S.cs.bmi / 28) ** 2.8)) / 30 * 0.6 / 1.25;
+    // the real case scores its own non-contrast series, which carries its own noise
+    if (onReal()) { realFill(0); NAMP = 0; }
     const c0 = Math.floor(CAC_CROP[0] / CAC_SP) - 2, c1 = Math.ceil((CAC_CROP[0] + CAC_CROP[2]) / CAC_SP) + 2;
     const r0 = Math.floor(CAC_CROP[1] / CAC_SP) - 2, r1 = Math.ceil((CAC_CROP[1] + CAC_CROP[2]) / CAC_SP) + 2;
     for (let s = 0; s < nS; s++) {
@@ -2678,13 +3072,20 @@
         const wgt = mx >= 400 ? 4 : mx >= 300 ? 3 : mx >= 200 ? 2 : 1;
         const cx = X0 + (sx / n + 0.5) * CAC_SP, cy = Y0 + (sy / n + 0.5) * CAC_SP, cz = S.range[1] - (s + 0.5) * CAC_T;
         // which artery, if any (reference)
-        let ref = null, bd = 1e9, bi = 0;
-        for (const v of VLIST) for (let i = 0; i < v.n; i += 2) {
-          const q = v.pts[i], dd = (q[0] - cx) ** 2 + (q[1] - cy) ** 2 + (q[2] - cz) ** 2;
-          if (dd < bd) { bd = dd; ref = v; bi = i; }
+        let refG = null;
+        if (isReal()) {
+          // the real scan's lesions were assigned by hand (see meta.json); anything else is valve, aorta or bone
+          let bd = 1e9;
+          for (const c of REAL.meta.calcium) { const dd = hyp(c.x - cx, c.y - cy, c.z - cz); if (dd < 8 && dd < bd) { bd = dd; refG = c.art; } }
+        } else {
+          let ref = null, bd = 1e9, bi = 0;
+          for (const v of VLIST) for (let i = 0; i < v.n; i += 2) {
+            const q = v.pts[i], dd = (q[0] - cx) ** 2 + (q[1] - cy) ** 2 + (q[2] - cz) ** 2;
+            if (dd < bd) { bd = dd; ref = v; bi = i; }
+          }
+          // stent metal is not calcium and is left out of the Agatston score
+          refG = ref && Math.sqrt(bd) < 4.5 && !ref.stent[bi] ? ref.group : null;
         }
-        // stent metal is not calcium and is left out of the Agatston score
-        const refG = ref && Math.sqrt(bd) < 4.5 && !ref.stent[bi] ? ref.group : null;
         comps.push({ id, s, n, area, mx, wgt, score: area >= 1 ? area * wgt : 0, ok: area >= 1, cx, cy, cz, ref: refG });
       }
     }
@@ -2692,6 +3093,7 @@
     for (const c of comps) if (c.ok && c.ref) tot[c.ref] += c.score;
     S.cac = { nS, img, map, comps, ref: tot, refTotal: tot.LM + tot.LAD + tot.LCX + tot.RCA };
     GA.set(g0); NAMP = n0;
+    if (onReal()) realFill(f0);
     S.cacUser = {};
   }
   function cacUserTotals() {
@@ -2738,9 +3140,11 @@
     const sc = S.scan;
     if (!sc) return;
     setGains(sc.e, KVC[S.kv]);
-    NAMP = (sc.sigma / 30) * 1.25;
+    // the real scan already carries its own noise and artefacts; only what the user's settings add goes on top
+    NAMP = ((onReal() ? sc.extra : sc.sigma) / 30) * 1.25;
     USE_MOTION = true;
-    USE_ART = true;
+    USE_ART = !isReal();
+    if (onReal()) realFill(sc.f);
     if (artScan !== sc) { artScan = sc; resetArtefacts(); }
   }
   let planZ = 30;
@@ -2748,25 +3152,28 @@
     topo() {
       const v = vp.vpTopo; v.resize();
       if (!TOPO) buildTopo();
-      const id = v.img(NX, NZ); id.data.set(TOPO);
-      v.blit(FOV, ZLEN);
+      const id = v.img(TOPO_W, TOPO_H); id.data.set(TOPO);
+      v.blit(TOPO_W, TOPO_H);
       const c = v.ctx, f = v.fit;
-      const yT = f.y + (ZTOP - S.range[1]) * f.s, yB = f.y + (ZTOP - S.range[0]) * f.s;
-      c.fillStyle = 'rgba(245,179,1,.10)'; c.fillRect(f.x, yT, FOV * f.s, yB - yT);
-      c.strokeStyle = '#f5b301'; c.lineWidth = 2 * v.dpr;
-      for (const y of [yT, yB]) { c.beginPath(); c.moveTo(f.x, y); c.lineTo(f.x + FOV * f.s, y); c.stroke(); }
+      const xL = f.x + (X0 - TOPO_X0) * f.s, xR = xL + FOV * f.s;
+      const yT = f.y + (TOPO_Z1 - S.range[1]) * f.s, yB = f.y + (TOPO_Z1 - S.range[0]) * f.s;
+      c.fillStyle = 'rgba(245,179,1,.10)'; c.fillRect(xL, yT, xR - xL, yB - yT);
+      c.strokeStyle = '#f5b301'; c.lineWidth = 1 * v.dpr; c.strokeRect(xL, yT, xR - xL, yB - yT);
+      c.lineWidth = 2 * v.dpr;
+      for (const y of [yT, yB]) { c.beginPath(); c.moveTo(xL, y); c.lineTo(xR, y); c.stroke(); }
       c.fillStyle = '#f5b301'; c.font = `${11 * v.dpr}px "IBM Plex Mono", monospace`;
       const tS = `start ${S.range[1].toFixed(0)} mm`, tE = `end ${S.range[0].toFixed(0)} mm`;
-      c.fillText(tS, f.x + 6 * v.dpr, yT - 5 * v.dpr);
-      c.fillText(tE, f.x + 6 * v.dpr, yB + 14 * v.dpr);
-      const yz = f.y + (ZTOP - planZ) * f.s;
-      c.strokeStyle = 'rgba(111,179,255,.6)'; c.lineWidth = 1 * v.dpr; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(f.x, yz); c.lineTo(f.x + FOV * f.s, yz); c.stroke(); c.setLineDash([]);
-      const k = v.dpr, bw = (t) => f.x + 10 * k + c.measureText(t).width;
-      topoLabels(v, [{ block: { x0: f.x, x1: bw(tS), y0: yT - 18 * k, y1: yT + 2 * k } }, { block: { x0: f.x, x1: bw(tE), y0: yB, y1: yB + 19 * k } }]);
-      $('#topoLbl').textContent = `range ${(S.range[1] - S.range[0]).toFixed(0)} mm`;
+      c.fillText(tS, xL + 4 * v.dpr, yT - 5 * v.dpr);
+      c.fillText(tE, xL + 4 * v.dpr, yB + 14 * v.dpr);
+      const yz = f.y + (TOPO_Z1 - planZ) * f.s;
+      c.strokeStyle = 'rgba(111,179,255,.6)'; c.lineWidth = 1 * v.dpr; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(xL, yz); c.lineTo(xR, yz); c.stroke(); c.setLineDash([]);
+      const k = v.dpr, bw = (t) => xL + 8 * k + c.measureText(t).width;
+      topoLabels(v, [{ block: { x0: xL, x1: bw(tS), y0: yT - 18 * k, y1: yT + 2 * k } }, { block: { x0: xL, x1: bw(tE), y0: yB, y1: yB + 19 * k } }]);
+      $('#topoLbl').textContent = `range ${(S.range[1] - S.range[0]).toFixed(0)} mm${isReal() ? ' · simulated topogram' : ''}`;
     },
     planAx() {
       const v = vp.vpPlanAx; v.resize();
+      if (onReal()) realFill(0);
       const cp = S.cp.slice(); S.cp[2] = planZ;
       withNonContrast(() => { const r0 = USE_RANGE; USE_RANGE = false; renderMPR(v, 'ax', { zoom: 1, wl: [400, 40], slab: 0, maxPx: 400 }); USE_RANGE = r0; });
       orientLabels(v, 'ax');
@@ -2779,7 +3186,7 @@
     mon() { drawMonitor(); },
     tac() { drawTAC(); },
     ax() {
-      const v = vp.vpAx; v.resize(); const pl = renderMPR(v, 'ax', { recon: true }); drawCross(v); orientLabels(v, 'ax'); drawRuler(v); planeLabels(v);
+      const v = vp.vpAx; v.resize(); const pl = renderMPR(v, 'ax', { recon: true }); drawCross(v); orientLabels(v, 'ax'); drawRuler(v); planeLabels(v); drawMeasure(v);
       const D = dcScan(), inc = 0.45, nIm = Math.round((S.range[1] - S.range[0]) / inc) + 1, im = clamp(Math.round((S.range[1] - S.cp[2]) / inc) + 1, 1, nIm);
       $('#axLbl').textContent = `z ${S.cp[2].toFixed(1)} mm · Im ${im}/${nIm}`;
       $('#axTr').innerHTML = `${D.pt}<br>${D.study}<br>${D.date}`;
@@ -2796,6 +3203,16 @@
     },
     vr() {
       const v = vp.vpVr; v.resize();
+      if (isReal() && S.read.vr !== 'mip') {
+        // the vendor's own volume renderings: drag turns through the views
+        const list = REAL.meta.vr[S.read.vr], n = list.length, i = (((Math.round((-S.read.yaw / 360) * n) % n) + n) % n);
+        vrCache = null;
+        drawVendor(v, list[i], false, 'vr');
+        $('#vrLbl').textContent = `VRT ${i + 1}/${n} · drag`;
+        $('#vrBl').textContent = S.read.vr === 'heart' ? `cardiac preset · ${(REAL.meta.vr.heartViews || [])[i] || ''}` : 'coronary tree preset';
+        $('#vrBr').textContent = 'real scan';
+        return;
+      }
       if (S.read.vr === 'heart' && (!heartField || heartField.key !== heartKey())) buildHeartField();
       const t = performance.now(), m = S.read.vr;
       renderVR(v, vrFast);
@@ -2811,22 +3228,98 @@
       c.imageSmoothingEnabled = true; c.drawImage(v.off, 0, 0, v.W, v.H);
       drawVROverlay(v);
     },
-    cpr() { const v = vp.vpCpr; v.resize(); renderCPR(v); $('#cprTr').textContent = `${dcScan().wl} · ${KER_NAME[S.read.kernel]}`; $('#cprLbl').textContent = `${TRACKS[S.read.track].name} · straightened · ${S.read.alpha}° · click to move the cursor`; },
-    xs() { const v = vp.vpXs; v.resize(); renderXS(v); $('#xsBr').textContent = dcScan().wl; },
+    cpr() {
+      const v = vp.vpCpr; v.resize();
+      if (isReal()) {
+        // the vendor's straightened reformat, turned so the vessel runs left to right from its origin
+        const g = REAL.meta.cpr[+S.read.track] || REAL.meta.cpr[0];
+        drawVendor(v, g.straight || g.curved[0], !!g.straight, 'cpr');
+        $('#cprTr').textContent = '';
+        $('#cprLbl').textContent = `${g.name} · ${g.straight ? 'straightened' : 'curved'} · ${g.hint}`;
+        return;
+      }
+      renderCPR(v); $('#cprTr').textContent = `${dcScan().wl} · ${KER_NAME[S.read.kernel]}`; $('#cprLbl').textContent = `${TRACKS[S.read.track].name} · straightened · ${S.read.alpha}° · click to move the cursor`;
+    },
+    xs() {
+      const v = vp.vpXs; v.resize();
+      if (isReal()) {
+        const g = REAL.meta.cpr[+S.read.track] || REAL.meta.cpr[0], n = g.curved.length, i = Math.min(n - 1, Math.floor((S.read.alpha / 360) * n));
+        drawVendor(v, g.curved[i], false, 'xs');
+        $('#xsLbl').textContent = `vendor curved MPR ${i + 1}/${n} · turn with the rotation slider`;
+        $('#xsBr').textContent = '';
+        return;
+      }
+      renderXS(v); $('#xsBr').textContent = dcScan().wl;
+    },
     readKv() { updateReadKv(); },
   };
 
-  // topogram: AP projection of the non-contrast volume
+  // Topogram: the AP projection of the whole chest (projected while the volume is built, see topoRows) plus the lung
+  // vessel markings, processed as a scanner processes its topogram: edge enhancement, a log-like curve, quantum noise.
+  // One pixel per millimetre.
+  const TOPO_W = TOPO_X1 - TOPO_X0, TOPO_H = TOPO_Z1 - TOPO_Z0;
   let TOPO = null;
   function buildTopo() {
-    TOPO = new Uint8ClampedArray(NX * NZ * 4);
-    for (let k = 0; k < NZ; k++) for (let i = 0; i < NX; i++) {
-      let s = 0;
-      for (let j = 0; j < NY; j++) { const o = (k * NY + j) * NX + i; s += Math.max(0, HU[o] + 1000); }
-      const L = (s / 1000) * DX * 0.02;
-      const g = 255 * Math.pow(clamp((L - 0.6) / 4.2, 0, 1), 0.85);
-      const o = ((NZ - 1 - k) * NX + i) * 4;
-      TOPO[o] = TOPO[o + 1] = TOPO[o + 2] = g; TOPO[o + 3] = 255;
+    const W = TOPO_W, H = TOPO_H, P = new Float32Array(W * H), F = TOPO_FULL, NC = TOPO_NC;
+    for (let r = 0; r < H; r++) {
+      const fy = clamp((r + 0.5) / TOPO_SP - 0.5, 0, TOPO_NR - 1.001), j = fy | 0, ty = fy - j;
+      for (let c = 0; c < W; c++) {
+        const fx = clamp((c + 0.5) / TOPO_SP - 0.5, 0, NC - 1.001), i = fx | 0, tx = fx - i, o = j * NC + i;
+        P[r * W + c] = (F[o] * (1 - tx) + F[o + 1] * tx) * (1 - ty) + (F[o + NC] * (1 - tx) + F[o + NC + 1] * tx) * ty;
+      }
+    }
+    // (a touch of blur first: the projection was sampled every 2 mm, and the edge enhancement would sharpen the steps)
+    P.set(gblur(P, W, H, 0.9, 0.9));
+    topoVessels(P, W, H);
+    const lo = gblur(P, W, H, 5, 5), n1 = 1 - Math.exp(-330 / 150);
+    TOPO = new Uint8ClampedArray(W * H * 4);
+    seed = 77;
+    for (let o = 0, k = 0; o < W * H; o++, k += 4) {
+      const p = P[o] + 1.2 * (P[o] - lo[o]);
+      let g = 255 * Math.pow(Math.max(0, 1 - Math.exp(-Math.max(0, p - 8) / 150)) / n1, 1.6);
+      if (P[o] > 4) g += (rnd() + rnd() - 1) * 7;
+      TOPO[k] = TOPO[k + 1] = TOPO[k + 2] = g; TOPO[k + 3] = 255;
+    }
+  }
+  // Lung markings: arterial and venous trees grown through the whole of both lungs (the CT volume's own trees stop at
+  // its edges), each branch adding its water-equivalent thickness of blood along its projection.
+  function topoVessels(P, W, H) {
+    seed = 41;
+    const isLung = (p) => { const h = topoHU(p[0], p[1], p[2]); return h > -930 && h < -780; };
+    const segs = [], queue = [];
+    const grow = (p, dir, r, depth) => {
+      let L = clamp(r * 6 + rnd() * 4, 4, 22), q = null;
+      for (let t = 0; t < 3; t++) {
+        const c = add(p, mul(dir, L));
+        if (depth < 1 || isLung(c)) { q = c; break; }
+        dir = nrm(add(dir, [(rnd() - 0.5) * 1.6, (rnd() - 0.5) * 1.6, (rnd() - 0.5) * 1.6])); L *= 0.7;
+      }
+      if (!q) return;
+      segs.push([p, q, r]);
+      const nb = depth < 2 ? 3 : 2;
+      for (let b = 0; b < nb; b++) {
+        const nd = nrm(add(dir, [(rnd() - 0.5) * 1.15, (rnd() - 0.5) * 1.15, (rnd() - 0.5) * 1.15]));
+        const rc = r * (nb === 3 ? 0.68 : 0.79) * (0.92 + rnd() * 0.16);
+        if (rc >= 0.4 && depth < 14) queue.push([q, nd, rc, depth + 1]);
+      }
+    };
+    for (const Hl of LUNG_HILA) for (const art of [true, false]) for (const [lx, ly, lz, up] of LUNG_LOBES) {
+      const dir = nrm([Hl.side * lx + (rnd() - 0.5) * 0.4, ly + (rnd() - 0.5) * 0.4, lz + (rnd() - 0.5) * 0.4]);
+      queue.push([art ? (up ? Hl.pa : Hl.il) : Hl.pv[up ? 0 : 1], dir, (art ? 3.1 : 2.9) + rnd() * 0.6, 0]);
+    }
+    for (let qi = 0; qi < queue.length && segs.length < 16000; qi++) grow(...queue[qi]);
+    for (const [p0, p1, r] of segs) {
+      const ax = p0[0] - TOPO_X0, az = TOPO_Z1 - p0[2], dx = p1[0] - p0[0], dz = p0[2] - p1[2];
+      const L2 = dx * dx + dz * dz, ty = Math.abs(p1[1] - p0[1]) / (hyp(dx, p1[1] - p0[1], dz) || 1);
+      const m = (Math.PI * r * r * 0.91) / Math.sqrt(Math.max(0.06, 1 - ty * ty)); // per mm of projected length
+      const sg = Math.max(0.55, r * 0.7), R = sg * 2.6, k = m / (2.5066 * sg), i2 = 1 / (2 * sg * sg);
+      const c0 = Math.max(0, Math.floor(Math.min(ax, ax + dx) - R)), c1 = Math.min(W - 1, Math.ceil(Math.max(ax, ax + dx) + R));
+      const r0 = Math.max(0, Math.floor(Math.min(az, az + dz) - R)), r1 = Math.min(H - 1, Math.ceil(Math.max(az, az + dz) + R));
+      for (let rr = r0; rr <= r1; rr++) for (let cc = c0; cc <= c1; cc++) {
+        const px = cc + 0.5 - ax, pz = rr + 0.5 - az;
+        const h = L2 > 1e-6 ? clamp((px * dx + pz * dz) / L2, 0, 1) : 0, ex = px - dx * h, ez = pz - dz * h, d2 = ex * ex + ez * ez;
+        if (d2 < R * R) P[rr * W + cc] += k * Math.exp(-d2 * i2);
+      }
     }
   }
 
@@ -2920,7 +3413,8 @@
     const b = S.bolus;
     const e = enh(b.t);
     const g = GA.slice(), n = NAMP, m = USE_MOTION, r0 = USE_RANGE, a0 = USE_ART;
-    setGains(e, KVC[100]); NAMP = 1.9; USE_MOTION = false; USE_RANGE = false; USE_ART = false;
+    setGains(e, KVC[100]); NAMP = onReal() ? 0.8 : 1.9; USE_MOTION = false; USE_RANGE = false; USE_ART = false;
+    if (onReal()) realFill(realEnhFrac(e));
     const cp = S.cp.slice(); S.cp[2] = b.z;
     try { renderMPR(v, 'ax', { zoom: 1.35, wl: [600, 150], slab: 0, maxPx: 300 }); } finally { S.cp = cp; GA.set(g); NAMP = n; USE_MOTION = m; USE_RANGE = r0; USE_ART = a0; }
     // ROI
@@ -2937,6 +3431,7 @@
     const b = S.bolus, e = enh(t);
     const g = GA.slice(), n = NAMP, m = USE_MOTION;
     setGains(e, KVC[100]); NAMP = 0; USE_MOTION = false;
+    if (onReal()) realFill(realEnhFrac(e));
     let s = 0, k = 0;
     for (let dy = -4; dy <= 4; dy += 1) for (let dx = -4; dx <= 4; dx += 1) { if (dx * dx + dy * dy > 16) continue; s += tri(b.roi[0] + dx, b.roi[1] + dy, b.z); k++; }
     GA.set(g); NAMP = n; USE_MOTION = m;
@@ -2980,8 +3475,8 @@
   function updateReadKv() {
     const sc = S.scan; if (!sc) return;
     const b = blurFor(S.read.recon);
-    const lv = 43 + GA[C_LEFT], rv = 43 + GA[C_RIGHT];
-    const myo = 40 + GA[C_MYO];
+    const lv = isReal() ? 45 + (REAL.meta.enhancement.aorta - 45) * sc.f : 43 + GA[C_LEFT], rv = isReal() ? 45 + 230 * sc.f : 43 + GA[C_RIGHT];
+    const myo = isReal() ? 50 + 40 * sc.f : 40 + GA[C_MYO];
     const sg = effSigma();
     const rows = [
       ['Aorta / LV', `${Math.round(lv)} HU`], ['Right heart', `${Math.round(rv)} HU`], ['Noise (SD)', `${sg.toFixed(0)} HU`],
@@ -2998,8 +3493,10 @@
     else if (b.R >= 1.2) notes.push(['gold', 'Moderate RCA motion. A different phase may sharpen the mid RCA.']);
     if (lv < 250) notes.push(['warn', 'Coronary enhancement is below 250 HU: the study is suboptimal and small plaques can be missed.']);
     if (MIS) notes.push(['warn', 'Step artefacts: an ectopic beat shifted the heart between acquisition steps.']);
-    const svc = 44 + GA[C_SVC];
+    const svc = isReal() ? 0 : 44 + GA[C_SVC];
     if (svc > 700) notes.push(['gold', `Dense contrast in the SVC (${Math.round(svc)} HU) throws streaks across the right coronary artery and aortic root. A saline chaser washes it out.`]);
+    if (REALBG) notes.push(['', 'The background is the real scan; the coronary arteries and their disease are simulated along the patient\u2019s own vessel courses. The topogram is simulated.']);
+    if (isReal()) notes.push(['', `Real scan: ${REAL.meta.scanner}. The CPR and 3D panels show the vendor workstation's own reformats; the axial and MPR images are the real volume with your noise, motion and reconstruction settings applied.`]);
     if (lv > 560) notes.push(['gold', 'Very dense LV and aorta cause beam hardening: look for a dark band in the basal inferolateral wall, and do not call it a perfusion defect.']);
     if ((S.cs.stents || []).length && S.read.kernel !== 'sharp') notes.push(['gold', 'Stent: switch to the sharp kernel and the wide window to see the lumen inside the struts.']);
     if (S.read.ir === 0 && sg > 30) notes.push(['gold', 'Filtered back projection is noisy at this dose. Iterative reconstruction lowers the noise.']);
@@ -3026,10 +3523,16 @@
   function mprHandlers(key, getOrient) {
     const v = vp[key];
     onDrag(v.cv, {
-      down(e, b) { if (b === 0) { S.cp = viewToWorld(v, e); syncCursorToCP(); interact('ax', 'mpr', 'vrOverlay', 'readKv'); } },
+      down(e, b) {
+        if (b !== 0) return;
+        if (key === 'vpAx' && QUIZ) { answerQuiz(viewToWorld(v, e)); return; }
+        if (key === 'vpAx' && MEAS.on) { MEAS.a = viewToWorld(v, e); MEAS.b = null; mark('ax'); return; }
+        S.cp = viewToWorld(v, e); syncCursorToCP(); interact('ax', 'mpr', 'vrOverlay', 'readKv');
+      },
       move(e, b, dx, dy) {
         if (b === 2) { S.read.wl = [clamp(S.read.wl[0] + dx * 4, 50, 4000), clamp(S.read.wl[1] - dy * 2, -1000, 1500)]; interact('ax', 'mpr', 'cpr', 'xs'); }
-        else { S.cp = viewToWorld(v, e); syncCursorToCP(); interact('ax', 'mpr', 'vrOverlay', 'readKv'); }
+        else if (key === 'vpAx' && MEAS.on && MEAS.a) { MEAS.b = viewToWorld(v, e); mark('ax'); }
+        else if (!QUIZ) { S.cp = viewToWorld(v, e); syncCursorToCP(); interact('ax', 'mpr', 'vrOverlay', 'readKv'); }
       },
       up() { mark('vrOverlay'); },
       wheel(e) {
@@ -3063,23 +3566,73 @@
   onDrag(vp.vpCpr.cv, {
     down(e, b) { if (b === 0) cprPick(e, true); },
     move(e, b, dx) { if (b === 2) { S.read.alpha = ((S.read.alpha + Math.round(dx)) % 360 + 360) % 360; $('#rotR').value = S.read.alpha; $('#rotO').textContent = S.read.alpha + '°'; interact('cpr', 'xs'); } else cprPick(e, true); },
-    wheel(e) { S.read.cur = clamp(S.read.cur + (e.deltaY > 0 ? 2 : -2), 0, TRACK.n - 1); cursorToCP(true); },
+    wheel(e) { if (!TRACK) return; S.read.cur = clamp(S.read.cur + (e.deltaY > 0 ? 2 : -2), 0, TRACK.n - 1); cursorToCP(true); },
   });
   function cprPick(e, live) {
-    const g = cprGeo; if (!g) return;
+    const g = cprGeo; if (!g || !TRACK) return;
     const r = vp.vpCpr.cv.getBoundingClientRect(), x = (e.clientX - r.left) * vp.vpCpr.dpr;
     const s = (x - g.ox) / g.sc - 2;
     S.read.cur = clamp(Math.round(s / 0.5), 0, TRACK.n - 1);
     cursorToCP(live);
   }
-  function cursorToCP(live) { S.cp = TRACK.p[S.read.cur].slice(); (live ? interact : mark)('cpr', 'xs', 'ax', 'mpr', 'vrOverlay', 'readKv'); }
+  function cursorToCP(live) { if (!TRACK) return; S.cp = TRACK.p[S.read.cur].slice(); (live ? interact : mark)('cpr', 'xs', 'ax', 'mpr', 'vrOverlay', 'readKv'); }
+
+  // ───────────────────────── learning tools: anatomy quiz and measurement ─────────────────────────
+  const ANAT_FULL = { 'Ao root': 'aortic root', 'Asc Ao': 'ascending aorta', 'Desc Ao': 'descending aorta', SVC: 'superior vena cava', IVC: 'inferior vena cava', PV: 'pulmonary vein', LV: 'left ventricle', MPA: 'main pulmonary artery', LPA: 'left pulmonary artery', RPA: 'right pulmonary artery', RV: 'right ventricle', LA: 'left atrium', LAA: 'left atrial appendage', RA: 'right atrium', Oes: 'oesophagus', 'L bronchus': 'left main bronchus', 'R bronchus': 'right main bronchus', 'R lung': 'right lung', 'L lung': 'left lung' };
+  let QUIZ = null;
+  const MEAS = { on: false, a: null, b: null };
+  // ask for a structure that is on the axial image now (with labels hidden until the answer)
+  function startQuiz() {
+    const pl = vp.vpAx.plane;
+    if (!pl || S.step !== 'read') { $('#quizFb').innerHTML = '<div class="note">Open the reading step first.</div>'; return; }
+    const seen = new Map(), N = 40;
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+      const p = planePt('ax', pl.u0 + ((c + 0.5) * pl.w) / N, pl.v0 + ((r + 0.5) * pl.h) / N);
+      const id = structAt(p[0], p[1], p[2]);
+      if (id >= 0 && id !== QUIZ?.last) seen.set(id, (seen.get(id) || 0) + 1);
+    }
+    const cands = [...seen].filter(([, n]) => n >= 5).map(([id]) => id);
+    if (!cands.length) { $('#quizFb').innerHTML = '<div class="note">Nothing to ask on this slice: scroll to the heart.</div>'; return; }
+    const id = cands[Math.floor(Math.random() * cands.length)];
+    QUIZ = { id, labels: S.read.labels, last: id };
+    if (S.read.labels) setLabels(false);
+    $('#quizFb').innerHTML = `<div class="note gold">Click the <b>${ANAT_FULL[ANAT[id]] || ANAT[id]}</b> on the axial image.</div>`;
+  }
+  function answerQuiz(p) {
+    const hit = structAt(p[0], p[1], p[2]), ok = hit === QUIZ.id, want = ANAT_FULL[ANAT[QUIZ.id]] || ANAT[QUIZ.id];
+    const got = hit >= 0 ? ANAT_FULL[ANAT[hit]] || ANAT[hit] : 'not a labelled structure';
+    $('#quizFb').innerHTML = `<div class="note ${ok ? 'ok' : 'warn'}">${ok ? `✓ Correct, that is the ${want}.` : `✗ That is ${got}. The ${want} is now labelled.`}</div>`;
+    const back = QUIZ.labels; QUIZ = { last: QUIZ.id };
+    if (back) setLabels(true); else mark('ax');
+    QUIZ = null;
+  }
+  function drawMeasure(v) {
+    if (!MEAS.a || !MEAS.b) return;
+    const a = worldToView(v, MEAS.a), b = worldToView(v, MEAS.b), c = v.ctx, k = v.dpr;
+    if (!a || !b) return;
+    const mm = hyp(MEAS.a[0] - MEAS.b[0], MEAS.a[1] - MEAS.b[1], MEAS.a[2] - MEAS.b[2]);
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+    c.strokeStyle = '#4fd1a1'; c.lineWidth = 1.5 * k; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+    for (const q of [a, b]) { c.beginPath(); c.arc(q[0], q[1], 3 * k, 0, Math.PI * 2); c.stroke(); }
+    c.font = `${11 * k}px "IBM Plex Mono", monospace`; c.lineWidth = 3 * k; c.strokeStyle = 'rgba(0,0,0,.8)'; c.lineJoin = 'round';
+    const t = `${mm.toFixed(1)} mm`, tx = (a[0] + b[0]) / 2 + 8 * k, ty = (a[1] + b[1]) / 2 - 6 * k;
+    c.strokeText(t, tx, ty); c.fillStyle = '#4fd1a1'; c.fillText(t, tx, ty);
+    c.restore();
+  }
+  $('#btnQuiz').addEventListener('click', startQuiz);
+  $('#btnMeasure').addEventListener('click', () => {
+    MEAS.on = !MEAS.on; MEAS.a = MEAS.b = null;
+    $('#btnMeasure').classList.toggle('gold', MEAS.on);
+    $('#btnMeasure').textContent = MEAS.on ? 'Measuring: drag on the axial image' : 'Measure distance';
+    mark('ax');
+  });
 
   // topogram: drag the range lines, hover to preview axial level
   onDrag(vp.vpTopo.cv, {
-    down(e) { const z = ZTOP - vp.vpTopo.toMM(e)[1]; drag = Math.abs(z - S.range[1]) < Math.abs(z - S.range[0]) ? 1 : 0; setRange(z); },
-    move(e) { setRange(ZTOP - vp.vpTopo.toMM(e)[1]); },
+    down(e) { const z = TOPO_Z1 - vp.vpTopo.toMM(e)[1]; drag = Math.abs(z - S.range[1]) < Math.abs(z - S.range[0]) ? 1 : 0; setRange(z); },
+    move(e) { setRange(TOPO_Z1 - vp.vpTopo.toMM(e)[1]); },
     up() { drag = -1; },
-    hover(e) { planZ = clamp(ZTOP - vp.vpTopo.toMM(e)[1], Z0 + 1, ZTOP - 1); mark('planAx', 'topo'); },
+    hover(e) { planZ = clamp(TOPO_Z1 - vp.vpTopo.toMM(e)[1], Z0 + 1, ZTOP - 1); mark('planAx', 'topo'); },
   });
   let drag = -1;
   function setRange(z) {
@@ -3141,6 +3694,7 @@
     if (st === 'cac') { if (!S.cac) { buildCAC(); cacSlice = Math.round(S.cac.nS * 0.3); } $('#cacSlice').max = S.cac.nS - 1; $('#cacSlice').value = cacSlice; renderCacTable(false); markDone('cac'); mark('cac'); }
     if (st === 'bolus') mark('mon', 'tac');
     if (st === 'read' || st === 'report') { applyReadGains(); updateBlur(S.read.recon); mark('ax', 'mpr', 'cpr', 'xs', 'readKv'); vrQuick(30); }
+    if (st !== 'read') { QUIZ = null; MEAS.a = MEAS.b = null; }
     if (st === 'report') buildReportForm();
   }
   function markDone(st) { const b = $(`#steps button[data-step="${st}"]`); b && b.classList.add('done'); }
@@ -3148,6 +3702,7 @@
 
   function invalidateScan() {
     S.scanDone = false; S.scan = null; S.cac = null;
+    if (onReal()) realFill(0);
     S.bolus.curve = []; S.bolus.trig = null; S.bolus.tScan = null; S.bolus.t = 0; S.bolus.running = false;
     $('#steps button[data-step="read"]').disabled = true; $('#steps button[data-step="report"]').disabled = true;
     $$('#steps button').forEach((b) => b.classList.remove('done'));
@@ -3191,8 +3746,8 @@
   function bestPhase() { let best = 75, bv = 1e9; for (let p = 30; p <= 85; p++) { const b = blurFor(p); if (b.R < bv - 0.01) { bv = b.R; best = p; } } return best; }
   function coverageProblem() {
     let top = -1e9, bot = 1e9;
-    for (const v of VLIST) for (const p of v.pts) { top = Math.max(top, p[2]); bot = Math.min(bot, p[2]); }
-    const apex = H2W(HL, 0, 0)[2] - 4;
+    for (const v of isReal() ? REAL.mv : VLIST) for (const p of v.pts) { top = Math.max(top, p[2]); bot = Math.min(bot, p[2]); }
+    const apex = onReal() ? -50 : H2W(HL, 0, 0)[2] - 4;
     bot = Math.min(bot, apex);
     if (S.range[1] < top + 3) return 'The scan starts below the coronary ostia: the left main and proximal arteries will be cut off.';
     if (S.range[0] > bot - 3) return 'The scan ends above the inferior heart: the distal vessels and apex will be cut off.';
@@ -3201,31 +3756,77 @@
 
   function caseCard() {
     const cs = S.cs;
-    $('#caseCard').innerHTML = `<b>${esc(cs.pt)}</b> · BMI ${cs.bmi} · HR ${cs.hr} bpm<br><span class="muted small">${esc(cs.hx)}</span>`;
-    $('#casePill').textContent = `Case ${S.caseIdx + 1} · ${cs.pt}`;
+    $('#caseCard').innerHTML = `<b>${esc(cs.pt)}</b> · BMI ${cs.bmi} · HR ${cs.hr} bpm<br><span class="muted small">${esc(cs.hx)}</span>${REALBG ? '<div class="small muted" style="margin-top:6px">Drawn into the real scan: the chest, heart and vessel courses are a real patient\u2019s; the coronary disease is simulated.</div>' : ''}${cs.real && REAL ? `<div class="note" style="margin:8px 0 0">Real scan: ${esc(REAL.meta.scanner)}. Pixel data only, no patient details. ${esc(REAL.meta.cacInfo.vendorText)}</div>` : ''}`;
+    $('#casePill').textContent = `Case ${S.caseIdx + 1} · ${cs.real ? 'real · ' : ''}${cs.pt}`;
+  }
+  // the CPR selector lists the synthetic tracks, or the vendor reformats of the real scan
+  function fillTrackSel() {
+    trackSel.innerHTML = '';
+    if (isReal()) { REAL.meta.cpr.forEach((g, i) => trackSel.add(new Option(g.name, i))); if (!REAL.meta.cpr[+S.read.track]) S.read.track = '0'; }
+    else { Object.entries(TRACKS).forEach(([k, t]) => trackSel.add(new Option(t.name, k))); if (!TRACKS[S.read.track]) S.read.track = 'LAD'; }
+    trackSel.value = S.read.track;
   }
 
   let ready = false;
   function loadCase(idx) {
-    S.caseIdx = idx; S.cs = CASES[idx]; S.meto = 0; IMGV++;
-    HU.set(baseHU); TAG.set(baseTag); FR.set(baseFR);
-    if (S.cs.infarct) applyInfarct();
-    buildCoronaries(S.cs);
-    stampCoronaries();
-    buildMotionGrid();
-    TOPO = null;
-    buildTrack(S.read.track);
-    S.read.cur = Math.round(TRACK.n * 0.15);
-    S.cp = TRACK.p[S.read.cur].slice();
-    planZ = VES.LM.pts[0][2];
+    const cs = CASES[idx];
+    if (cs.real && !(REAL && REAL.cta)) return loadRealCase(idx, 'case');
+    if (!cs.real && S.bg === 'real' && !(REAL && REAL.bg)) return loadRealCase(idx, 'bg');
+    S.caseIdx = idx; S.cs = cs; S.meto = 0; IMGV++;
+    REALBG = !cs.real && S.bg === 'real';
+    const realTechnique = () => {
+      S.range = [Math.max(-58, Math.ceil(REAL.meta.zRange[0]) + 1), Math.min(50, Math.floor(REAL.meta.zRange[1]) - 1)];
+      // the real scan's own technique is the reference for noise: 100 kV and a high tube current
+      S.kv = 100; S.mas = 500;
+      $$('#kvSeg button').forEach((x) => x.classList.toggle('on', x.dataset.v === '100'));
+      $('#masR').value = 500; $('#masO').textContent = '500 mAs';
+    };
+    if (cs.real) {
+      REAL.f = -1; realFill(0); TAG.set(REAL.tag); FR.fill(0);
+      VES = {}; VLIST = []; TRACK = null;
+      buildMotionGrid();
+      S.cp = REAL.meta.lm.slice(); planZ = REAL.meta.lm[2];
+      realTechnique();
+    } else {
+      if (REALBG) {
+        TAG.set(REAL.tag); FR.fill(0);
+        buildCoronaries(S.cs);
+        REAL.f = -1; realFill(0); // fills the volume and draws the arteries into it
+        realTechnique();
+      } else {
+        HU.set(baseHU); TAG.set(baseTag); FR.set(baseFR);
+        if (S.cs.infarct) applyInfarct();
+        buildCoronaries(S.cs);
+        stampCoronaries();
+        S.range = [-58, 50];
+      }
+      buildMotionGrid();
+      fillTrackSel();
+      buildTrack(S.read.track);
+      S.read.cur = Math.round(TRACK.n * 0.15);
+      S.cp = TRACK.p[S.read.cur].slice();
+      planZ = VES.LM.pts[0][2];
+    }
+    fillTrackSel();
+    MEAS.a = MEAS.b = null; QUIZ = null;
     invalidateScan();
     caseCard(); updatePlan();
-    $('#repFb').innerHTML = '';
+    $('#repFb').innerHTML = ''; $('#quizFb').innerHTML = '';
     setStep('plan');
+  }
+  async function loadRealCase(idx, need) {
+    const ld = $('#loading'), bar = $('#loadBar'), txt = $('#loadTxt');
+    ld.style.display = ''; ld.firstElementChild.textContent = (need === 'bg' ? 'Loading the real scan background' : 'Loading the real scan') + '…'; txt.textContent = 'about 9 MB, fetched once'; bar.style.width = '0%';
+    try { await loadReal(need, (f) => { bar.style.width = `${f * 100}%`; }); }
+    catch (e) { console.error('CT lab: real scan', e); ld.style.display = 'none'; alert('The real scan could not be loaded. Check the connection and try again.'); caseSel.value = S.caseIdx; return; }
+    ld.style.display = 'none';
+    loadCase(idx);
   }
   function rebuildCoronaries() {
     // GTN changes vessel calibre
     IMGV++;
+    if (isReal()) return;
+    if (REALBG) { TAG.set(REAL.tag); FR.fill(0); buildCoronaries(S.cs); REAL.f = -1; realFill(0); buildMotionGrid(); buildTrack(S.read.track); return; }
     HU.set(baseHU); TAG.set(baseTag); FR.set(baseFR);
     if (S.cs.infarct) applyInfarct();
     buildCoronaries(S.cs); stampCoronaries(); buildMotionGrid(); buildTrack(S.read.track);
@@ -3240,6 +3841,7 @@
   $('#scanSel').addEventListener('change', (e) => { S.scanner = e.target.value; invalidateScan(); updatePlan(); });
   function seg(id, fn) { $$(`#${id} button`).forEach((b) => b.addEventListener('click', () => { $$(`#${id} button`).forEach((x) => x.classList.toggle('on', x === b)); fn(b.dataset.v); })); }
   seg('kvSeg', (v) => { S.kv = +v; invalidateScan(); updatePlan(); });
+  seg('bgSeg', (v) => { if (S.bg === v) return; S.bg = v; loadCase(S.caseIdx); });
   seg('gateSeg', (v) => { S.gating = v; invalidateScan(); updatePlan(); });
   seg('vrSeg', (v) => { S.read.vr = v; vrQuick(30); });
   const LBL_SEGS = ['lblSegPlan', 'lblSegCac', 'lblSegBolus', 'lblSeg'];
@@ -3272,6 +3874,7 @@
     if (wrong) h += ` ${wrong} assigned to the wrong artery or to a non-coronary structure.`;
     h += '</div>';
     if (rt === 0) h += '<div class="note">CAC 0. In a symptomatic patient this does not rule out non-calcified plaque: the CTA still matters.</div>';
+    if (isReal()) h += `<div class="note">${esc(REAL.meta.cacInfo.vendorText)} The reference here is scored on the same series resampled to this grid, so it differs a little from the vendor’s number. Calcium on the aortic valve and in the aortic wall is not coronary: leave it out.</div>`;
     $('#cacFb').innerHTML = h;
     S.cacDone = true;
   });
@@ -3333,9 +3936,14 @@
     mark('mon', 'tac');
   }
   function completeScan(e) {
-    const sigma = noiseSigma(S.kv, S.mas);
+    let sigma = noiseSigma(S.kv, S.mas), extra = 0, f = 0;
     const dose = doseEst();
-    S.scan = { e, sigma, dose, cut: coverageProblem(), when: new Date() };
+    if (onReal()) {
+      // the real scan keeps its own noise; the user's technique can only add to it
+      extra = realExtraNoise(sigma); sigma = Math.sqrt(REAL.meta.enhancement.noise ** 2 + extra * extra); f = realEnhFrac(e);
+      realFill(f);
+    }
+    S.scan = { e, sigma, extra, f, dose, cut: coverageProblem(), when: new Date() };
     IMGV++;
     S.scanDone = true;
     // reconstruction phase limits
@@ -3378,8 +3986,11 @@
 
   // controls: read
   const trackSel = $('#trackSel');
-  Object.entries(TRACKS).forEach(([k, t]) => trackSel.add(new Option(t.name, k)));
-  trackSel.addEventListener('change', () => { S.read.track = trackSel.value; buildTrack(S.read.track); S.read.cur = Math.round(TRACK.n * 0.15); cursorToCP(); vrQuick(30); });
+  trackSel.addEventListener('change', () => {
+    S.read.track = trackSel.value;
+    if (isReal()) { mark('cpr', 'xs'); return; }
+    buildTrack(S.read.track); S.read.cur = Math.round(TRACK.n * 0.15); cursorToCP(); vrQuick(30);
+  });
   range('rotR', 'rotO', (v) => { S.read.alpha = v; interact('cpr', 'xs'); }, (v) => v + '°');
   $('#wlSel').addEventListener('change', (e) => { S.read.wl = e.target.value.split(',').map(Number); mark('ax', 'mpr', 'cpr', 'xs'); });
   $('#slabSel').addEventListener('change', (e) => { S.read.slab = +e.target.value; mark('ax', 'mpr'); });
@@ -3420,12 +4031,14 @@
     n++; if (modOK) { ok++; li.push(`<li class="good">✓ Modifiers: ${key.mods.join(', ') || 'none'}</li>`); } else li.push(`<li class="bad">✗ Modifiers: answer ${key.mods.join(', ') || 'none'}</li>`);
     const full = `CAD-RADS ${key.cr}${key.P ? '/' + key.P : ''}${key.mods.length ? '/' + key.mods.join('/') : ''}`;
     const lesions = (S.cs.lesions || []).map((L, i) => `<button class="btn" data-go="${i}" style="margin:3px 4px 0 0;padding:4px 8px">${VES[L.v].name} ${Math.round(L.sten * 100)}% · ${TYPNAME[TYP[L.type]].split(' (')[0]}</button>`).join('') + (S.cs.bridges || []).map((b, i) => `<button class="btn" data-gob="${i}" style="margin:3px 4px 0 0;padding:4px 8px">${VES[b.v].name} bridge</button>`).join('') + (S.cs.stents || []).map((s, i) => `<button class="btn" data-gos="${i}" style="margin:3px 4px 0 0;padding:4px 8px">${VES[s.v].name} stent</button>`).join('');
-    $('#repFb').innerHTML = `<div class="card"><div class="row" style="margin:0"><div class="score">${ok}/${n}</div><div class="small">Final report: <b class="mono">${full}</b></div></div><ul class="tight fb">${li.join('')}</ul>${lesions ? `<div class="small muted" style="margin-top:6px">Go to finding:</div>${lesions}` : ''}</div>` + S.cs.teach.map((t) => `<div class="note">${t}</div>`).join('');
+    const realKey = isReal() && REAL.meta.key ? `<div class="note gold"><b>Provisional key.</b> This reading was made from the images for teaching; the clinical report was not available. Findings used:<ul class="tight">${REAL.meta.key.lesions.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div>` : '';
+    $('#repFb').innerHTML = `<div class="card"><div class="row" style="margin:0"><div class="score">${ok}/${n}</div><div class="small">Final report: <b class="mono">${full}</b></div></div><ul class="tight fb">${li.join('')}</ul>${lesions ? `<div class="small muted" style="margin-top:6px">Go to finding:</div>${lesions}` : ''}</div>` + realKey + S.cs.teach.map((t) => `<div class="note">${t}</div>`).join('');
     $$('#repFb [data-go]').forEach((b) => b.addEventListener('click', () => { const L = S.cs.lesions[+b.dataset.go]; goTo(L.v, L.s); }));
     $$('#repFb [data-gob]').forEach((b) => b.addEventListener('click', () => { const B2 = S.cs.bridges[+b.dataset.gob], v = VES[B2.v]; goTo(B2.v, B2.at * v.len); }));
     $$('#repFb [data-gos]').forEach((b) => b.addEventListener('click', () => { const st = S.cs.stents[+b.dataset.gos], v = VES[st.v]; goTo(st.v, ((st.from + st.to) / 2) * v.len); }));
   }
   function goTo(vid, s) {
+    if (isReal()) return;
     const tk = Object.keys(TRACKS).find((k) => TRACKS[k].chain[TRACKS[k].chain.length - 1] === vid) || 'LAD';
     S.read.track = tk; trackSel.value = tk; buildTrack(tk);
     const k = TRACK.tv.findIndex((v, i) => v.id === vid && TRACK.ti[i] * 0.5 >= s);
@@ -3474,8 +4087,8 @@
       const get = (k) => new Promise((res, rej) => { const rq = db.transaction(VSTORE).objectStore(VSTORE).get(k); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); });
       if ((await get('key')) !== key) return false;
       const rec = await get('v');
-      if (!rec || rec.hu.length !== NV || rec.tag.length !== NV || rec.fr.length !== NV || rec.noise.length !== NV) return false;
-      baseHU.set(rec.hu); baseTag.set(rec.tag); baseFR.set(rec.fr); NOISE.set(rec.noise);
+      if (!rec || rec.hu.length !== NV || rec.tag.length !== NV || rec.fr.length !== NV || rec.noise.length !== NV || !rec.topo || rec.topo.length !== TOPO_FULL.length) return false;
+      baseHU.set(rec.hu); baseTag.set(rec.tag); baseFR.set(rec.fr); NOISE.set(rec.noise); TOPO_FULL.set(rec.topo);
       return true;
     } finally { db.close(); }
   }
@@ -3484,7 +4097,7 @@
     try {
       await new Promise((res, rej) => {
         const tx = db.transaction(VSTORE, 'readwrite');
-        tx.objectStore(VSTORE).put({ hu: baseHU, tag: baseTag, fr: baseFR, noise: NOISE }, 'v');
+        tx.objectStore(VSTORE).put({ hu: baseHU, tag: baseTag, fr: baseFR, noise: NOISE, topo: TOPO_FULL }, 'v');
         tx.objectStore(VSTORE).put(key, 'key');
         tx.oncomplete = res; tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
       });
@@ -3514,7 +4127,7 @@
     const q = new URLSearchParams(location.search).get('case');
     const idx = Math.max(0, CASES.findIndex((c) => c.id === q));
     caseSel.value = idx;
-    loadCase(idx);
+    await loadCase(idx);
     $('#loading').style.display = 'none';
   }
   boot();

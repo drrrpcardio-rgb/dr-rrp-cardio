@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CT Lab · Dr. RRP Cardio</title>
-<meta name="description" content="Cardiac CT and CT coronary angiography simulator: plan the scan, score calcium, time the contrast bolus, then read MPR, curved MPR and 3D images and write a CAD-RADS report.">
+<meta name="description" content="Cardiac CT and CT coronary angiography simulator with a real de-identified CTCA case: plan the scan, score calcium, time the contrast bolus, then read MPR, curved MPR and 3D images and write a CAD-RADS report.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -201,6 +201,7 @@ ul.tight li{margin:2px 0}
         <section class="panel on" data-panel="plan">
           <h2>Patient and scan plan</h2>
           <div class="row"><label for="caseSel">Case</label><select id="caseSel"></select></div>
+          <div class="row"><label>Background</label><div class="seg" id="bgSeg"><button data-v="real" class="on">Real scan</button><button data-v="syn">Synthetic</button></div></div>
           <div class="card" id="caseCard"></div>
 
           <h3>Heart rate control</h3>
@@ -301,6 +302,12 @@ ul.tight li{margin:2px 0}
           <div class="row"><label>Labels</label><div class="seg" id="lblSeg"><button data-v="1" class="on">Anatomy on</button><button data-v="0">Off</button></div></div>
           <div class="card"><dl class="kv" id="readKv"></dl></div>
           <div id="readNotes"></div>
+          <h3>Learn</h3>
+          <div class="card">
+            <div class="btns" style="margin:0 0 6px"><button class="btn" id="btnQuiz">Quiz me: name a structure</button><button class="btn" id="btnMeasure">Measure distance</button></div>
+            <div id="quizFb"></div>
+            <p class="small muted" style="margin:6px 0 0">The quiz hides the labels and asks you to click a structure on the axial image. Measure lets you drag a ruler on the axial image (aortic root 30–40 mm, LA under 40 mm AP, LV under 56 mm).</p>
+          </div>
           <details open><summary>How to read</summary>
             <ul>
               <li>Pick a vessel. The straightened CPR shows the whole artery; click it to move the cursor and see the cross-section.</li>
@@ -346,7 +353,7 @@ ul.tight li{margin:2px 0}
             </ul>
           </details>
           <div class="btns"><button class="btn" id="btnNewCase">Try another case</button></div>
-          <p class="disclaim">Simulated images from a synthetic heart model, for teaching only. Not real patient data and not for clinical decisions.</p>
+          <p class="disclaim">Cases 1–16 are simulated images from a synthetic heart model. The real-scan case is a de-identified coronary CT angiogram (pixel data only, no patient details) shown with the vendor's reformats; its answer key is a provisional teaching reading, not the clinical report. For teaching only, not for clinical decisions.</p>
         </section>
       </div>
     </aside>
